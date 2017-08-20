@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?page id="LOGIN" title="gestiflotte"?>
+
+<zk xmlns="http://www.zkoss.org/2005/zul"
+    xmlns:h="http://www.w3.org/1999/xhtml"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.zkoss.org/2005/zul http://www.zkoss.org/2005/zul/zul.xsd">
+	
+        <zscript>
+            <![CDATA[
+                Integer NbJoursAvantExpiration = (Integer) session.getAttribute("NbJoursAvantExpiration");
+                if( NbJoursAvantExpiration == null || NbJoursAvantExpiration < 0) {
+                    Executions.sendRedirect("/");
+                }
+                if(NbJoursAvantExpiration != 999999 && NbJoursAvantExpiration < 7) {
+                    Messagebox.show("Il vous reste seulement " + NbJoursAvantExpiration + " jour(s) avant l'expiration de votre clé, veuillez commander une nouvelle clé.", "Warning", Messagebox.OK, Messagebox.EXCLAMATION);
+                }
+            ]]>
+    </zscript>
+    
+<window id="loginWnd" title="gestiflotte" border="normal" height="300px" width="600px" mode="modal" position="center">
+    <caption image="/images/skin/cle.png" label="Veuillez vous identifiez!"/>
+    <h:form method="post" action="/gestiflotte/j_spring_security_check" id='loginForm'>
+    <grid style="width:50%;margin-top:80px;margin-left:25%">
+        <rows>
+            <row><label id="lusername"  value="Login:"/>
+                <textbox focus="true" id="j_username" name="j_username" constraint="no empty: Veillez indiquez votre login" width="95%" />
+            </row>
+            <row><label id="lpassword"  value="Password:"/>
+                <textbox name="j_password" id="j_password" type="password" constraint="no empty: Veuillez indiquez votre mot de passe" width="95%" />
+            </row>
+            <row>
+                <checkbox id="remember_me" name="_spring_security_remember_me" label="Rester connecté" />
+                <h:input type="submit" value="Submit" class="z-button" style="width:95%"/>
+            </row>            
+        </rows>
+    </grid>
+    <grid style="width:50%;margin-left:25%" visible="${param.login_error}">
+        <rows>
+            <row>
+                <label id="message" style="color:red;" value="Login et/ou mot de passe incorrect(s)" visible="${param.login_error}" />
+            </row>
+        </rows>
+    </grid>
+    </h:form>
+</window>    
+</zk>

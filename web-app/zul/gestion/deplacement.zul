@@ -1,0 +1,360 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?init class="org.zkoss.zkplus.databind.AnnotateDataBinderInit" arg0="./deplacementWin" ?>
+<?variable-resolver class="org.zkoss.zkplus.spring.DelegatingVariableResolver"?>
+
+
+<zk xmlns="http://www.zkoss.org/2005/zul"
+    xmlns:h="http://www.w3.org/1999/xhtml"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.zkoss.org/2005/zul http://www.zkoss.org/2005/zul/zul.xsd">
+
+    <window id="deplacementWin" height="100%" width="100%" style="margin:auto;" use="${deplacementWindow}">
+    <!-- <zscript src="/zs/deplacement.zs"/> -->
+        <borderlayout>
+            <north id="eastPanel" size="65px" open="false"  title="Recherche avancée" flex="true" splittable="true"  collapsible="true"  >
+                <hlayout spacing="10px" style="margin-top:9px;margin-left:10px">
+					
+                    <label value="Personnel :" />
+                    <combobox id="filterpersonnel" model="@{deplacementWin.personnels}" selectedItem="@{deplacementWin.filtre.personnel}" autocomplete="true" autodrop="true" mold="rounded" onSelect="deplacementWin.ofs=0;deplacementWin.filtrer()" onOK="deplacementWin.ofs=0;deplacementWin.filtrer()">
+                        <comboitem self="@{each=elementfiltrepersonnel}" label="@{elementfiltrepersonnel}"/>
+                    </combobox>
+					
+                    <label value="Voiture de service :" />
+                    <combobox id="filtervoitureService" model="@{deplacementWin.voitureServices}" selectedItem="@{deplacementWin.filtre.voitureService}" autocomplete="true" autodrop="true" mold="rounded" onSelect="deplacementWin.ofs=0;deplacementWin.filtrer()" onOK="deplacementWin.ofs=0;deplacementWin.filtrer()">
+                        <comboitem self="@{each=elementfiltrevoitureService}" label="@{elementfiltrevoitureService}"/>
+                    </combobox>
+										                    
+                </hlayout>
+            </north>
+            <west id="westPanel" title="Gestion de déplacements des personnels" size="40%" flex="true" splittable="true" collapsible="true" open="false">
+                <groupbox id="gbCrud" width="100%" height="100%">
+                    <grid fixedLayout="true">
+                        <rows>
+						
+                            <row>
+                                <label value="N° déplacement"/>
+								 
+                                <textbox id="fieldNumeroDeplacement" constraint="no empty: Veillez indiquez une valeur" value="@{deplacementWin.objet.numeroDeplacement, save-when='triggerBtn.onClick'}" onBindingSave='if(self.value == null)throw new WrongValueException(self, "Vous devriez indiquer une valeur");'/>
+                            </row>												
+						
+                            <row>
+                                <label value="Mission"/>
+								 
+                                <textbox id="fieldMission" constraint="no empty: Veillez indiquez une valeur" value="@{deplacementWin.objet.mission, save-when='triggerBtn.onClick'}" onBindingSave='if(self.value == null)throw new WrongValueException(self, "Vous devriez indiquer une valeur");'/>
+                            </row>												
+						
+                            <row>
+                                <label value="Date de départ"/>
+								 
+                                <datebox id="fieldDateDepart" format="dd/MM/yyyy" width="120px" value="@{deplacementWin.objet.dateDepart, save-when='triggerBtn.onClick'}" >
+                                    <attribute name="onChange">
+                                            <![CDATA[
+                                                fieldDateDepart.constraint = "";
+                                                fieldDateRetour.constraint = "";
+                                                if(fieldDateDepart.value != null && fieldDateRetour.value != null) {
+                                                    if (fieldDateDepart.value.getTime() >= fieldDateRetour.value.getTime()){
+                                                        fieldDateRetour.value = fieldDateDepart.value;
+                                                        fieldNombreDeJours.value = 0;
+                                                    } else {
+                                                        long dr = fieldDateRetour.value.getTime();
+                                                        long dd = fieldDateDepart.value.getTime();
+                                                        fieldNombreDeJours.value = (int) ((dr - dd)/(24*60*60*1000));
+                                                    }
+                                                }
+                                            ]]>
+                                    </attribute>
+                                </datebox>
+                            </row>												
+						
+                            <row>
+                                <label value="Date de retour"/>
+								 
+                                <datebox id="fieldDateRetour" format="dd/MM/yyyy" width="120px" value="@{deplacementWin.objet.dateRetour, save-when='triggerBtn.onClick'}" >
+                                    <attribute name="onChange">
+                                            <![CDATA[
+                                                fieldDateDepart.constraint = "";
+                                                fieldDateRetour.constraint = "";
+                                                if(fieldDateDepart.value != null && fieldDateRetour.value != null) {
+                                                    if (fieldDateDepart.value.getTime() >= fieldDateRetour.value.getTime()){
+                                                        fieldDateRetour.value = fieldDateDepart.value;
+                                                        fieldNombreDeJours.value = 0;
+                                                    } else {
+                                                        long dr = fieldDateRetour.value.getTime();
+                                                        long dd = fieldDateDepart.value.getTime();
+                                                        fieldNombreDeJours.value = (int) ((dr - dd)/(24*60*60*1000));
+                                                    }
+                                                }
+                                            ]]>
+                                    </attribute>
+                                </datebox>
+                            </row>												
+						
+                            <row>
+                                <label value="Nombre de jours"/>
+								 
+                                <intbox id="fieldNombreDeJours" constraint="no empty: Veillez indiquez une valeur" value="@{deplacementWin.objet.nombreDeJours, save-when='triggerBtn.onClick'}" onBindingSave='if(self.value == null)throw new WrongValueException(self, "Vous devriez indiquer une valeur");'/>
+                            </row>												
+						
+                            <row>
+                                <label value="Kilométrage de départ"/>
+								 
+                                <intbox id="fieldKilometrageDepart" constraint="no empty: Veillez indiquez une valeur" value="@{deplacementWin.objet.kilometrageDepart, save-when='triggerBtn.onClick'}" onBindingSave='if(self.value == null)throw new WrongValueException(self, "Vous devriez indiquer une valeur");'/>
+                            </row>												
+						
+                            <row>
+                                <label value="Kilométrage de retour"/>
+								 
+                                <intbox id="fieldKilometrageRetour" value="@{deplacementWin.objet.kilometrageRetour, save-when='triggerBtn.onClick'}" >
+                                    <attribute name="onChange">
+                                            <![CDATA[
+                                                fieldKilometrageDepart.constraint = "";
+                                                fieldKilometrageRetour.constraint = "";
+                                                if(fieldKilometrageDepart.value != null && fieldKilometrageRetour.value != null) {
+                                                    if (fieldKilometrageDepart.value >= fieldKilometrageRetour.value){
+                                                        fieldKilometrageRetour.value = fieldKilometrageDepart.value;
+                                                        fieldDistanceParcourue.value = 0;
+                                                    } else {
+                                                        int kr = fieldKilometrageRetour.value;
+                                                        int kd = fieldKilometrageDepart.value;
+                                                        fieldDistanceParcourue.value = (int) ((kr - kd));
+                                                    }
+                                                }
+                                            ]]>
+                                    </attribute>
+                                </intbox>
+                            </row>												
+						
+                            <row>
+                                <label value="Distance parcourue"/>
+								 
+                                <intbox id="fieldDistanceParcourue" value="@{deplacementWin.objet.distanceParcourue, save-when='triggerBtn.onClick'}" />
+                            </row>												
+						
+                            <row>
+                                <label value="Observations"/>
+								 
+                                <textbox id="fieldObservations" value="@{deplacementWin.objet.observations, save-when='triggerBtn.onClick'}" />
+                            </row>												
+						 
+						
+                            <row>
+                                <label value="Personnel" />
+                                <combobox id="copersonnels" model="@{deplacementWin.personnels}" selectedItem="@{deplacementWin.personnelSelected}">
+                                    <comboitem self="@{each=elementpersonnel}" label="@{elementpersonnel}"/>
+                                </combobox>
+                            </row>
+						
+                            <row>
+                                <label value="Voiture de service" />
+                                <combobox id="covoitureServices" model="@{deplacementWin.voitureServices}" selectedItem="@{deplacementWin.voitureServiceSelected}" onSelect="deplacementWin.changerDeVoiture()">
+                                    <comboitem self="@{each=elementvoitureService}" label="@{elementvoitureService}"/>
+                                </combobox>
+                            </row>
+						
+                        </rows>
+                    </grid>					
+					
+                    <separator />
+                    <button id="btnSave" onClick="Events.sendEvent(new Event(Events.ON_CLICK,triggerBtn));deplacementWin.add()" label="Sauveguarder" image="/images/skin/database_save.png"/>
+                    <button id="btnUpdate" onClick="Events.sendEvent(new Event(Events.ON_CLICK,triggerBtn));deplacementWin.update()" label="Modifier" image="/images/skin/database_edit.png" visible="false"/>
+                    <button id="btnDelete" onClick="Events.sendEvent(new Event(Events.ON_CLICK,triggerBtn));deplacementWin.delete()" label="Supprimer" image="/images/skin/database_delete.png" visible="false"/>
+                    <!-- <button id="btnNew" onClick="deplacementWin.newRecord()" label="Nouveau enregistrement" image="/images/skin/database_add.png"/> -->
+                    <button id="btnCancel" onClick="deplacementWin.cancel()" label="Annuler" image="/images/skin/cancel.png" visible="false"/>
+                    <button visible="false" id="triggerBtn" onBindingValidate=""/>
+                </groupbox>
+            </west>
+            <center border="none" flex="true">
+                <groupbox width="100%" height="100%">
+                    <listbox id="lstObjet" onSelect="deplacementWin.select()" model="@{deplacementWin.listeObjets}" selectedItem="@{deplacementWin.objetSelected}"  width="100%" height="100%" mold="paging" paginal="${paging}">
+                        <auxhead sclass="category-center">
+							
+                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <textbox id="filterNumeroDeplacement" value="@{deplacementWin.filtre.numeroDeplacement}" onChanging="deplacementWin.ofs; deplacementWin.filtre.numeroDeplacement=event.value; deplacementWin.filtrer(); self.focus(); self.setSelectionRange(self.value.length(), self.value.length())" width="100%"/>
+                            </auxheader>
+								
+                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <textbox id="filterMission" value="@{deplacementWin.filtre.mission}" onChanging="deplacementWin.ofs; deplacementWin.filtre.mission=event.value; deplacementWin.filtrer(); self.focus(); self.setSelectionRange(self.value.length(), self.value.length())" width="100%"/>
+                            </auxheader>
+								
+                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" onClick="if(gridFilter.visible) gridFilter.visible=false; else gridFilter.visible=true" />
+                                <datebox id="filterDateDepart" format="dd/MM/yyyy" value="@{deplacementWin.filtre.dateDepart}" onOK="deplacementWin.ofs=0; deplacementWin.filtrer(); self.focus();" width="90%"/>
+<!--                                <grid id="gridFilter" span="true" sizedByContent="true" visible="false">
+                                    <rows>
+                                        <row>
+                                            <datebox id="filterDateDepart_begin" format="dd/MM/yyyy" value="@{deplacementWin.filtre.dateDepart_begin}" onChanging="deplacementWin.ofs=0; deplacementWin.filtre.dateDepart_begin=event.value; deplacementWin.filtrer(); self.focus();" />
+                                        </row>
+                                        <row>
+                                            <datebox id="filterDateDepart_end" format="dd/MM/yyyy" value="@{deplacementWin.filtre.dateDepart_end}" onChange="deplacementWin.ofs=0; deplacementWin.filtre.dateDepart_end=event.value; deplacementWin.filtrer(); self.focus();"/>
+                                        </row>
+                                    </rows>
+                                </grid>-->
+                            </auxheader>
+								
+                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <datebox id="filterDateRetour" format="dd/MM/yyyy" value="@{deplacementWin.filtre.dateRetour}" onOK="deplacementWin.ofs=0; deplacementWin.filtrer(); self.focus();" width="90%"/>
+                            </auxheader>
+								
+                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <intbox id="filterNombreDeJours" value="@{deplacementWin.filtre.nombreDeJours}" width="100%">
+                                    <attribute name="onChanging">
+										<![CDATA[
+											deplacementWin.ofs=0;
+											if(event.value.equals("")) {
+												if(deplacementWin.filtre.nombreDeJours != null) {
+													deplacementWin.filtre.nombreDeJours = null;
+												}
+											} else {
+												deplacementWin.filtre.nombreDeJours=new Integer(event.value);
+											}
+											deplacementWin.filtrer();
+											self.focus();
+											if(!event.value.equals("")) {
+												self.setSelectionRange(self.value.toString().length(), self.value.toString().length());
+											}
+										]]>
+                                    </attribute>    
+                                </intbox>
+                            </auxheader>
+								
+<!--                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <intbox id="filterKilometrageDepart" value="@{deplacementWin.filtre.kilometrageDepart}" width="100%">
+                                    <attribute name="onChanging">
+										<![CDATA[
+											deplacementWin.ofs=0;
+											if(event.value.equals("")) {
+												if(deplacementWin.filtre.kilometrageDepart != null) {
+													deplacementWin.filtre.kilometrageDepart = null;
+												}
+											} else {
+												deplacementWin.filtre.kilometrageDepart=new Integer(event.value);
+											}
+											deplacementWin.filtrer();
+											self.focus();
+											if(!event.value.equals("")) {
+												self.setSelectionRange(self.value.toString().length(), self.value.toString().length());
+											}
+										]]>
+                                    </attribute>    
+                                </intbox>
+                            </auxheader>
+								
+                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <intbox id="filterKilometrageRetour" value="@{deplacementWin.filtre.kilometrageRetour}" width="100%">
+                                    <attribute name="onChanging">
+										<![CDATA[
+											deplacementWin.ofs=0;
+											if(event.value.equals("")) {
+												if(deplacementWin.filtre.kilometrageRetour != null) {
+													deplacementWin.filtre.kilometrageRetour = null;
+												}
+											} else {
+												deplacementWin.filtre.kilometrageRetour=new Integer(event.value);
+											}
+											deplacementWin.filtrer();
+											self.focus();
+											if(!event.value.equals("")) {
+												self.setSelectionRange(self.value.toString().length(), self.value.toString().length());
+											}
+										]]>
+                                    </attribute>    
+                                </intbox>
+                            </auxheader>-->
+								
+                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <intbox id="filterDistanceParcourue" value="@{deplacementWin.filtre.distanceParcourue}" width="100%">
+                                    <attribute name="onChanging">
+										<![CDATA[
+											deplacementWin.ofs=0;
+											if(event.value.equals("")) {
+												if(deplacementWin.filtre.distanceParcourue != null) {
+													deplacementWin.filtre.distanceParcourue = null;
+												}
+											} else {
+												deplacementWin.filtre.distanceParcourue=new Integer(event.value);
+											}
+											deplacementWin.filtrer();
+											self.focus();
+											if(!event.value.equals("")) {
+												self.setSelectionRange(self.value.toString().length(), self.value.toString().length());
+											}
+										]]>
+                                    </attribute>    
+                                </intbox>
+                            </auxheader>
+								
+                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <textbox id="filterObservations" value="@{deplacementWin.filtre.observations}" onChanging="deplacementWin.ofs; deplacementWin.filtre.observations=event.value; deplacementWin.filtrer(); self.focus(); self.setSelectionRange(self.value.length(), self.value.length())" width="100%"/>
+                            </auxheader>
+								 
+                        </auxhead>
+                        <listhead sizable="true">
+							
+                            <listheader id="hnumeroDeplacement" label="N° déplacement" sort="auto(numeroDeplacement)" onSort="deplacementWin.sort(event)"/>	
+							
+                            <listheader id="hmission" label="Mission" sort="auto(mission)" onSort="deplacementWin.sort(event)" width="300px"/>	
+							
+                            <listheader id="hdateDepart" label="Date de départ" sort="auto(dateDepart)" onSort="deplacementWin.sort(event)"/>	
+							
+                            <listheader id="hdateRetour" label="Date de retour" sort="auto(dateRetour)" onSort="deplacementWin.sort(event)"/>	
+							
+                            <listheader id="hnombreDeJours" label="Nombre de jours" sort="auto(nombreDeJours)" onSort="deplacementWin.sort(event)"/>	
+							
+<!--                            <listheader label="Kilométrage de départ" sort="auto(kilometrageDepart)" onSort="deplacementWin.sort(event)"/>	
+							
+                            <listheader label="Kilométrage de retour" sort="auto(kilometrageRetour)" onSort="deplacementWin.sort(event)"/>	-->
+							
+                            <listheader id="hdistanceParcourue" label="Distance parcourue" sort="auto(distanceParcourue)" onSort="deplacementWin.sort(event)"/>	
+							
+                            <listheader id="hobservations" label="Observations" sort="auto(observations)" onSort="deplacementWin.sort(event)"/>	
+							                                 
+                        </listhead>
+                        <listitem self="@{each=element}">                         
+                            
+                            <listcell label="@{element.numeroDeplacement}"/>
+							
+                            <listcell>
+<!--                                label="@{element.mission, converter=com.choranet.zk.TextConverter}">-->
+                                <textbox value="@{element.mission}" inplace="true" readonly="true" width="99%"/>
+                            </listcell>
+							
+                            <listcell>
+                                <datebox value="@{element.dateDepart}" inplace="true" readonly="true" width="99%"/>
+                            </listcell>
+							
+                            <listcell>
+                                <datebox value="@{element.dateRetour}" inplace="true" readonly="true" width="99%"/>
+                            </listcell>
+							
+                            <listcell label="@{element.nombreDeJours}"/>
+							
+<!--                            <listcell label="@{element.kilometrageDepart}"/>
+							
+                            <listcell label="@{element.kilometrageRetour}"/>-->
+							
+                            <listcell label="@{element.distanceParcourue}"/>
+							
+                            <listcell>
+                                <textbox value="@{element.observations}" inplace="true" readonly="true" width="99%"/>
+                            </listcell>
+							     
+                        </listitem>
+                    </listbox>
+                    <paging id="paging" totalSize="@{deplacementWin.tailleListe}" pageSize="@{deplacementWin.maxNb}" onPaging="deplacementWin.getNextElements(event);" />
+                    <separator/>
+                    <button id="btnNew" onClick="deplacementWin.newRecord()" label="Nouveau" image="/images/skin/database_add.png"/>
+                    <button id="btnPdf" onClick="deplacementWin.genererRapportPdf()" label="Generer rapport" image="/images/skin/pdf-soubor-logo.png"/>
+                    <button id="btnExcel" onClick="deplacementWin.genererRapportExcel()" label="Generer excel" image="/images/skin/excel-icon.png"/>
+                </groupbox>
+            </center>
+        </borderlayout>
+    </window>
+</zk>

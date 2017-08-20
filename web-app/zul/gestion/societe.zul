@@ -1,0 +1,275 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?init class="org.zkoss.zkplus.databind.AnnotateDataBinderInit" arg0="./societeWin" ?>
+<?variable-resolver class="org.zkoss.zkplus.spring.DelegatingVariableResolver"?>
+
+
+<zk xmlns="http://www.zkoss.org/2005/zul"
+    xmlns:h="http://www.w3.org/1999/xhtml"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.zkoss.org/2005/zul http://www.zkoss.org/2005/zul/zul.xsd">
+
+    <window id="societeWin" height="100%" width="100%" style="margin:auto;" use="${societeWindow}">
+    <!-- <zscript src="/zs/societe.zs"/> -->
+        <borderlayout>
+            <west id="westPanel" title="Gestion des sociétés du group et des partenaires" size="40%" flex="true" splittable="true" collapsible="true" open="false">
+                <groupbox id="gbCrud" width="100%" height="100%">
+                    <grid fixedLayout="true">
+                        <rows>
+						
+                            <row>
+                                <label value="Code"/>
+								 
+                                <textbox id="fieldCode" constraint="no empty: Veillez indiquez une valeur" value="@{societeWin.objet.code, save-when='triggerBtn.onClick'}" onBindingSave='if(self.value == null)throw new WrongValueException(self, "Vous devriez indiquer une valeur");'/>
+                            </row>
+                            
+                            <row>
+                                <label value="Raison social"/>
+								 
+                                <textbox id="fieldRaisonSociale" constraint="no empty: Veillez indiquez une valeur" value="@{societeWin.objet.raisonSociale, save-when='triggerBtn.onClick'}" onBindingSave='if(self.value == null)throw new WrongValueException(self, "Vous devriez indiquer une valeur");'/>
+                            </row>												
+						
+                            <row>
+                                <label value="Société groupe"/>
+								 
+                                <checkbox id="fieldSocieteDuGroup" label="?" checked="@{societeWin.objet.societeDuGroup, save-when='triggerBtn.onClick'}"/>
+                            </row>												
+						
+                            <row>
+                                <label value="Identifiant fiscal"/>
+								 
+                                <textbox id="fieldIdFiscal" value="@{societeWin.objet.idFiscal, save-when='triggerBtn.onClick'}" />
+                            </row>												
+						
+                            <row>
+                                <label value="Patente"/>
+								 
+                                <textbox id="fieldPatente" value="@{societeWin.objet.patente, save-when='triggerBtn.onClick'}" />
+                            </row>												
+						
+                            <row>
+                                <label value="Registre du commerce"/>
+								 
+                                <textbox id="fieldRc" value="@{societeWin.objet.rc, save-when='triggerBtn.onClick'}" />
+                            </row>												
+						
+                            <row>
+                                <label value="CNSS"/>
+								 
+                                <textbox id="fieldCnss" value="@{societeWin.objet.cnss, save-when='triggerBtn.onClick'}" />
+                            </row>												
+						
+                            <row>
+                                <label value="Adresse"/>
+								 
+                                <textbox id="fieldAdresse" value="@{societeWin.objet.adresse, save-when='triggerBtn.onClick'}" />
+                            </row>												
+						
+                            <row>
+                                <label value="Ville"/>
+								 
+                                <textbox id="fieldVille" value="@{societeWin.objet.ville, save-when='triggerBtn.onClick'}" />
+                            </row>												
+						
+                            <row>
+                                <label value="Téléphone"/>
+								 
+                                <textbox id="fieldTel" constraint="no empty: Veillez indiquez une valeur" value="@{societeWin.objet.tel, save-when='triggerBtn.onClick'}" onBindingSave='if(self.value == null)throw new WrongValueException(self, "Vous devriez indiquer une valeur");'/>
+                            </row>												
+						
+                            <row>
+                                <label value="Fax"/>
+								 
+                                <textbox id="fieldFax" value="@{societeWin.objet.fax, save-when='triggerBtn.onClick'}" />
+                            </row>												
+						
+                            <row>
+                                <label value="Email"/>
+								 
+                                <textbox id="fieldEmail" value="@{societeWin.objet.email, save-when='triggerBtn.onClick'}" />
+                            </row>												
+						
+                            <row>
+                                <label value="Site web"/>
+								 
+                                <textbox id="fieldSiteWeb" value="@{societeWin.objet.siteWeb, save-when='triggerBtn.onClick'}" />
+                            </row>												
+                        </rows>
+                    </grid>					
+					
+                    <separator />
+                    <button id="btnSave" onClick="Events.sendEvent(new Event(Events.ON_CLICK,triggerBtn));societeWin.add()" label="Sauveguarder" image="/images/skin/database_save.png"/>
+                    <button id="btnUpdate" onClick="Events.sendEvent(new Event(Events.ON_CLICK,triggerBtn));societeWin.update()" label="Modifier" image="/images/skin/database_edit.png" visible="false"/>
+                    <button id="btnDelete" onClick="Events.sendEvent(new Event(Events.ON_CLICK,triggerBtn));societeWin.delete()" label="Supprimer" image="/images/skin/database_delete.png" visible="false"/>
+                    <!-- <button id="btnNew" onClick="societeWin.newRecord()" label="Nouveau enregistrement" image="/images/skin/database_add.png"/> -->
+                    <button id="btnCancel" onClick="societeWin.cancel()" label="Annuler" image="/images/skin/cancel.png" visible="false"/>
+                    <button visible="false" id="triggerBtn" onBindingValidate=""/>
+                </groupbox>
+            </west>
+            <center border="none" flex="true">
+                <groupbox width="100%" height="100%">
+                    <listbox id="lstObjet" onSelect="societeWin.select()" model="@{societeWin.listeObjets}" selectedItem="@{societeWin.objetSelected}"  width="100%" height="100%" mold="paging" paginal="${paging}">
+                        <auxhead sclass="category-center">
+							
+                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <textbox id="filterCode" value="@{societeWin.filtre.code}" onChanging="societeWin.ofs; societeWin.filtre.code=event.value; societeWin.filtrer(); self.focus(); self.setSelectionRange(self.value.length(), self.value.length())" width="100%"/>
+                            </auxheader>
+                            
+                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <textbox id="filterRaisonSociale" value="@{societeWin.filtre.raisonSociale}" onChanging="societeWin.ofs; societeWin.filtre.raisonSociale=event.value; societeWin.filtrer(); self.focus(); self.setSelectionRange(self.value.length(), self.value.length())" width="100%"/>
+                            </auxheader>
+								
+                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <checkbox id="filterSocieteDuGroup" onCheck="societeWin.ofs=0;societeWin.filtre.societeDuGroup=self.checked; societeWin.filtrer()" />
+                            </auxheader>
+								
+                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <textbox id="filterIdFiscal" value="@{societeWin.filtre.idFiscal}" onChanging="societeWin.ofs; societeWin.filtre.idFiscal=event.value; societeWin.filtrer(); self.focus(); self.setSelectionRange(self.value.length(), self.value.length())" width="100%"/>
+                            </auxheader>
+								
+                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <textbox id="filterPatente" value="@{societeWin.filtre.patente}" onChanging="societeWin.ofs; societeWin.filtre.patente=event.value; societeWin.filtrer(); self.focus(); self.setSelectionRange(self.value.length(), self.value.length())" width="100%"/>
+                            </auxheader>
+								
+                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <textbox id="filterRc" value="@{societeWin.filtre.rc}" onChanging="societeWin.ofs; societeWin.filtre.rc=event.value; societeWin.filtrer(); self.focus(); self.setSelectionRange(self.value.length(), self.value.length())" width="100%"/>
+                            </auxheader>
+								
+                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <textbox id="filterCnss" value="@{societeWin.filtre.cnss}" onChanging="societeWin.ofs; societeWin.filtre.cnss=event.value; societeWin.filtrer(); self.focus(); self.setSelectionRange(self.value.length(), self.value.length())" width="100%"/>
+                            </auxheader>
+								
+                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <textbox id="filterAdresse" value="@{societeWin.filtre.adresse}" onChanging="societeWin.ofs; societeWin.filtre.adresse=event.value; societeWin.filtrer(); self.focus(); self.setSelectionRange(self.value.length(), self.value.length())" width="100%"/>
+                            </auxheader>
+								
+                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <textbox id="filterVille" value="@{societeWin.filtre.ville}" onChanging="societeWin.ofs; societeWin.filtre.ville=event.value; societeWin.filtrer(); self.focus(); self.setSelectionRange(self.value.length(), self.value.length())" width="100%"/>
+                            </auxheader>
+								
+                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <textbox id="filterTel" value="@{societeWin.filtre.tel}" onChanging="societeWin.ofs; societeWin.filtre.tel=event.value; societeWin.filtrer(); self.focus(); self.setSelectionRange(self.value.length(), self.value.length())" width="100%"/>
+                            </auxheader>
+								
+                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <textbox id="filterFax" value="@{societeWin.filtre.fax}" onChanging="societeWin.ofs; societeWin.filtre.fax=event.value; societeWin.filtrer(); self.focus(); self.setSelectionRange(self.value.length(), self.value.length())" width="100%"/>
+                            </auxheader>
+								
+                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <textbox id="filterEmail" value="@{societeWin.filtre.email}" onChanging="societeWin.ofs; societeWin.filtre.email=event.value; societeWin.filtrer(); self.focus(); self.setSelectionRange(self.value.length(), self.value.length())" width="100%"/>
+                            </auxheader>
+								
+                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <textbox id="filterSiteWeb" value="@{societeWin.filtre.siteWeb}" onChanging="societeWin.ofs; societeWin.filtre.siteWeb=event.value; societeWin.filtrer(); self.focus(); self.setSelectionRange(self.value.length(), self.value.length())" width="100%"/>
+                            </auxheader>
+								
+                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <textbox id="filterPhotoLogo" value="@{societeWin.filtre.photoLogo}" onChanging="societeWin.ofs; societeWin.filtre.photoLogo=event.value; societeWin.filtrer(); self.focus(); self.setSelectionRange(self.value.length(), self.value.length())" width="100%"/>
+                            </auxheader>
+								 
+                        </auxhead>
+                        <listhead sizable="true">
+							
+                            <listheader id="hcode" label="Code" sort="auto(code)" onSort="societeWin.sort(event)"/>
+                            
+                            <listheader id="hraisonSociale" label="Raison social" sort="auto(raisonSociale)" onSort="societeWin.sort(event)"/>	
+							
+                            <listheader id="hsocieteDuGroup" label="Société groupe" sort="auto(societeDuGroup)" onSort="societeWin.sort(event)"/>	
+							
+                            <listheader id="hidFiscal" label="Id. fiscal" sort="auto(idFiscal)" onSort="societeWin.sort(event)"/>	
+							
+                            <listheader id="hpatente" label="Patente" sort="auto(patente)" onSort="societeWin.sort(event)"/>	
+							
+                            <listheader id="hrc" label="RC" sort="auto(rc)" onSort="societeWin.sort(event)"/>	
+							
+                            <listheader id="hcnss" label="CNSS" sort="auto(cnss)" onSort="societeWin.sort(event)"/>	
+							
+                            <listheader id="hadresse" label="Adresse" sort="auto(adresse)" onSort="societeWin.sort(event)" width="150px"/>	
+							
+                            <listheader id="hville" label="Ville" sort="auto(ville)" onSort="societeWin.sort(event)"/>	
+							
+                            <listheader id="htel" label="Téléphone" sort="auto(tel)" onSort="societeWin.sort(event)"/>	
+							
+                            <listheader id="hfax" label="Fax" sort="auto(fax)" onSort="societeWin.sort(event)"/>	
+							
+                            <listheader id="hemail" label="Email" sort="auto(email)" onSort="societeWin.sort(event)"/>	
+							
+                            <listheader id="hsiteWeb" label="Site Web" sort="auto(siteWeb)" onSort="societeWin.sort(event)"/>	
+
+                        </listhead>
+                        <listitem self="@{each=element}">                         
+                            
+                            <listcell label="@{element.code}"/>
+                            
+                            <listcell>
+                                <textbox value="@{element.raisonSociale}" inplace="true" readonly="true" width="99%"/>
+                            </listcell>
+				
+                            <listcell label="@{element.societeDuGroup, converter=com.choranet.zk.TrueFalseConverter}"/>    
+                            		
+                            <listcell>
+                                <textbox value="@{element.idFiscal}" inplace="true" readonly="true" width="99%"/>
+                            </listcell>
+							
+                            <listcell>
+                                <textbox value="@{element.patente}" inplace="true" readonly="true" width="99%"/>
+                            </listcell>
+							
+                            <listcell>
+                                <textbox value="@{element.rc}" inplace="true" readonly="true" width="99%"/>
+                            </listcell>
+							
+                            <listcell>
+                                <textbox value="@{element.cnss}" inplace="true" readonly="true" width="99%"/>
+                            </listcell>
+							
+                            <listcell>
+                                <textbox value="@{element.adresse}" inplace="true" readonly="true" width="99%"/>
+                            </listcell>
+							
+                            <listcell>
+                                <textbox value="@{element.ville}" inplace="true" readonly="true" width="99%"/>
+                            </listcell>
+							
+                            <listcell>
+                                <textbox value="@{element.tel}" inplace="true" readonly="true" width="99%"/>
+                            </listcell>
+							
+                            <listcell>
+                                <textbox value="@{element.fax}" inplace="true" readonly="true" width="99%"/>
+                            </listcell>
+							
+                            <listcell>
+                                <textbox value="@{element.email}" inplace="true" readonly="true" width="99%"/>
+                            </listcell>
+							
+                            <listcell>
+                                <textbox value="@{element.siteWeb}" inplace="true" readonly="true" width="99%"/>
+                            </listcell>
+							
+                        </listitem>
+                    </listbox>
+                    <paging id="paging" totalSize="@{societeWin.tailleListe}" pageSize="@{societeWin.maxNb}" onPaging="societeWin.getNextElements(event);" />
+                    <separator/>
+                    <button id="btnNew" onClick="societeWin.newRecord()" label="Nouveau" image="/images/skin/database_add.png"/>
+                    <button id="btnPdf" onClick="societeWin.genererRapportPdf()" label="Generer rapport" image="/images/skin/pdf-soubor-logo.png"/>
+                    <button id="btnExcel" onClick="societeWin.genererRapportExcel()" label="Generer excel" image="/images/skin/excel-icon.png"/>
+                    <fileupload id="btnImport" label="Import en masse" onUpload="societeWin.importation(event.getMedia())" image="/images/skin/BriefcaseOpen-16x16.png"/>
+                </groupbox>
+            </center>
+        </borderlayout>
+    </window>
+</zk>

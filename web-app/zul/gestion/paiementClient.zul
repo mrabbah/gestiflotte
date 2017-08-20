@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?init class="org.zkoss.zkplus.databind.AnnotateDataBinderInit" arg0="./paiementClientWin" ?>
+<?variable-resolver class="org.zkoss.zkplus.spring.DelegatingVariableResolver"?>
+
+
+<zk xmlns="http://www.zkoss.org/2005/zul"
+    xmlns:h="http://www.w3.org/1999/xhtml"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.zkoss.org/2005/zul http://www.zkoss.org/2005/zul/zul.xsd">
+
+    <window id="paiementClientWin" height="100%" width="100%" style="margin:auto;" use="${paiementClientWindow}">
+    <!-- <zscript src="/zs/paiementClient.zs"/> -->
+        <borderlayout>
+            <north id="eastPanel" size="65px" open="false"  title="Recherche avancée" flex="true" splittable="true"  collapsible="true"  >
+                <hlayout spacing="10px" style="margin-top:9px;margin-left:10px">
+					
+                    <label value="Facturation :" />
+                    <combobox id="filterfacturation" model="@{paiementClientWin.facturations}" selectedItem="@{paiementClientWin.filtre.facturation}" autocomplete="true" autodrop="true" mold="rounded" onSelect="paiementClientWin.ofs=0;paiementClientWin.filtrer()" onOK="paiementClientWin.ofs=0;paiementClientWin.filtrer()">
+                        <comboitem self="@{each=elementfiltrefacturation}" label="@{elementfiltrefacturation}"/>
+                    </combobox>
+										                    
+                </hlayout>
+            </north>
+            <west id="westPanel" title="Gestion de paiement de factures clients" size="40%" flex="true" splittable="true" collapsible="true" open="false">
+                <groupbox id="gbCrud" width="100%" height="100%">
+                    <grid fixedLayout="true">
+                        <rows>
+						
+                            <row>
+                                <label value="Numéro transaction"/>
+								 
+                                <textbox id="fieldNumTransaction" constraint="no empty: Veillez indiquez une valeur" value="@{paiementClientWin.objet.numTransaction, save-when='triggerBtn.onClick'}" onBindingSave='if(self.value == null)throw new WrongValueException(self, "Vous devriez indiquer une valeur");'/>
+                            </row>												
+						
+                            <row>
+                                <label value="Date"/>
+								 
+                                <datebox id="fieldDate" constraint="no empty: Veillez indiquez une valeur" format="dd/MM/yyyy HH:mm" width="120px" value="@{paiementClientWin.objet.date, save-when='triggerBtn.onClick'}" onBindingSave='if(self.value == null)throw new WrongValueException(self, "Vous devriez indiquer une valeur");'/>
+                            </row>												
+						
+                            <row>
+                                <label value="Mode paiement"/>
+								 
+                                <textbox id="fieldModePaiement" constraint="no empty: Veillez indiquez une valeur" value="@{paiementClientWin.objet.modePaiement, save-when='triggerBtn.onClick'}" onBindingSave='if(self.value == null)throw new WrongValueException(self, "Vous devriez indiquer une valeur");'/>
+                            </row>												
+						
+                            <row>
+                                <label value="Montant payé"/>
+								 
+                                <doublebox id="fieldMontantPaye" constraint="no empty: Veillez indiquez une valeur" value="@{paiementClientWin.objet.montantPaye, save-when='triggerBtn.onClick'}" onBindingSave='if(self.value == null)throw new WrongValueException(self, "Vous devriez indiquer une valeur");'/>
+                            </row>												
+						 
+						
+                            <row>
+                                <label value="Facturation" />
+                                <combobox id="cofacturations" model="@{paiementClientWin.facturations}" selectedItem="@{paiementClientWin.facturationSelected}">
+                                    <comboitem self="@{each=elementfacturation}" label="@{elementfacturation}"/>
+                                </combobox>
+                            </row>
+						
+                        </rows>
+                    </grid>					
+					
+                    <separator />
+                    <button id="btnSave" onClick="Events.sendEvent(new Event(Events.ON_CLICK,triggerBtn));paiementClientWin.add()" label="Sauveguarder" image="/images/skin/database_save.png"/>
+                    <button id="btnUpdate" onClick="Events.sendEvent(new Event(Events.ON_CLICK,triggerBtn));paiementClientWin.update()" label="Modifier" image="/images/skin/database_edit.png" visible="false"/>
+                    <button id="btnDelete" onClick="Events.sendEvent(new Event(Events.ON_CLICK,triggerBtn));paiementClientWin.delete()" label="Supprimer" image="/images/skin/database_delete.png" visible="false"/>
+                    <!-- <button id="btnNew" onClick="paiementClientWin.newRecord()" label="Nouveau enregistrement" image="/images/skin/database_add.png"/> -->
+                    <button id="btnCancel" onClick="paiementClientWin.cancel()" label="Annuler" image="/images/skin/cancel.png" visible="false"/>
+                    <button visible="false" id="triggerBtn" onBindingValidate=""/>
+                </groupbox>
+            </west>
+            <center border="none" flex="true">
+                <groupbox width="100%" height="100%">
+                    <listbox id="lstObjet" onSelect="paiementClientWin.select()" model="@{paiementClientWin.listeObjets}" selectedItem="@{paiementClientWin.objetSelected}"  width="100%" height="100%" mold="paging" paginal="${paging}">
+                        <auxhead sclass="category-center">
+							
+                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <textbox id="filterNumTransaction" value="@{paiementClientWin.filtre.numTransaction}" onChanging="paiementClientWin.ofs; paiementClientWin.filtre.numTransaction=event.value; paiementClientWin.filtrer(); self.focus(); self.setSelectionRange(self.value.length(), self.value.length())" width="100%"/>
+                            </auxheader>
+								
+                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <datebox id="filterDate" format="dd/MM/yyyy" value="@{paiementClientWin.filtre.date}" onOK="paiementClientWin.ofs=0; paiementClientWin.filtrer(); self.focus();" width="90%"/>
+                            </auxheader>
+								
+                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <textbox id="filterModePaiement" value="@{paiementClientWin.filtre.modePaiement}" onChanging="paiementClientWin.ofs; paiementClientWin.filtre.modePaiement=event.value; paiementClientWin.filtrer(); self.focus(); self.setSelectionRange(self.value.length(), self.value.length())" width="100%"/>
+                            </auxheader>
+								
+                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <doublebox id="filterMontantPaye" value="@{paiementClientWin.filtre.montantPaye}" width="100%">
+                                    <attribute name="onChanging">
+										<![CDATA[
+											paiementClientWin.ofs=0;
+											if(event.value.equals("")) {
+												if(paiementClientWin.filtre.montantPaye != null) {
+													paiementClientWin.filtre.montantPaye = null;
+												}
+											} else {
+												paiementClientWin.filtre.montantPaye=new Double(event.value);
+											}
+											paiementClientWin.filtrer();
+											self.focus();
+											if(!event.value.equals("")) {
+												self.setSelectionRange(self.value.toString().length(), self.value.toString().length());
+											}
+										]]>
+                                    </attribute>    
+                                </doublebox>
+                            </auxheader>
+								 
+                        </auxhead>
+                        <listhead sizable="true">
+							
+                            <listheader id="hnumTransaction" label="Numéro transaction" sort="auto(numTransaction)" onSort="paiementClientWin.sort(event)"/>	
+							
+                            <listheader id="hdate" label="Date" sort="auto(date)" onSort="paiementClientWin.sort(event)"/>	
+							
+                            <listheader id="hmodePaiement" label="Mode paiement" sort="auto(modePaiement)" onSort="paiementClientWin.sort(event)"/>	
+							
+                            <listheader id="hmontantPaye" label="Montant payé" sort="auto(montantPaye)" onSort="paiementClientWin.sort(event)"/>	
+							                                 
+                        </listhead>
+                        <listitem self="@{each=element}">                         
+                            
+                            <listcell label="@{element.numTransaction}"/>
+							
+                            <listcell label="@{element.date}"/>
+							
+                            <listcell label="@{element.modePaiement}"/>
+							
+                            <listcell label="@{element.montantPaye}"/>
+							     
+                        </listitem>
+                    </listbox>
+                    <paging id="paging" totalSize="@{paiementClientWin.tailleListe}" pageSize="@{paiementClientWin.maxNb}" onPaging="paiementClientWin.getNextElements(event);" />
+                    <separator/>
+                    <button id="btnNew" onClick="paiementClientWin.newRecord()" label="Nouveau" image="/images/skin/database_add.png"/>
+                    <button id="btnPdf" onClick="paiementClientWin.genererRapportPdf()" label="Generer rapport" image="/images/skin/pdf-soubor-logo.png"/>
+                    <button id="btnExcel" onClick="paiementClientWin.genererRapportExcel()" label="Generer excel" image="/images/skin/excel-icon.png"/>
+                </groupbox>
+            </center>
+        </borderlayout>
+    </window>
+</zk>

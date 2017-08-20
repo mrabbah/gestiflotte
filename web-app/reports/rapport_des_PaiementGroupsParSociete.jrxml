@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Rapport_des_locations" language="groovy" pageWidth="1161" pageHeight="595" orientation="Landscape" columnWidth="1121" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20">
+	<property name="ireport.zoom" value="1.464100000000006"/>
+	<property name="ireport.x" value="936"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="nomsociete" class="java.lang.String"/>
+	<parameter name="titrerapport" class="java.lang.String"/>
+	<parameter name="datedebut" class="java.util.Date"/>
+	<parameter name="datefin" class="java.util.Date"/>
+	<field name="numCheque" class="java.lang.String"/>
+	<field name="date" class="java.util.Date"/>
+	<field name="montantCheque" class="java.lang.Double"/>
+	<field name="societeGroup.raisonSociale" class="java.lang.String"/>
+	<variable name="montantparsociete" class="java.lang.Double" resetType="Group" resetGroup="societe" calculation="Sum">
+		<variableExpression><![CDATA[$F{montantCheque}]]></variableExpression>
+	</variable>
+	<variable name="montanttotal" class="java.lang.Double" calculation="Sum">
+		<variableExpression><![CDATA[$F{montantCheque}]]></variableExpression>
+	</variable>
+	<group name="societe">
+		<groupExpression><![CDATA[$F{societeGroup.raisonSociale}]]></groupExpression>
+		<groupHeader>
+			<band height="58">
+				<textField>
+					<reportElement x="0" y="10" width="746" height="20"/>
+					<textElement>
+						<font size="14" isBold="true" isUnderline="true"/>
+					</textElement>
+					<textFieldExpression class="java.lang.String"><![CDATA[$F{societeGroup.raisonSociale}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement mode="Opaque" x="0" y="36" width="373" height="20" forecolor="#006699" backcolor="#E6E6E6"/>
+					<textElement textAlignment="Left" verticalAlignment="Middle" rotation="None" markup="none">
+						<font fontName="SansSerif" size="11" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					</textElement>
+					<text><![CDATA[N° Chèque]]></text>
+				</staticText>
+				<staticText>
+					<reportElement mode="Opaque" x="373" y="36" width="373" height="20" forecolor="#006699" backcolor="#E6E6E6"/>
+					<textElement textAlignment="Left" verticalAlignment="Middle" rotation="None" markup="none">
+						<font fontName="SansSerif" size="11" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					</textElement>
+					<text><![CDATA[Date]]></text>
+				</staticText>
+				<staticText>
+					<reportElement mode="Opaque" x="746" y="36" width="375" height="20" forecolor="#006699" backcolor="#E6E6E6"/>
+					<textElement textAlignment="Left" verticalAlignment="Middle" rotation="None" markup="none">
+						<font fontName="SansSerif" size="11" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					</textElement>
+					<text><![CDATA[Montant]]></text>
+				</staticText>
+				<line>
+					<reportElement x="0" y="56" width="1121" height="2" forecolor="#666666"/>
+				</line>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="21">
+				<textField>
+					<reportElement x="746" y="0" width="375" height="20"/>
+					<textElement verticalAlignment="Middle">
+						<font size="12" isBold="true"/>
+					</textElement>
+					<textFieldExpression class="java.lang.Float"><![CDATA[$V{montantparsociete}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement mode="Opaque" x="0" y="0" width="746" height="20" forecolor="#006699" backcolor="#FFFFFF"/>
+					<textElement textAlignment="Left" verticalAlignment="Middle" rotation="None" markup="none">
+						<font fontName="SansSerif" size="11" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					</textElement>
+					<text><![CDATA[Total]]></text>
+				</staticText>
+			</band>
+		</groupFooter>
+	</group>
+	<background>
+		<band/>
+	</background>
+	<title>
+		<band height="72">
+			<frame>
+				<reportElement mode="Opaque" x="0" y="-20" width="1121" height="92" backcolor="#006699"/>
+				<textField>
+					<reportElement x="20" y="20" width="429" height="43" forecolor="#FFFFFF"/>
+					<textElement>
+						<font size="34" isBold="true"/>
+					</textElement>
+					<textFieldExpression class="java.lang.String"><![CDATA[$P{nomsociete}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="736" y="43" width="375" height="20" forecolor="#FFFFFF"/>
+					<textElement textAlignment="Right">
+						<font size="14" isBold="false"/>
+					</textElement>
+					<textFieldExpression class="java.lang.String"><![CDATA[$P{titrerapport}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="736" y="63" width="375" height="20" forecolor="#FFFFFF"/>
+					<textElement textAlignment="Right">
+						<font size="14" isBold="false"/>
+					</textElement>
+					<textFieldExpression class="java.lang.String"><![CDATA["du "+new SimpleDateFormat("dd-MM-yyyy").format($P{datedebut})+" au "+new SimpleDateFormat("dd-MM-yyyy").format($P{datefin})]]></textFieldExpression>
+				</textField>
+			</frame>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="13"/>
+	</pageHeader>
+	<detail>
+		<band height="21">
+			<line>
+				<reportElement positionType="FixRelativeToBottom" x="0" y="17" width="1121" height="1"/>
+				<graphicElement>
+					<pen lineWidth="0.25" lineColor="#333333"/>
+				</graphicElement>
+			</line>
+			<textField isBlankWhenNull="true">
+				<reportElement x="0" y="0" width="373" height="17"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{numCheque}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy" isBlankWhenNull="true">
+				<reportElement x="373" y="0" width="373" height="17"/>
+				<textElement/>
+				<textFieldExpression class="java.util.Date"><![CDATA[$F{date}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00" isBlankWhenNull="true">
+				<reportElement x="746" y="0" width="375" height="17"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.Double"><![CDATA[$F{montantCheque}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band/>
+	</columnFooter>
+	<pageFooter>
+		<band height="20">
+			<textField>
+				<reportElement mode="Opaque" x="0" y="0" width="1081" height="13" backcolor="#E6E6E6"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.lang.String"><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement mode="Opaque" x="1081" y="0" width="40" height="13" backcolor="#E6E6E6"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd MM yyyy">
+				<reportElement x="0" y="0" width="100" height="13"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+	<lastPageFooter>
+		<band height="21">
+			<staticText>
+				<reportElement mode="Opaque" x="0" y="1" width="746" height="20" forecolor="#006699" backcolor="#FFFFFF"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle" rotation="None" markup="none">
+					<font fontName="SansSerif" size="11" isBold="true" isItalic="false" isUnderline="true" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+				</textElement>
+				<text><![CDATA[Total des chèques : ]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="746" y="1" width="375" height="20"/>
+				<textElement>
+					<font size="14" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Double"><![CDATA[$V{montanttotal}]]></textFieldExpression>
+			</textField>
+		</band>
+	</lastPageFooter>
+	<summary>
+		<band/>
+	</summary>
+</jasperReport>

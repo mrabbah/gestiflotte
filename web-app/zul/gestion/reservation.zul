@@ -1,0 +1,314 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?init class="org.zkoss.zkplus.databind.AnnotateDataBinderInit" arg0="./reservationWin" ?>
+<?variable-resolver class="org.zkoss.zkplus.spring.DelegatingVariableResolver"?>
+
+
+<zk xmlns="http://www.zkoss.org/2005/zul"
+    xmlns:h="http://www.w3.org/1999/xhtml"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.zkoss.org/2005/zul http://www.zkoss.org/2005/zul/zul.xsd">
+
+    <window id="reservationWin" height="100%" width="100%" style="margin:auto;" use="${reservationWindow}">
+    <!-- <zscript src="/zs/reservation.zs"/> -->
+        <borderlayout>
+            <north id="eastPanel" size="65px" open="false"  title="Recherche avancée" flex="true" splittable="true"  collapsible="true"  >
+                <hlayout spacing="10px" style="margin-top:9px;margin-left:10px">
+					
+                    <label value="Conducteur :" />
+                    <combobox id="filterconducteur" model="@{reservationWin.conducteurs}" selectedItem="@{reservationWin.filtre.conducteur}" autocomplete="true" autodrop="true" mold="rounded" onSelect="reservationWin.ofs=0;reservationWin.filtrer()" onOK="reservationWin.ofs=0;reservationWin.filtrer()">
+                        <comboitem self="@{each=elementfiltreconducteur}" label="@{elementfiltreconducteur}"/>
+                    </combobox>
+					
+                    <label value="Véhicule :" />
+                    <combobox id="filtervehicule" model="@{reservationWin.vehicules}" selectedItem="@{reservationWin.filtre.vehicule}" autocomplete="true" autodrop="true" mold="rounded" onSelect="reservationWin.ofs=0;reservationWin.filtrer()" onOK="reservationWin.ofs=0;reservationWin.filtrer()">
+                        <comboitem self="@{each=elementfiltrevehicule}" label="@{elementfiltrevehicule}"/>
+                    </combobox>
+					
+                    <label value="Responsable réservation :" />
+                    <combobox id="filterresponsableReservations" model="@{reservationWin.responsableReservationss}" selectedItem="@{reservationWin.filtre.responsableReservations}" autocomplete="true" autodrop="true" mold="rounded" onSelect="reservationWin.ofs=0;reservationWin.filtrer()" onOK="reservationWin.ofs=0;reservationWin.filtrer()">
+                        <comboitem self="@{each=elementfiltreresponsableReservations}" label="@{elementfiltreresponsableReservations}"/>
+                    </combobox>
+					
+                    <label value="Client :" />
+                    <combobox id="filterclient" model="@{reservationWin.clients}" selectedItem="@{reservationWin.filtre.client}" autocomplete="true" autodrop="true" mold="rounded" onSelect="reservationWin.ofs=0;reservationWin.filtrer()" onOK="reservationWin.ofs=0;reservationWin.filtrer()">
+                        <comboitem self="@{each=elementfiltreclient}" label="@{elementfiltreclient}"/>
+                    </combobox>
+										                    
+                </hlayout>
+            </north>
+            <west id="westPanel" title="Gestion des réservations véhicules pour intervention" size="40%" flex="true" splittable="true" collapsible="true" open="false">
+                <groupbox id="gbCrud" width="100%" height="100%">
+                    <grid fixedLayout="true">
+                        <rows>
+				
+<!--                            <row>
+                                <label value="Numéro Réservation"/>
+								 
+                                <textbox id="fieldNumReservation" constraint="no empty: Veillez indiquez une valeur" value="@{reservationWin.objet.numReservation, save-when='triggerBtn.onClick'}" onBindingSave='if(self.value == null)throw new WrongValueException(self, "Vous devriez indiquer une valeur");'/>
+                            </row>-->
+                            
+                            <row>
+                                <label value="Numéro BC"/>
+								 
+                                <textbox id="fieldNumBC" constraint="no empty: Veillez indiquez une valeur" value="@{reservationWin.objet.numBC, save-when='triggerBtn.onClick'}" onBindingSave='if(self.value == null)throw new WrongValueException(self, "Vous devriez indiquer une valeur");'/>
+                            </row>												
+						
+                            <row>
+                                <label value="Mission"/>
+								 
+                                <textbox id="fieldMission" constraint="no empty: Veillez indiquez une valeur" value="@{reservationWin.objet.mission, save-when='triggerBtn.onClick'}" onBindingSave='if(self.value == null)throw new WrongValueException(self, "Vous devriez indiquer une valeur");'/>
+                            </row>												
+						
+                            <row>
+                                <label value="Date départ"/>
+								 
+                                <datebox id="fieldDateDepart" constraint="no empty: Veillez indiquez une valeur" format="dd/MM/yyyy HH:mm" width="120px" value="@{reservationWin.objet.dateDepart, save-when='triggerBtn.onClick'}" onBindingSave='if(self.value == null)throw new WrongValueException(self, "Vous devriez indiquer une valeur");'>
+                                    <attribute name="onChange">
+                                            <![CDATA[
+                                                fieldDateDepart.constraint = "";
+                                                fieldDateRestitution.constraint = "";
+                                                if(fieldDateDepart.value != null && fieldDateRestitution.value != null) {
+                                                    if (fieldDateDepart.value.getTime() >= fieldDateRestitution.value.getTime()){
+                                                        fieldDateRestitution.value = fieldDateDepart.value;
+                                                    }
+                                                    long dr = fieldDateRestitution.value.getTime();
+                                                    long dd = fieldDateDepart.value.getTime();
+                                                    int diff = (int) ((dr - dd)/(24*60*60*1000));
+                                                    fieldNombreDeJours.value =  diff;
+                                                }
+                                            ]]>
+                                    </attribute>
+                                </datebox>
+                            </row>					                                            
+                                                       
+                           		
+                            <row>
+                                <label value="Date restitution"/>
+								 
+                                <datebox id="fieldDateRestitution" constraint="no empty: Veillez indiquez une valeur" format="dd/MM/yyyy HH:mm" width="120px" value="@{reservationWin.objet.dateRestitution, save-when='triggerBtn.onClick'}" onBindingSave='if(self.value == null)throw new WrongValueException(self, "Vous devriez indiquer une valeur");'>
+                                    <attribute name="onChange">
+                                            <![CDATA[
+                                                fieldDateDepart.constraint = "";
+                                                fieldDateRestitution.constraint = "";
+                                                if(fieldDateDepart.value != null && fieldDateRestitution.value != null) {
+                                                    if (fieldDateDepart.value.getTime() >= fieldDateRestitution.value.getTime()){
+                                                        fieldDateRestitution.value = fieldDateDepart.value;
+                                                    }
+                                                    long dr = fieldDateRestitution.value.getTime();
+                                                    long dd = fieldDateDepart.value.getTime();
+                                                    int diff = (int) ((dr - dd)/(24*60*60*1000));
+                                                    fieldNombreDeJours.value =  diff;
+                                                }
+                                                fieldDateDepart.constraint = "no empty: Veillez indiquez une valeur";
+                                                fieldDateRestitution.constraint = "no empty: Veillez indiquez une valeur";
+                                            ]]>
+                                    </attribute>
+                                </datebox>
+                            </row>												
+                            
+                            <row>
+                                <label value="Prix par jour"/>
+								 
+                                <doublebox id="fieldPrixParJour" constraint="no empty: Veillez indiquez une valeur" value="@{reservationWin.objet.prixParJour, save-when='triggerBtn.onClick'}" onBindingSave='if(self.value == null)throw new WrongValueException(self, "Vous devriez indiquer une valeur");'/>
+							
+                            </row>
+                
+                            <row>
+                                <label value="Nombre de jours"/>
+								 
+                                <intbox id="fieldNombreDeJours"  value="@{reservationWin.objet.nombreDeJours, save-when='triggerBtn.onClick'}" onBindingSave='if(self.value == null)throw new WrongValueException(self, "Vous devriez indiquer une valeur");'/>
+                            </row>												
+						
+                            <row>
+                                <label value="Lieu de livraison"/>
+								 
+                                <textbox id="fieldLieuLivraison" value="@{reservationWin.objet.lieuLivraison, save-when='triggerBtn.onClick'}" />
+                            </row>												
+						
+                            <row>
+                                <label value="Lieu de reprise"/>
+								 
+                                <textbox id="fieldLieuReprise" value="@{reservationWin.objet.lieuReprise, save-when='triggerBtn.onClick'}" />
+                            </row>												
+						
+                            <row>
+                                <label value="Observations"/>
+								 
+                                <textbox id="fieldObservations" value="@{reservationWin.objet.observations, save-when='triggerBtn.onClick'}" />
+                            </row>												
+						 
+						
+                            <row>
+                                <label value="Conducteur" />
+                                <combobox id="coconducteurs" model="@{reservationWin.conducteurs}" selectedItem="@{reservationWin.conducteurSelected}">
+                                    <comboitem self="@{each=elementconducteur}" label="@{elementconducteur}"/>
+                                </combobox>
+                            </row>
+						
+                            <row>
+                                <label value="Véhicule" />
+                                <combobox id="covehicules" model="@{reservationWin.vehicules}" selectedItem="@{reservationWin.vehiculeSelected}" onSelect="reservationWin.changerDeVoiture()">
+                                    <comboitem self="@{each=elementvehicule}" label="@{elementvehicule}"/>
+                                </combobox>
+                            </row>
+						
+                            <row>
+                                <label value="Responsable réservation" />
+                                <combobox id="coresponsableReservationss" model="@{reservationWin.responsableReservationss}" selectedItem="@{reservationWin.responsableReservationsSelected}">
+                                    <comboitem self="@{each=elementresponsableReservations}" label="@{elementresponsableReservations}"/>
+                                </combobox>
+                            </row>
+						
+                            <row>
+                                <label value="Client" />
+                                <combobox id="coclients" model="@{reservationWin.clients}" selectedItem="@{reservationWin.clientSelected}">
+                                    <comboitem self="@{each=elementclient}" label="@{elementclient}"/>
+                                </combobox>
+                            </row>
+						
+                        </rows>
+                    </grid>					
+					
+                    <separator />
+                    <button id="btnSave" onClick="Events.sendEvent(new Event(Events.ON_CLICK,triggerBtn));reservationWin.add()" label="Sauveguarder" image="/images/skin/database_save.png"/>
+                    <button id="btnConfirm" onClick="Events.sendEvent(new Event(Events.ON_CLICK,triggerBtn));reservationWin.confirmerReservation()" label="Confirmer" image="/images/skin/database_save.png" visible="false"/>
+                    
+                    <button id="btnUpdate" onClick="Events.sendEvent(new Event(Events.ON_CLICK,triggerBtn));reservationWin.update()" label="Modifier" image="/images/skin/database_edit.png" visible="false"/>
+                    <button id="btnDelete" onClick="Events.sendEvent(new Event(Events.ON_CLICK,triggerBtn));reservationWin.delete()" label="Supprimer" image="/images/skin/database_delete.png" visible="false"/>
+                    <!--<button id="btnNew" onClick="reservationWin.newRecord()" label="Nouveau enregistrement" image="/images/skin/database_add.png"/>-->
+                    <button id="btnCancel" onClick="reservationWin.cancel()" label="Annuler" image="/images/skin/cancel.png" visible="false"/>
+                    <button visible="false" id="triggerBtn" onBindingValidate=""/>
+                </groupbox>
+            </west>
+            <center border="none" flex="true">
+                <groupbox width="100%" height="100%">
+                    <listbox id="lstObjet" onSelect="reservationWin.select()" model="@{reservationWin.listeObjets}" selectedItem="@{reservationWin.objetSelected}"  width="100%" height="100%" mold="paging" paginal="${paging}">
+                        <auxhead sclass="category-center">
+							
+<!--                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <textbox id="filterNumReservation" value="@{reservationWin.filtre.numReservation}" onChanging="reservationWin.ofs; reservationWin.filtre.numReservation=event.value; reservationWin.filtrer(); self.focus(); self.setSelectionRange(self.value.length(), self.value.length())" width="100%"/>
+                            </auxheader>-->
+                            
+                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <textbox id="filterNumBC" value="@{reservationWin.filtre.numBC}" onChanging="reservationWin.ofs; reservationWin.filtre.numBC=event.value; reservationWin.filtrer(); self.focus(); self.setSelectionRange(self.value.length(), self.value.length())" width="100%"/>
+                            </auxheader>
+								
+                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <textbox id="filterMission" value="@{reservationWin.filtre.mission}" onChanging="reservationWin.ofs; reservationWin.filtre.mission=event.value; reservationWin.filtrer(); self.focus(); self.setSelectionRange(self.value.length(), self.value.length())" width="100%"/>
+                            </auxheader>
+								
+                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <doublebox id="filterPrixParJour" value="@{reservationWin.filtre.prixParJour}" width="100%">
+                                    <attribute name="onChanging">
+                                        <![CDATA[
+                                                reservationWin.ofs=0;
+                                                if(event.value.equals("")) {
+                                                        if(reservationWin.filtre.prixParJour != null) {
+                                                                reservationWin.filtre.prixParJour = null;
+                                                        }
+                                                } else {
+                                                        reservationWin.filtre.prixParJour=new Double(event.value);
+                                                }
+                                                reservationWin.filtrer();
+                                                self.focus();
+                                                if(!event.value.equals("")) {
+                                                        self.setSelectionRange(self.value.toString().length(), self.value.toString().length());
+                                                }
+                                        ]]>
+                                    </attribute>    
+                                </doublebox>
+                            </auxheader>
+								
+                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <datebox id="filterDateDepart" format="dd/MM/yyyy" value="@{reservationWin.filtre.dateDepart}" onOK="reservationWin.ofs=0; reservationWin.filtrer(); self.focus();" width="90%"/>
+                            </auxheader>
+			    <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <datebox id="filterDateRestitution" format="dd/MM/yyyy" value="@{reservationWin.filtre.dateRestitution}" onOK="reservationWin.ofs=0; reservationWin.filtrer(); self.focus();" width="90%"/>
+                            </auxheader>
+                            
+                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <intbox id="filterNombreDeJours" value="@{reservationWin.filtre.nombreDeJours}" onChanging="reservationWin.ofs; reservationWin.filtre.nombreDeJours=event.value; reservationWin.filtrer(); self.focus(); self.setSelectionRange(self.value.length(), self.value.length())" width="100%">
+                                    <attribute name="onChanging">
+                                        <![CDATA[
+                                                reservationWin.ofs=0;
+                                                if(event.value.equals("")) {
+                                                        if(reservationWin.filtre.nombreDeJours != null) {
+                                                                reservationWin.filtre.nombreDeJours = null;
+                                                        }
+                                                } else {
+                                                        reservationWin.filtre.nombreDeJours=new Integer(event.value);
+                                                }
+                                                reservationWin.filtrer();
+                                                self.focus();
+                                                if(!event.value.equals("")) {
+                                                        self.setSelectionRange(self.value.toString().length(), self.value.toString().length());
+                                                }
+                                        ]]>
+                                    </attribute>   
+                                    </intbox>
+                            </auxheader>
+								
+                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <textbox id="filterLieuLivraison" value="@{reservationWin.filtre.lieuLivraison}" onChanging="reservationWin.ofs; reservationWin.filtre.lieuLivraison=event.value; reservationWin.filtrer(); self.focus(); self.setSelectionRange(self.value.length(), self.value.length())" width="100%"/>
+                            </auxheader>
+			
+								 
+                        </auxhead>
+                        <listhead sizable="true">
+							
+<!--                            <listheader label="NumReservation" sort="auto(numReservation)" onSort="reservationWin.sort(event)"/>	-->
+                            
+                            <listheader id="hnumBC" label="NumBC" sort="auto(numBC)" onSort="reservationWin.sort(event)"/>	
+							
+                            <listheader id="hmission" label="Mission" sort="auto(mission)" onSort="reservationWin.sort(event)" width="300px"/>	
+							
+                            <listheader id="hprixParJour" label="Prix par jour" sort="auto(prixParJour)" onSort="reservationWin.sort(event)"/>	
+							
+                            <listheader id="hdateDepart" label="Date départ" sort="auto(dateDepart)" onSort="reservationWin.sort(event)"/>	
+							
+                            <listheader id="hdateRestitution" label="Date restitution " sort="auto(dateRestitution)" onSort="reservationWin.sort(event)"/>	
+							
+                            <listheader id="hnombreDeJours" label="Nombre de jours" sort="auto(nombreDeJours)" onSort="reservationWin.sort(event)"/>	
+							
+                            <listheader id="hlieuLivraison" label="Lieu livraison" sort="auto(lieuLivraison)" onSort="reservationWin.sort(event)"/>	
+			
+							                                 
+                        </listhead>
+                        <listitem self="@{each=element}">                         
+                            
+<!--                            <listcell label="@{element.numReservation}"/>-->
+                            
+                            <listcell label="@{element.numBC}"/>
+							
+                            <listcell label="@{element.mission, converter=com.choranet.zk.TextConverter}"/>
+							
+                            <listcell label="@{element.prixParJour}"/>
+							
+                            <listcell label="@{element.dateDepart}"/>
+							
+                            <listcell label="@{element.dateRestitution}"/>
+							
+                            <listcell label="@{element.nombreDeJours}"/>
+							
+                            <listcell label="@{element.lieuLivraison}"/>
+			
+                        </listitem>
+                    </listbox>
+                    <paging id="paging" totalSize="@{reservationWin.tailleListe}" pageSize="@{reservationWin.maxNb}" onPaging="reservationWin.getNextElements(event);" />
+                    <separator/>
+                    <button id="btnNew" onClick="reservationWin.newRecord()" label="Nouveau" image="/images/skin/database_add.png"/>
+                    <button id="btnPdf" onClick="reservationWin.genererRapportPdf()" label="Generer rapport" image="/images/skin/pdf-soubor-logo.png"/>
+                    <button id="btnExcel" onClick="reservationWin.genererRapportExcel()" label="Generer excel" image="/images/skin/excel-icon.png"/>
+                </groupbox>
+            </center>
+        </borderlayout>
+    </window>
+</zk>

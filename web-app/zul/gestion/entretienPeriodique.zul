@@ -1,0 +1,258 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?init class="org.zkoss.zkplus.databind.AnnotateDataBinderInit" arg0="./entretienPeriodiqueWin" ?>
+<?variable-resolver class="org.zkoss.zkplus.spring.DelegatingVariableResolver"?>
+
+
+<zk xmlns="http://www.zkoss.org/2005/zul"
+    xmlns:h="http://www.w3.org/1999/xhtml"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.zkoss.org/2005/zul http://www.zkoss.org/2005/zul/zul.xsd">
+
+    <window id="entretienPeriodiqueWin" height="100%" width="100%" style="margin:auto;" use="${entretienPeriodiqueWindow}">
+    <!-- <zscript src="/zs/entretienPeriodique.zs"/> -->
+        <borderlayout>
+            <north id="eastPanel" size="65px" open="false"  title="Recherche avancée" flex="true" splittable="true"  collapsible="true"  >
+                <hlayout spacing="10px" style="margin-top:9px;margin-left:10px">
+					
+                    <label value="Véhicule :" />
+                    <combobox id="filtervehicule" model="@{entretienPeriodiqueWin.vehicules}" selectedItem="@{entretienPeriodiqueWin.filtre.vehicule}" autocomplete="true" autodrop="true" mold="rounded" onSelect="entretienPeriodiqueWin.ofs=0;entretienPeriodiqueWin.filtrer()" onOK="entretienPeriodiqueWin.ofs=0;entretienPeriodiqueWin.filtrer()">
+                        <comboitem self="@{each=elementfiltrevehicule}" label="@{elementfiltrevehicule}"/>
+                    </combobox>
+					
+                    <label value="Type entretien périodique :" />
+                    <combobox id="filtertypeEntretienPeriodique" model="@{entretienPeriodiqueWin.typeEntretienPeriodiques}" selectedItem="@{entretienPeriodiqueWin.filtre.typeEntretienPeriodique}" autocomplete="true" autodrop="true" mold="rounded" onSelect="entretienPeriodiqueWin.ofs=0;entretienPeriodiqueWin.filtrer()" onOK="entretienPeriodiqueWin.ofs=0;entretienPeriodiqueWin.filtrer()">
+                        <comboitem self="@{each=elementfiltretypeEntretienPeriodique}" label="@{elementfiltretypeEntretienPeriodique}"/>
+                    </combobox>
+										                    
+                </hlayout>
+            </north>
+            <west id="westPanel" title="Gestion des entretiens périodiques des véhicules du group" size="40%" flex="true" splittable="true" collapsible="true" open="false">
+                <groupbox id="gbCrud" width="100%" height="100%">
+                    <grid fixedLayout="true">
+                        <rows>
+				
+                            <row>
+                                <label value="N° Bon"/>
+								 
+                                <textbox id="fieldNumBon"  value="@{entretienPeriodiqueWin.objet.numBon, save-when='triggerBtn.onClick'}" />
+                            </row>
+                            
+                            <row>
+                                <label value="Fournisseur" />
+                                <combobox id="cofournisseurs" model="@{entretienPeriodiqueWin.fournisseurs}" selectedItem="@{entretienPeriodiqueWin.fournisseurSelected}">
+                                    <comboitem self="@{each=elementfournisseur}" label="@{elementfournisseur}"/>
+                                </combobox>
+                            </row>
+                            
+                            <row>
+                                <label value="Date entretien"/>
+								 
+                                <datebox id="fieldDateEntretien" constraint="no empty: Veillez indiquez une valeur" format="dd/MM/yyyy HH:mm" width="120px" value="@{entretienPeriodiqueWin.objet.dateEntretien, save-when='triggerBtn.onClick'}" onBindingSave='if(self.value == null)throw new WrongValueException(self, "Vous devriez indiquer une valeur");'/>
+                            </row>												
+						
+                            <row>
+                                <label value="Détails"/>
+								 
+                                <textbox id="fieldDetails" constraint="no empty: Veillez indiquez une valeur" value="@{entretienPeriodiqueWin.objet.details, save-when='triggerBtn.onClick'}" onBindingSave='if(self.value == null)throw new WrongValueException(self, "Vous devriez indiquer une valeur");' />
+                            </row>												
+						
+                            <row>
+                                <label value="Période"/>
+								 
+                                <intbox id="fieldPeriode" constraint="no empty: Veillez indiquez une valeur" value="@{entretienPeriodiqueWin.objet.periode, save-when='triggerBtn.onClick'}" onBindingSave='if(self.value == null)throw new WrongValueException(self, "Vous devriez indiquer une valeur");'/>
+                            </row>												
+						
+                            <row>
+                                <label value="Montant"/>
+								 
+                                <doublebox id="fieldMontant" constraint="no empty: Veillez indiquez une valeur" value="@{entretienPeriodiqueWin.objet.montant, save-when='triggerBtn.onClick'}" onBindingSave='if(self.value == null)throw new WrongValueException(self, "Vous devriez indiquer une valeur");'/>
+                            </row>												
+						
+                            <row>
+                                <label value="Payé"/>
+								 
+                                <checkbox id="fieldPaye" label="?" checked="@{entretienPeriodiqueWin.objet.paye, save-when='triggerBtn.onClick'}"/>
+                            </row>												
+						 
+						
+                            <row>
+                                <label value="Véhicules" />
+                                <combobox id="covehicules" model="@{entretienPeriodiqueWin.vehicules}" selectedItem="@{entretienPeriodiqueWin.vehiculeSelected}" disabled="true">
+                                    <comboitem self="@{each=elementvehicule}" label="@{elementvehicule}"/>
+                                </combobox>
+                            </row>
+						
+                            <row>
+                                <label value="Type entretien périodiques" />
+                                <combobox id="cotypeEntretienPeriodiques" model="@{entretienPeriodiqueWin.typeEntretienPeriodiques}" selectedItem="@{entretienPeriodiqueWin.typeEntretienPeriodiqueSelected}" disabled="true">
+                                    <comboitem self="@{each=elementtypeEntretienPeriodique}" label="@{elementtypeEntretienPeriodique}"/>
+                                </combobox>
+                            </row>
+						
+                        </rows>
+                    </grid>					
+					
+                    <separator />
+<!--                    <button id="btnSave" onClick="Events.sendEvent(new Event(Events.ON_CLICK,triggerBtn));entretienPeriodiqueWin.add()" label="Sauveguarder" image="/images/skin/database_save.png"/>-->
+                    <button id="btnUpdate" onClick="Events.sendEvent(new Event(Events.ON_CLICK,triggerBtn));entretienPeriodiqueWin.update()" label="Modifier" image="/images/skin/database_edit.png" visible="false"/>
+                    <button id="btnDelete" onClick="Events.sendEvent(new Event(Events.ON_CLICK,triggerBtn));entretienPeriodiqueWin.delete()" label="Supprimer" image="/images/skin/database_delete.png" visible="true"/>
+                    <!-- <button id="btnNew" onClick="entretienPeriodiqueWin.newRecord()" label="Nouveau enregistrement" image="/images/skin/database_add.png"/> -->
+                    <button id="btnCancel" onClick="entretienPeriodiqueWin.cancel()" label="Annuler" image="/images/skin/cancel.png" visible="false"/>
+                    <button visible="false" id="triggerBtn" onBindingValidate=""/>
+                </groupbox>
+            </west>
+            <center border="none" flex="true">
+                <groupbox width="100%" height="100%">
+                    <listbox id="lstObjet" onSelect="entretienPeriodiqueWin.select()" model="@{entretienPeriodiqueWin.listeObjets}" selectedItem="@{entretienPeriodiqueWin.objetSelected}"  width="100%" height="100%" mold="paging" paginal="${paging}">
+                        <auxhead sclass="category-center">
+							
+                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <textbox id="filterNumBon" value="@{entretienPeriodiqueWin.filtre.numBon}" onChanging="entretienPeriodiqueWin.ofs; entretienPeriodiqueWin.filtre.numBon=event.value; entretienPeriodiqueWin.filtrer(); self.focus(); self.setSelectionRange(self.value.length(), self.value.length())" width="100%"/>
+                            </auxheader>
+                            
+                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <combobox id="filterfournisseurs" model="@{entretienPeriodiqueWin.fournisseurs}" selectedItem="@{entretienPeriodiqueWin.filtre.fournisseur}" autocomplete="true" autodrop="true" mold="rounded" onSelect="entretienPeriodiqueWin.ofs=0;entretienPeriodiqueWin.filtrer()" onOK="entretienPeriodiqueWin.ofs=0;entretienPeriodiqueWin.filtrer()" width="85%">
+                                    <comboitem self="@{each=elementfiltrefournisseur}" label="@{elementfiltrefournisseur}"/>
+                                </combobox>
+                            </auxheader>
+                            
+                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <datebox id="filterDateEntretien" format="dd/MM/yyyy" value="@{entretienPeriodiqueWin.filtre.dateEntretien}" onOK="entretienPeriodiqueWin.ofs=0; entretienPeriodiqueWin.filtrer(); self.focus();" width="90%"/>
+                            </auxheader>
+								
+                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <textbox id="filterDetails" value="@{entretienPeriodiqueWin.filtre.details}" onChanging="entretienPeriodiqueWin.ofs; entretienPeriodiqueWin.filtre.details=event.value; entretienPeriodiqueWin.filtrer(); self.focus(); self.setSelectionRange(self.value.length(), self.value.length())" width="100%"/>
+                            </auxheader>
+								
+                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <intbox id="filterPeriode" value="@{entretienPeriodiqueWin.filtre.periode}" width="100%">
+                                    <attribute name="onChanging">
+                                        <![CDATA[
+                                                entretienPeriodiqueWin.ofs=0;
+                                                if(event.value.equals("")) {
+                                                        if(entretienPeriodiqueWin.filtre.periode != null) {
+                                                                entretienPeriodiqueWin.filtre.periode = null;
+                                                        }
+                                                } else {
+                                                        entretienPeriodiqueWin.filtre.periode=new Integer(event.value);
+                                                }
+                                                entretienPeriodiqueWin.filtrer();
+                                                self.focus();
+                                                if(!event.value.equals("")) {
+                                                        self.setSelectionRange(self.value.toString().length(), self.value.toString().length());
+                                                }
+                                        ]]>
+                                    </attribute>    
+                                </intbox>
+                            </auxheader>
+								
+                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <doublebox id="filterMontant" value="@{entretienPeriodiqueWin.filtre.montant}" width="100%">
+                                    <attribute name="onChanging">
+                                        <![CDATA[
+                                                entretienPeriodiqueWin.ofs=0;
+                                                if(event.value.equals("")) {
+                                                        if(entretienPeriodiqueWin.filtre.montant != null) {
+                                                                entretienPeriodiqueWin.filtre.montant = null;
+                                                        }
+                                                } else {
+                                                        entretienPeriodiqueWin.filtre.montant=new Double(event.value);
+                                                }
+                                                entretienPeriodiqueWin.filtrer();
+                                                self.focus();
+                                                if(!event.value.equals("")) {
+                                                        self.setSelectionRange(self.value.toString().length(), self.value.toString().length());
+                                                }
+                                        ]]>
+                                    </attribute>    
+                                </doublebox>
+                            </auxheader>
+								
+                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <combobox id="filterpaye" readonly="true"  width="300%">
+                                    <attribute name="onCreate">
+                                        <![CDATA[
+                                            List l = new ArrayList();
+                                            l.add("Oui/Non");
+                                            l.add("Oui");
+                                            l.add("Non");
+                                            ListModelList lm = new ListModelList(l);
+                                            lm.addSelection(lm.get(0));
+                                            self.setModel(lm);
+                                        ]]>
+                                    </attribute>
+                                    <attribute name="onChange">
+                                        <![CDATA[
+                                            if(self.selectedIndex == 0) {
+                                                entretienPeriodiqueWin.filtre.paye = null;
+                                            } else if(self.selectedIndex == 1) {
+                                                entretienPeriodiqueWin.filtre.paye = true;
+                                            } else {
+                                                entretienPeriodiqueWin.filtre.paye = false;
+                                            }
+                                            entretienPeriodiqueWin.ofs=0;
+                                            entretienPeriodiqueWin.filtrer();
+                                        ]]>
+                                    </attribute>
+                                </combobox>       
+                            </auxheader>
+								 
+                        </auxhead>
+                        <listhead sizable="true">
+							
+                            <listheader id="hnumBon" label="N° Bon" sort="auto(numBon)" onSort="entretienPeriodiqueWin.sort(event)"/>
+                            
+                            <listheader id="hfournisseur" label="Fournisseur" sort="auto(fournisseur.raisonSociale)" onSort="entretienPeriodiqueWin.sort(event)"/>
+                            
+                            <listheader id="hdateEntretien" label="Date entretien" sort="auto(dateEntretien)" onSort="entretienPeriodiqueWin.sort(event)"/>	
+							
+                            <listheader id="hdetails" label="Détails" sort="auto(details)" onSort="entretienPeriodiqueWin.sort(event)" width="350px"/>	
+							
+                            <listheader id="hperiode" label="Période" sort="auto(periode)" onSort="entretienPeriodiqueWin.sort(event)"/>	
+							
+                            <listheader id="hmontant" label="Montant" sort="auto(montant)" onSort="entretienPeriodiqueWin.sort(event)"/>	
+							
+                            <listheader label="Payé?" />	
+							                                 
+                        </listhead>
+                        <listitem self="@{each=element}">                         
+                            
+                            <listcell label="@{element.numBon}"/>
+                            
+                            <listcell>
+                                <textbox value="@{element.fournisseur.raisonSociale}" inplace="true" readonly="true" width="99%"/>
+                            </listcell>
+                            
+                            <listcell>
+                                <textbox value="@{element.dateEntretien}" inplace="true" readonly="true" width="99%"/>
+                            </listcell>
+							
+                            <listcell><!--label="@{element.details, converter='com.choranet.zk.TextConverter'}" >-->
+                                <textbox value="@{element.details}" inplace="true" readonly="true" width="99%"/>
+                            </listcell>
+							
+                            <listcell label="@{element.periode}"/>
+							
+                            <listcell label="@{element.montant}"/>
+							
+                            <listcell label="@{element.paye, converter='com.choranet.zk.TrueFalseConverter'}"/>
+                                
+                        </listitem>
+                    </listbox>
+                    <paging id="paging" totalSize="@{entretienPeriodiqueWin.tailleListe}" pageSize="@{entretienPeriodiqueWin.maxNb}" onPaging="entretienPeriodiqueWin.getNextElements(event);" />
+                    <separator/>
+<!--                    <button id="btnNew" onClick="entretienPeriodiqueWin.newRecord()" label="Nouveau" image="/images/skin/database_add.png"/>-->
+                    <button id="btnPdf" onClick="entretienPeriodiqueWin.genererRapportPdf()" label="Generer rapport" image="/images/skin/pdf-soubor-logo.png"/>
+                    <button id="btnExcel" onClick="entretienPeriodiqueWin.genererRapportExcel()" label="Generer excel" image="/images/skin/excel-icon.png"/>
+                </groupbox>
+            </center>
+        </borderlayout>
+    </window>
+</zk>

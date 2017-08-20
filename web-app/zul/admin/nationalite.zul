@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?init class="org.zkoss.zkplus.databind.AnnotateDataBinderInit" arg0="./nationaliteWin" ?>
+<?variable-resolver class="org.zkoss.zkplus.spring.DelegatingVariableResolver"?>
+
+
+<zk xmlns="http://www.zkoss.org/2005/zul"
+    xmlns:h="http://www.w3.org/1999/xhtml"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.zkoss.org/2005/zul http://www.zkoss.org/2005/zul/zul.xsd">
+
+    <window id="nationaliteWin" height="100%" width="100%" style="margin:auto;" use="${nationaliteWindow}">
+    <!-- <zscript src="/zs/nationalite.zs"/> -->
+        <borderlayout>
+            <west id="westPanel" title="Gestion de nationnalitées des intervenants" size="40%" flex="true" splittable="true" collapsible="true" open="false">
+                <groupbox id="gbCrud" width="100%" height="100%">
+                    <grid fixedLayout="true">
+                        <rows>
+						
+                            <row>
+                                <label value="Libelle"/>
+								 
+                                <textbox id="fieldLibelle" constraint="no empty: Veillez indiquez une valeur" value="@{nationaliteWin.objet.libelle, save-when='triggerBtn.onClick'}" onBindingSave='if(self.value == null)throw new WrongValueException(self, "Vous devriez indiquer une valeur");'/>
+                            </row>												
+						 
+						
+                        </rows>
+                    </grid>					
+					
+                    <separator />
+                    <button id="btnSave" onClick="Events.sendEvent(new Event(Events.ON_CLICK,triggerBtn));nationaliteWin.add()" label="Sauveguarder" image="/images/skin/database_save.png"/>
+                    <button id="btnUpdate" onClick="Events.sendEvent(new Event(Events.ON_CLICK,triggerBtn));nationaliteWin.update()" label="Modifier" image="/images/skin/database_edit.png" visible="false"/>
+                    <button id="btnDelete" onClick="Events.sendEvent(new Event(Events.ON_CLICK,triggerBtn));nationaliteWin.delete()" label="Supprimer" image="/images/skin/database_delete.png" visible="false"/>
+                    <!-- <button id="btnNew" onClick="nationaliteWin.newRecord()" label="Nouveau enregistrement" image="/images/skin/database_add.png"/> -->
+                    <button id="btnCancel" onClick="nationaliteWin.cancel()" label="Annuler" image="/images/skin/cancel.png" visible="false"/>
+                    <button visible="false" id="triggerBtn" onBindingValidate=""/>
+                </groupbox>
+            </west>
+            <center border="none" flex="true">
+                <groupbox width="100%" height="100%">
+                    <listbox id="lstObjet" onSelect="nationaliteWin.select()" model="@{nationaliteWin.listeObjets}" selectedItem="@{nationaliteWin.objetSelected}"  width="100%" height="100%" mold="paging" paginal="${paging}">
+                        <auxhead sclass="category-center">
+							
+                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <textbox id="filterLibelle" value="@{nationaliteWin.filtre.libelle}" onChanging="nationaliteWin.ofs; nationaliteWin.filtre.libelle=event.value; nationaliteWin.filtrer(); self.focus(); self.setSelectionRange(self.value.length(), self.value.length())" width="100%"/>
+                            </auxheader>
+								 
+                        </auxhead>
+                        <listhead sizable="true">
+							
+                            <listheader id="hlibelle" label="Libelle" sort="auto(libelle)" onSort="nationaliteWin.sort(event)"/>	
+							                                 
+                        </listhead>
+                        <listitem self="@{each=element}">                         
+                            
+                            <listcell label="@{element.libelle}"/>
+							     
+                        </listitem>
+                    </listbox>
+                    <paging id="paging" totalSize="@{nationaliteWin.tailleListe}" pageSize="@{nationaliteWin.maxNb}" onPaging="nationaliteWin.getNextElements(event);" />
+                    <separator/>
+                    <button id="btnNew" onClick="nationaliteWin.newRecord()" label="Nouveau" image="/images/skin/database_add.png"/>
+                    <button id="btnPdf" onClick="nationaliteWin.genererRapportPdf()" label="Generer rapport" image="/images/skin/pdf-soubor-logo.png"/>
+                    <button id="btnExcel" onClick="nationaliteWin.genererRapportExcel()" label="Generer excel" image="/images/skin/excel-icon.png"/>
+                </groupbox>
+            </center>
+        </borderlayout>
+    </window>
+</zk>

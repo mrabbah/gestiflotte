@@ -1,0 +1,1818 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?init class="org.zkoss.zkplus.databind.AnnotateDataBinderInit" arg0="./interventionWin" ?>
+<?variable-resolver class="org.zkoss.zkplus.spring.DelegatingVariableResolver"?>
+
+
+<zk xmlns="http://www.zkoss.org/2005/zul"
+    xmlns:h="http://www.w3.org/1999/xhtml"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.zkoss.org/2005/zul http://www.zkoss.org/2005/zul/zul.xsd">
+
+    <window id="interventionWin" height="100%" width="100%" style="margin:auto;" use="${interventionWindow}">
+    <!-- <zscript src="/zs/intervention.zs"/> -->
+        <borderlayout>
+            <north id="eastPanel" size="65px" open="true"  title="Recherche avancée" flex="true" splittable="true"  collapsible="true">
+                <hlayout spacing="10px" style="margin-top:9px;margin-left:10px">
+					
+<!--                    <label value="conducteur :" />
+                    <combobox id="filterconducteur" model="@{interventionWin.conducteurs}" selectedItem="@{interventionWin.filtre.conducteur}" autocomplete="true" autodrop="true" mold="rounded" onSelect="interventionWin.ofs=0;interventionWin.filtrer()" onOK="interventionWin.ofs=0;interventionWin.filtrer()">
+                        <comboitem self="@{each=elementfiltreconducteur}" label="@{elementfiltreconducteur}"/>
+                    </combobox>
+					
+                    <label value="vehicule :" />
+                    <combobox id="filtervehicule" model="@{interventionWin.vehicules}" selectedItem="@{interventionWin.filtre.vehicule}" autocomplete="true" autodrop="true" mold="rounded" onSelect="interventionWin.ofs=0;interventionWin.filtrer()" onOK="interventionWin.ofs=0;interventionWin.filtrer()">
+                        <comboitem self="@{each=elementfiltrevehicule}" label="@{elementfiltrevehicule}"/>
+                    </combobox>-->
+					
+<!--                    <label value="agentLoueurResponsable :" />
+                    <combobox id="filteragentLoueurResponsable" model="@{interventionWin.agentLoueurResponsables}" selectedItem="@{interventionWin.filtre.agentLoueurResponsable}" autocomplete="true" autodrop="true" mold="rounded" onSelect="interventionWin.ofs=0;interventionWin.filtrer()" onOK="interventionWin.ofs=0;interventionWin.filtrer()">
+                        <comboitem self="@{each=elementfiltreagentLoueurResponsable}" label="@{elementfiltreagentLoueurResponsable}"/>
+                    </combobox>-->
+                    
+                    <label value="Mois :" />
+                    <spinner id="filterDateDepartMois" constraint="min 1 max 12" width="45px"/>
+                    
+                    <label value="Année :" />
+                    <spinner id="filterDateDepartAnnee" constraint="min 2010" width="60px"/>
+                    
+                    <button label="Filtrer par mois" onClick="interventionWin.filtre.dateDepartMois = filterDateDepartMois.value; interventionWin.filtre.dateDepartAnnee = filterDateDepartAnnee.value; interventionWin.ofs=0; interventionWin.filtrer(); eastPanel.open=false; paging.totalSize=interventionWin.tailleListe"/>			
+<!--                    <label value="client :" />
+                    <combobox id="filterclient" model="@{interventionWin.clients}" selectedItem="@{interventionWin.filtre.client}" autocomplete="true" autodrop="true" mold="rounded" onSelect="interventionWin.ofs=0;interventionWin.filtrer()" onOK="interventionWin.ofs=0;interventionWin.filtrer()">
+                        <comboitem self="@{each=elementfiltreclient}" label="@{elementfiltreclient}"/>
+                    </combobox>-->
+										                    
+                </hlayout>
+            </north>
+            <west id="westPanel" title="Gestion des interventions" size="40%" flex="true" splittable="true" collapsible="true" open="false">                  
+                <groupbox id="gbCrud" width="100%" height="100%">
+                    <tabbox mold="accordion-lite">
+                        <tabs>
+                            <tab label="Informations clé" />
+                            <tab label="Kilomètrage et Charges" />
+                            <tab label="Facturation" />
+                            <tab label="Intervenants" />
+                        </tabs>
+                        <tabpanels>
+                            <tabpanel>
+                                <grid fixedLayout="true">
+                                    <rows>
+                                        <row>
+                                            <label id="labelNumInter" visible="false" value="N° Intervention"/>		 
+                                            <textbox id="fieldNumIntervention" visible="false" readonly="true" value="@{interventionWin.objet.numIntervention, save-when='triggerBtn.onClick'}"/>
+                                        </row>
+                                    
+                                        <row>
+                                            <label value="Type Intervention"/>		 
+                                            <combobox id="cotype" readonly="true" selectedItem="@{interventionWin.typeSelected, save-when='self.onChange'}">
+                                                <attribute name="onSelect">
+                                                   <![CDATA[
+                                                        fieldDateDepart.constraint = ""; 
+                                                        if(fieldDateDepart.value != null && interventionWin.getNumIntervention(self.selectedItem.value, fieldDateDepart.value) == true){
+                                                            labelNumInter.visible = true;
+                                                            fieldNumIntervention.visible = true;
+                                                        }
+                                                        fieldDateDepart.constraint="no empty: Veillez indiquez une valeur";
+                                                   ]]>
+                                                </attribute>
+                                                <comboitem label="TRANSPORT" value="T"/>
+                                                <comboitem label="DEPLACEMENT" value="D"/>
+                                                <comboitem label="GRUTAGE" value="G"/>
+                                                <comboitem label="MANUTENTION_LEVAGE" value="M"/>
+                                            </combobox>
+                                        </row>
+                                        
+                                        <row>
+                                            <label value="Etat véhicule"/>
+                                            <combobox id="coetatChargement" readonly="true" selectedItem="@{interventionWin.etatChargementSelected, save-when='self.onChange'}" width="94px">
+                                                <attribute name="onChange">
+                                                    <![CDATA[
+                                                        Double consommationMin, consommationMax;
+                                                        if (coetatChargement.value.equals("CHARGE")) {
+                                                            consommationMin = fieldConsommationGasoilMin.value;
+                                                            consommationMax = fieldConsommationGasoilMax.value;
+                                                            fieldConsommationGasoilMin.visible = true;
+                                                            fieldConsommationGasoilMax.visible = true;
+                                                            fieldConsommationGasoilAvideMin.visible = false;
+                                                            fieldConsommationGasoilAvideMax.visible = false;
+                                                        }else {
+                                                            consommationMin = fieldConsommationGasoilAvideMin.value;
+                                                            consommationMax = fieldConsommationGasoilAvideMax.value;
+                                                            fieldConsommationGasoilAvideMin.visible = true;
+                                                            fieldConsommationGasoilAvideMax.visible = true;
+                                                            fieldConsommationGasoilMin.visible = false;
+                                                            fieldConsommationGasoilMax.visible = false;
+                                                        }
+                                                        if (fieldKilometrageDisque.value != null && consommationMax != null && consommationMin != null){                                                          
+                                                            fieldPourcentageConsommation.value = fieldConsommationGasoil.value / fieldKilometrageDisque.value * 100;
+                                                            if (fieldPourcentageConsommation.value > consommationMax){
+                                                                    fieldPourcentageConsommation.style = "background-color : red";
+                                                            }else
+                                                                if (fieldPourcentageConsommation.value < consommationMin) {
+                                                                    fieldPourcentageConsommation.style = "background-color : yellow";
+                                                                }
+                                                                else
+                                                                    fieldPourcentageConsommation.style = "background-color : green";
+                                                        }
+                                                    ]]>
+                                                </attribute>
+                                                <comboitem label="CHARGE" value="CHARGE"/>
+                                                <comboitem label="DECHARGE" value="DECHARGE"/>
+                                            </combobox>
+                                        </row>
+                                        	
+                                        <row>
+                                            <label value="Date départ/ Date arrivée"/>		 
+                                            <cell>
+                                                <datebox id="fieldDateDepart" constraint="no empty: Veillez indiquez une valeur" format="dd/MM/yyyy HH:mm" width="100px" value="@{interventionWin.objet.dateDepart, save-when='triggerBtn.onClick'}" onBindingSave='if(self.value == null)throw new WrongValueException(self, "Vous devriez indiquer une valeur");'>
+                                                    <attribute name="onChange">
+                                                <![CDATA[
+                                                    if(fieldDateDepart.value != null) {
+                                                        interventionWin.objet.dateDepart = fieldDateDepart.value;
+                                                        interventionWin.setDateDepartMois_Annee();
+                                                        //fieldDateDepart.disabled = true;
+                                                        interventionWin.actualiserValeurAssociation();
+                                                        
+                                                        fieldSource.value = null;
+                                                        fieldDestination.value = null;
+                                                        fieldAnnee.value = null;
+                                                        fieldDebutPeriode.value = null;
+                                                        fieldFinPeriode.value = null;
+                                                        fieldQuantite.value = null;
+                                                        fieldPrix.value = null;
+                                                        
+                                                        idTrajetRow.visible = false;
+                                                        idSourceRow.visible = false;
+                                                        idDestinationRow.visible = false;
+                                                        idAnneeRow.visible = false;
+                                                        idPeriodeRow.visible = false;
+                                                        idQuantiteRow.visible = false;
+                                                        idPrixRow.visible = false;
+                                                        idModeTarifRow.visible = true;
+                                                        idClientRow.visible = true;
+                                                        
+                                                        coModeTarifs.value = null;
+                                                    }
+                                                    fieldDateDepart.constraint = "";
+                                                    if(fieldDateDepart.value != null && fieldDateRestitution.value != null) {
+                                                        if (fieldDateDepart.value.getTime() >= fieldDateRestitution.value.getTime()){
+                                                            fieldDateRestitution.value = fieldDateDepart.value;
+                                                            fieldNombreDeJours.value = 0;
+                                                        } else {
+                                                            if (coModeTarifs.selectedItem == null){
+                                                                fieldMontantFacture.value = null;
+                                                                fieldMontantDeBase.value = null;
+                                                            }
+                                                            if (coModeTarifs.value == "Journalier") {
+                                                                long dr = fieldDateRestitution.value.getTime();
+                                                                long dd = fieldDateDepart.value.getTime();
+                                                                fieldQuantite.value = (int) ((dr - dd)/(24*60*60*1000));
+                                                            }
+                                                        }
+                                                    }   
+                                                    if (cotype.selectedItem != null && interventionWin.getNumIntervention(cotype.selectedItem.value, self.value) == true){
+                                                        labelNumInter.visible = true;
+                                                        fieldNumIntervention.visible = true;
+                                                    }
+                                                    fieldDateDepart.constraint = "no empty: Veillez indiquez une valeur";
+                                                ]]>
+                                                    </attribute>
+                                                
+<!--                                                <attribute name="onChange">
+                                                    <![CDATA[
+                                                        java.text.DateFormat format=new java.text.SimpleDateFormat("-dd/mm/yy-");
+                                                        String DateString = format.format(self.value).toString();
+                                                        String field = fieldNumIntervention.value;
+                                                        char NInterFirstChart = field.charAt(1);
+                                                        String suffixe = DateString.concat(field.substring(1, field.length()));
+                                                        if (NInterFirstChart == '-')
+                                                           suffixe = DateString.concat(field.substring(11, field.length()));
+                                                           //field = field.substring(0,1).concat(DateString).concat(field.substring(1, field.length()));
+                                                        fieldNumIntervention.value = field.substring(0,1).concat(suffixe);
+                                                    ]]>
+                                                </attribute>-->
+                                                </datebox>
+                                                <datebox id="fieldDateRestitution" format="dd/MM/yyyy HH:mm" width="100px" value="@{interventionWin.objet.dateRestitution, save-when='triggerBtn.onClick'}" >
+                                                    <attribute name="onChange">
+                                            <![CDATA[
+                                                if(fieldDateRestitution.value != null) {
+                                                    interventionWin.objet.dateRestitution = fieldDateRestitution.value;
+                                                }        
+                                                fieldDateDepart.constraint = "";
+                                                if(fieldDateDepart.value != null && fieldDateRestitution.value != null) {
+                                                    if (fieldDateDepart.value.getTime() >= fieldDateRestitution.value.getTime()){
+                                                        fieldDateRestitution.value = fieldDateDepart.value;
+                                                        fieldNombreDeJours.value = 0;
+                                                    } else {
+                                                        if (coModeTarifs.value == "Journalier") {
+                                                            long dr = fieldDateRestitution.value.getTime();
+                                                            long dd = fieldDateDepart.value.getTime();
+                                                            fieldQuantite.value = (int) ((dr - dd)/(24*60*60*1000));
+                                                        }
+                                                    }
+                                                }   
+                                                if(fieldQuantite.value != null && fieldPrix.value != null) {
+                                                    fieldMontantFacture.value = fieldQuantite.value * fieldPrix.value;
+                                                    fieldMontantDeBase.value = fieldQuantite.value * fieldPrix.value;
+                                                }
+                                                fieldDateDepart.constraint = "no empty: Veillez indiquez une valeur";
+                                            ]]>
+                                                    </attribute>
+                                                </datebox>
+                                            </cell>
+                                        </row>
+<!--                                        <row>
+                                            <label value="Date arrivée"/>
+                                            
+                                        </row>-->
+                                        <row id="idClientRow" visible="false">
+                                            <label value="Client" />
+                                            <combobox id="coclients" model="@{interventionWin.clients}" selectedItem="@{interventionWin.clientSelected}">
+                                                <attribute name="onChange">
+                                                    <![CDATA[
+                                                        if (self.selectedItem != null) {
+                                                            coModeTarifs.value = null;
+                                                            interventionWin.actualiserTarification(fieldDateDepart.value);
+                                                            if(tarifications != null)
+                                                               idModeTarifRow.visible = true;
+                                                            //coModeTarifs.value = null; 
+                                                            fieldMontantFacture.value = null;
+                                                            if(interventionWin.tarificationSelected != null) {
+                                                                fieldUnite.value = interventionWin.objet.tarification.unite;
+                                                                fieldAnnee.value = interventionWin.objet.tarification.annee;
+                                                                fieldDebutPeriode.value = interventionWin.objet.tarification.debutPeriode;
+                                                                fieldFinPeriode.value = interventionWin.objet.tarification.finPeriode;
+                                                                fieldQuantite.value = 1;
+                                                                fieldPrix.value = interventionWin.objet.tarification.prix;
+                                                                fieldMontantFacture.value = interventionWin.objet.tarification.prix;
+                                                                fieldMontantDeBase.value = interventionWin.objet.tarification.prix;
+                                                                if (interventionWin.objet.tarification.modeTarif.equals("Journalier")) {
+                                                                    interventionWin.objet.tarification.unite = "Jour";
+                                                                    idQuantiteRow.visible = true;
+                                                                    idTrajetRow.visible = false;
+                                                                    idSourceRow.visible = false;
+                                                                    idDestinationRow.visible = false;
+                                                                    idRegionRow.visible = false;
+                                                                    
+                                                                    if(fieldDateDepart.value != null && fieldDateRestitution.value != null){
+                                                                        long dr = fieldDateRestitution.value.getTime();
+                                                                        long dd = fieldDateDepart.value.getTime();
+                                                                        fieldQuantite.value = (int) ((dr - dd)/(24*60*60*1000));                                                                    
+                                                                    }
+                                                                 } else
+                                                                    if (interventionWin.objet.tarification.modeTarif.equals("Forfitaire/Trajet")) {
+                                                                        interventionWin.objet.tarification.unite = "Trajet";
+                                                                        fieldSource.value = interventionWin.trajetSelected.source;
+                                                                        fieldDestination.value = interventionWin.trajetSelected.destination;
+                                                                        idQuantiteRow.visible = false;
+                                                                        idTrajetRow.visible = true;
+                                                                        idSourceRow.visible = true;
+                                                                        idDestinationRow.visible = true;
+                                                                        idRegionRow.visible = false;
+                                                                    } else
+                                                                            if (interventionWin.objet.tarification.modeTarif.equals("Forfitaire/Region")) {
+                                                                                interventionWin.objet.tarification.unite = "Region";
+                                                                                idQuantiteRow.visible = false;
+                                                                                idTrajetRow.visible = false;
+                                                                                idSourceRow.visible = false;
+                                                                                idDestinationRow.visible = false;
+                                                                                idRegionRow.visible = true;
+                                                                            } else
+                                                                                if (self.value.equals("Kilometrage")) {
+                                                                                    interventionWin.objet.tarification.unite = "Km";
+                                                                                    idQuantiteRow.visible = true;
+                                                                                    idTrajetRow.visible = false;
+                                                                                    idSourceRow.visible = false;
+                                                                                    idDestinationRow.visible = false;
+                                                                                    idRegionRow.visible = false;
+                                                                                } else
+                                                                                    if (self.value.equals("Tonnage/Trajet")) {
+                                                                                        interventionWin.objet.tarification.unite = "Tonne";
+                                                                                        fieldSource.value = interventionWin.trajetSelected.source;
+                                                                                        fieldDestination.value = interventionWin.trajetSelected.destination;
+                                                                                        idQuantiteRow.visible = true;
+                                                                                        idTrajetRow.visible = true;
+                                                                                        idSourceRow.visible = true;
+                                                                                        idDestinationRow.visible = true;
+                                                                                        idRegionRow.visible = false;
+                                                                                    }else
+                                                                                        if (interventionWin.objet.tarification.modeTarif.equals("Kilometrage")) {
+                                                                                            interventionWin.objet.tarification.unite = "Km";
+                                                                                            idQuantiteRow.visible = true;
+                                                                                            idTrajetRow.visible = false;
+                                                                                            idSourceRow.visible = false;
+                                                                                            idDestinationRow.visible = false;
+                                                                                            idRegionRow.visible = false;
+                                                                                        } 
+                                                                    idModeTarifRow.visible = true;
+                                                                    idAnneeModeTarifRow.visible = true;
+                                                                    idPeriodeRow.visible = true;
+                                                                    idPrixRow.visible = true;
+                                                        } else {
+                                                            //idModeTarifRow.visible = false;
+                                                            idTrajetRow.visible = false;
+                                                            idSourceRow.visible = false;
+                                                            idDestinationRow.visible = false;
+                                                            idAnneeRow.visible = false;
+                                                            idPeriodeRow.visible = false;
+                                                            idQuantiteRow.visible = false;
+                                                            idPrixRow.visible = false;
+                                                        }
+                                                      }
+                                                    ]]>
+                                                </attribute>
+<!--                                                <attribute name="onBlur">
+                                                    <![CDATA[
+                                                        if (self.selectedItem == null) {
+                                                            self.focus = true;
+                                                        }
+                                                    ]]>
+                                                </attribute>-->
+                                                <comboitem self="@{each=elementclient}" label="@{elementclient}"/>
+                                            </combobox>
+                                        </row>
+                                        
+                                        <row id="idModeTarifRow" visible="false">
+                                            <label value="Mode Tarification"/>
+                                            <combobox id="coModeTarifs" readonly="true" model="@{interventionWin.modeTarifs}" selectedItem="@{interventionWin.modeTarifSelected}">
+                                                <attribute name="onChange">
+                                                    <![CDATA[
+                                                          
+                                                        if (self.selectedItem != null) {
+                                                            interventionWin.actualiserTarificationByModeTarif(fieldDateDepart.value);
+                                                            coTrajets.value = null;   
+                                                            coRegions.value = null; 
+                                                            if(interventionWin.modeTarifSelected != null) {  
+                                                                
+                                                                fieldSource.value = null;
+                                                                fieldDestination.value = null;
+                                                                fieldAnnee.value = null;
+                                                                fieldQuantite.value = 1;
+                                                                
+                                                                idModeTarifRow.visible = true;
+                                                                idAnneeModeTarifRow.visible = true;
+                                                                idPeriodeRow.visible = true;
+                                                                idPrixRow.visible = true;
+                                                                
+                                                                if (interventionWin.modeTarifSelected.equals("Journalier")) {
+                                                                    interventionWin.objet.tarification.unite = "Jour";
+                                                                    idQuantiteRow.visible = true;
+                                                                    idTrajetRow.visible = false;
+                                                                    idSourceRow.visible = false;
+                                                                    idDestinationRow.visible = false;
+                                                                    idRegionRow.visible = false;
+                                                                    } else
+                                                                    if (interventionWin.modeTarifSelected.equals("Forfitaire/Trajet")) {
+                                                                        fieldUnite.value = "Trajet";
+                                                                        idQuantiteRow.visible = false;
+                                                                        idTrajetRow.visible = true;
+                                                                        idSourceRow.visible = true;
+                                                                        idDestinationRow.visible = true;
+                                                                        idRegionRow.visible = false;
+                                                                    } else
+                                                                            if (interventionWin.modeTarifSelected.equals("Forfitaire/Region")) {
+                                                                                fieldUnite.value = "Region";
+                                                                                idQuantiteRow.visible = false;
+                                                                                idTrajetRow.visible = false;
+                                                                                idSourceRow.visible = false;
+                                                                                idDestinationRow.visible = false;
+                                                                                idRegionRow.visible = true;
+                                                                            } else
+                                                                                if (interventionWin.modeTarifSelected.equals("Kilometrage")) {
+                                                                                    fieldUnite.value = "Km";
+                                                                                    interventionWin.objet.quantite = 1;
+                                                                                    idQuantiteRow.visible = true;
+                                                                                    idTrajetRow.visible = false;
+                                                                                    idSourceRow.visible = false;
+                                                                                    idDestinationRow.visible = false;
+                                                                                    idRegionRow.visible = false;
+                                                                                } else
+                                                                                    if (interventionWin.modeTarifSelected.equals("Tonnage/Trajet")) {
+                                                                                        fieldUnite.value = "Tonne";
+                                                                                        idQuantiteRow.visible = true;
+                                                                                        idTrajetRow.visible = true;
+                                                                                        idSourceRow.visible = true;
+                                                                                        idDestinationRow.visible = true;
+                                                                                        idRegionRow.visible = false;
+                                                                                    }
+                                                        } else {
+                                                            idModeTarifRow.visible = true;
+                                                            idAnneeRow.visible = false;
+                                                            idPeriodeRow.visible = false;
+                                                            idQuantiteRow.visible = false;
+                                                            idPrixRow.visible = false;
+                                                        }
+                                                      }
+                                                    ]]>
+                                                </attribute>
+                                                <comboitem self="@{each=elementmodeTarif}" label="@{elementmodeTarif}"/>
+                                            </combobox>
+                                        </row>	
+                                        
+                                        <row id="idTrajetRow" visible="false">
+                                            <label value="Trajet"/>		 
+                                            <combobox id="coTrajets" readonly="true" model="@{interventionWin.trajets}" selectedItem="@{interventionWin.trajetSelected}">
+                                                <attribute name="onChange">
+                                                    <![CDATA[
+                                                    if (self.selectedItem != null) {
+                                                        if(interventionWin.modeTarifSelected == "Tonnage/Trajet")
+                                                                idQuantiteRow.visible = true;
+                                                        idPrixRow.visible = true;
+                                                        interventionWin.actualiserTarificationByTrajetSelected(fieldDateDepart.value);
+                                                        fieldAnnee.value = interventionWin.objet.tarification.annee;
+                                                        fieldDebutPeriode.value = interventionWin.objet.tarification.debutPeriode;
+                                                        fieldFinPeriode.value = interventionWin.objet.tarification.finPeriode;
+                                                        fieldQuantite.value = 1;
+                                                        fieldPrix.value = interventionWin.objet.tarification.prix;
+                                                        fieldMontantFacture.value = interventionWin.objet.tarification.prix;
+                                                        fieldMontantDeBase.value = interventionWin.objet.tarification.prix;
+                                                        fieldSource.value = interventionWin.trajetSelected.source;
+                                                        fieldDestination.value = interventionWin.trajetSelected.destination;
+                                                    }else {
+                                                        fieldSource.value = null;
+                                                        fieldDestination.value = null; 
+                                                    }
+                                                    
+                                                    if (interventionWin.modeTarifSelected.toString().equals("Forfitaire/Trajet")
+                                                        || interventionWin.modeTarifSelected.toString().equals("Tonnage/Trajet")) {
+                                                        interventionWin.objet.kilometrageRetour = fieldKilometrageDepart.value + interventionWin.trajetSelected.kilometrage;                                                        
+                                                        fieldKilometrageRetour.value = interventionWin.objet.kilometrageRetour;
+                                                        fieldDistanceParcourue.value = (double) ((fieldKilometrageRetour.value - fieldKilometrageDepart.value));
+                                                        interventionWin.objet.kilometrageDisque = fieldDistanceParcourue.value;
+                                                        fieldKilometrageDisque.value = fieldDistanceParcourue.value;
+                                                        
+                                                        if (fieldConsommationGasoil.value != null){
+                                                        
+                                                            Double consommationMin, consommationMax;
+                                                            if (coetatChargement.value.equals("CHARGE")) {
+                                                                consommationMin = fieldConsommationGasoilMin.value;
+                                                                consommationMax = fieldConsommationGasoilMax.value;
+                                                            }else {
+                                                                consommationMin = fieldConsommationGasoilAvideMin.value;
+                                                                consommationMax = fieldConsommationGasoilAvideMax.value;
+                                                            }
+                                                            if (fieldKilometrageDisque.value != null && consommationMax != null && consommationMin != null){  
+                                                                fieldPourcentageConsommation.value = fieldConsommationGasoil.value / fieldKilometrageDisque.value * 100;
+                                                                if (fieldPourcentageConsommation.value > consommationMax){
+                                                                        fieldPourcentageConsommation.style = "background-color : red";
+                                                                }else
+                                                                if (fieldPourcentageConsommation.value < consommationMin) {
+                                                                    fieldPourcentageConsommation.style = "background-color : yellow";
+                                                                }
+                                                                else
+                                                                        fieldPourcentageConsommation.style = "background-color : green";
+                                                            }            
+                                                        }
+                                                    }
+                                                    fieldMission.value = self.value;
+                                                    
+                                                    if(fieldMontantDeBase.value != null && fieldPourcentageCommission.value != null)
+                                                        fieldCommission.value = interventionWin.arrondirePrix((fieldPourcentageCommission.value * fieldMontantDeBase.value)/100, 0.005, "Majoration");
+                                                    
+                                                    ]]>
+                                                </attribute>
+<!--                                                <attribute name="onBlur">
+                                                    <![CDATA[
+                                                        if (self.selectedItem == null) {
+                                                            self.focus = true;
+                                                        }
+                                                    ]]>
+                                                </attribute>-->
+                                                <comboitem self="@{each=elementtrajet}" label="@{elementtrajet}"/>
+                                            </combobox>
+                                        </row>
+                            
+                                        <row id="idSourceRow" visible="false">
+                                            <label value="Source/Destination"/>
+                                            <cell>
+                                                <textbox id="fieldSource" width="75px" readonly="true" value="@{interventionWin.objet.tarification.trajet.source}"/>
+                                                <textbox id="fieldDestination" width="75px" readonly="true" value="@{interventionWin.objet.tarification.trajet.destination}"/>
+                                            </cell>
+                                        </row>
+                                        
+<!--                                        <row id="idSourceRow" visible="false">
+                                            <label value="Source"/>		 
+                                            <textbox id="fieldSource" readonly="true" value="@{interventionWin.objet.tarification.trajet.source}"/>
+                                        </row>
+                            
+                                        <row id="idDestinationRow" visible="false">
+                                            <label value="Destination"/>		 
+                                            <textbox id="fieldDestination" readonly="true" value="@{interventionWin.objet.tarification.trajet.destination}"/>
+                                        </row>-->
+                            
+                                        <row id="idRegionRow" visible="false">
+                                            <label value="Région"/>		 
+                                            <combobox id="coRegions" readonly="true" model="@{interventionWin.regions}" selectedItem="@{interventionWin.regionSelected}">
+                                                <attribute name="onChange">
+                                                    <![CDATA[
+                                                    if (self.selectedItem != null){
+                                                        idPrixRow.visible = true;
+                                                        interventionWin.actualiserTarificationByRegionSelected(fieldDateDepart.value);
+                                                        fieldAnnee.value = interventionWin.objet.tarification.annee;
+                                                        fieldDebutPeriode.value = interventionWin.objet.tarification.debutPeriode;
+                                                        fieldFinPeriode.value = interventionWin.objet.tarification.finPeriode;
+                                                        fieldQuantite.value = 1;
+                                                        fieldPrix.value = interventionWin.objet.tarification.prix;
+                                                        fieldMontantFacture.value = fieldPrix.value;
+                                                        fieldMontantDeBase.value = fieldPrix.value;
+                                                        fieldMission.value = self.value;
+                                                        
+                                                        if(fieldMontantDeBase.value != null && fieldPourcentageCommission.value != null)
+                                                          fieldCommission.value = interventionWin.arrondirePrix((fieldPourcentageCommission.value * fieldMontantDeBase.value)/100, 0.005, "Majoration");
+                                                     }
+                                                    ]]>
+                                                </attribute>
+                                                <comboitem self="@{each=elementregion}" label="@{elementregion}"/>
+                                            </combobox>
+                                        </row>
+                                        
+                                        <row id="idAnneeRow" visible="false">
+                                            <label value="Année"/>
+                                            <intbox id="fieldAnnee" readonly="true"/>    
+                                        </row>
+                            
+                                        <row id="idPeriodeRow" visible="false">
+                                            <label value="Période de "/>
+                                            <cell colspan="1">
+                                                <intbox id="fieldDebutPeriode" width="40px"  readonly="true" value="@{interventionWin.objet.tarification.debutPeriode}"/>    
+                                                <label value=" Au "/>
+                                                <intbox id="fieldFinPeriode" width="40px"  readonly="true" value="@{interventionWin.objet.tarification.finPeriode}"/>
+                                                <label value=" DU MOIS"/>
+                                            </cell>
+                                        </row>
+                            
+                                        <row id="idQuantiteRow" visible="false">
+                                            <label value="Quantité"/>			 
+                                            <cell colspan="1">
+                                                <doublebox id="fieldQuantite" value="@{interventionWin.objet.quantite, save-when='triggerBtn.onClick'}">
+                                                    <attribute name="onChange">
+                                                        <![CDATA[       
+                                                            if(fieldQuantite.value != null && fieldPrix.value != null) {
+                                                                fieldMontantFacture.value = interventionWin.arrondirePrix(fieldQuantite.value * fieldPrix.value, 0.005, "Majoration");
+                                                                fieldMontantDeBase.value = interventionWin.arrondirePrix(fieldQuantite.value * fieldPrix.value, 0.005, "Majoration");
+                                                            }
+                                                        ]]>   
+                                                    </attribute>
+                                                </doublebox>
+                                                <label id="fieldUnite" value="@{interventionWin.objet.tarification.unite}"/>
+                                            </cell>
+                                        </row>
+	
+                                        <row id="idPrixRow" visible="false">
+                                            <label value="Prix"/>			 
+                                            <doublebox id="fieldPrix" value="@{interventionWin.objet.prixParJour, save-when='triggerBtn.onClick'}">
+                                                <attribute name="onChange">
+                                                        <![CDATA[                                                            
+                                                            if(fieldQuantite.value != null && fieldPrix.value != null) {
+                                                                fieldMontantFacture.value = interventionWin.arrondirePrix(fieldQuantite.value * fieldPrix.value, 0.005, "Majoration");
+                                                                fieldMontantDeBase.value = interventionWin.arrondirePrix(fieldQuantite.value * fieldPrix.value, 0.005, "Majoration");
+                                                            }
+                                                        ]]>   
+                                                </attribute>
+                                            </doublebox>
+                                        </row>
+                                        <row>
+                                            <label value="Mission"/>			 
+                                            <textbox id="fieldMission" constraint="no empty: Veillez indiquez une valeur" value="@{interventionWin.objet.mission, save-when='triggerBtn.onClick'}" onBindingSave='if(self.value == null)throw new WrongValueException(self, "Vous devriez indiquer une valeur");' width="215px"/>
+                                        </row>												
+						
+<!--                                        <row visible="false">
+                                            <label value="Nombre de jours"/>		 
+                                            <intbox id="fieldNombreDeJours" value="@{interventionWin.objet.nombreDeJours, save-when='triggerBtn.onClick'}" >
+                                                <attribute name="onClick">
+                                                    <![CDATA[
+                                                        fieldNombreDeJours.constraint = "";
+                                                        fieldPrixParJour.constraint = "";
+                                                        if(fieldNombreDeJours.value != null && fieldPrixParJour.value != null) {
+                                                            fieldMontantFacture.value = fieldNombreDeJours.value * fieldPrixParJour.value;
+                                                        }
+                                                        fieldNombreDeJours.constraint = "no empty: Veillez indiquez une valeur";
+                                                        fieldPrixParJour.constraint = "no empty: Veillez indiquez une valeur";
+                                                    ]]>   
+                                                </attribute>
+                                                <attribute name="onChange">
+                                                    <![CDATA[
+                                                        fieldNombreDeJours.constraint = "";
+                                                        fieldPrixParJour.constraint = "";
+                                                        if(fieldNombreDeJours.value != null && fieldPrixParJour.value != null) {
+                                                            fieldMontantFacture.value = fieldNombreDeJours.value * fieldPrixParJour.value;
+                                                        }
+                                                        fieldNombreDeJours.constraint = "no empty: Veillez indiquez une valeur";
+                                                        fieldPrixParJour.constraint = "no empty: Veillez indiquez une valeur";
+                                                    ]]>   
+                                                </attribute>
+                                            </intbox>
+                                        </row>-->
+<!--                                        <row visible="false">
+                                            <label value="Prix par jours"/>			 
+                                            <doublebox id="fieldPrixParJour" constraint="no empty: Veillez indiquez une valeur" value="@{interventionWin.objet.prixParJour, save-when='triggerBtn.onClick'}" onBindingSave='if(self.value == null)throw new WrongValueException(self, "Vous devriez indiquer une valeur");'>
+                                                <attribute name="onChange">
+                                                <![CDATA[
+                                                    fieldNombreDeJours.constraint = "";
+                                                    fieldPrixParJour.constraint = "";
+                                                    if(fieldNombreDeJours.value != null && fieldPrixParJour.value != null) {
+                                                        fieldMontantFacture.value = fieldNombreDeJours.value * fieldPrixParJour.value;
+                                                    }
+                                                    fieldNombreDeJours.constraint = "no empty: Veillez indiquez une valeur";
+                                                    fieldPrixParJour.constraint = "no empty: Veillez indiquez une valeur";
+                                                ]]>   
+                                                </attribute>
+                                            </doublebox>
+                                        </row>-->
+                                        <row>
+                                            <label value="Montant Total"/>			 
+                                            <doublebox id="fieldMontantFacture" format="#.0##" value="@{interventionWin.objet.montantFacture, save-when='triggerBtn.onClick'}" >
+<!--                                                <attribute name="onClick">
+                                                <![CDATA[
+                                                    fieldNombreDeJours.constraint = "";
+                                                    fieldPrixParJour.constraint = "";
+                                                    if(fieldNombreDeJours.value != null && fieldPrixParJour.value != null) {
+                                                        fieldMontantFacture.value = fieldNombreDeJours.value * fieldPrixParJour.value;
+                                                    }
+                                                    fieldNombreDeJours.constraint = "no empty: Veillez indiquez une valeur";
+                                                    fieldPrixParJour.constraint = "no empty: Veillez indiquez une valeur";
+                                                ]]>   
+                                                </attribute>-->
+                                            </doublebox>
+                                        </row>
+                                    </rows>
+                                </grid>
+                            </tabpanel>
+                            <tabpanel>
+                                <grid fixedLayout="true">
+                                    <rows>
+                                        <row>
+                                            <label value="Véhicule" />
+                                            <combobox id="covehicules" model="@{interventionWin.vehicules}" constraint="no empty: Veillez indiquez une valeur" selectedItem="@{interventionWin.vehiculeSelected}" onBindingSave='if(self.value == null)throw new WrongValueException(self, "Vous devriez indiquer une valeur");' width="100px">
+                                                <attribute name="onChange">
+                                                    <![CDATA[
+                                                        //interventionWin.changerDeVoiture()"
+                                                        fieldKilometrageDepart.value = interventionWin.vehiculeSelected.kilometrage;
+                                                        if (interventionWin.trajetSelected != null) {
+                                                            fieldKilometrageRetour.value = fieldKilometrageDepart.value + interventionWin.trajetSelected.kilometrage;                                                                                                                    
+                                                            fieldDistanceParcourue.value = (double) ((fieldKilometrageRetour.value - fieldKilometrageDepart.value));
+                                                            fieldKilometrageDisque.value = fieldDistanceParcourue.value;
+
+                                                            if (fieldConsommationGasoil.value != null){
+                                                                Double consommationMin, consommationMax;
+                                                                if (coetatChargement.value.equals("CHARGE")) {
+                                                                    consommationMin = fieldConsommationGasoilMin.value;
+                                                                    consommationMax = fieldConsommationGasoilMax.value;
+                                                                }else {
+                                                                    consommationMin = fieldConsommationGasoilAvideMin.value;
+                                                                    consommationMax = fieldConsommationGasoilAvideMax.value;
+                                                                }
+                                                                if (fieldKilometrageDisque.value != null && consommationMax != null && consommationMin != null){
+                                                                    fieldPourcentageConsommation.value = fieldConsommationGasoil.value / fieldKilometrageDisque.value * 100;
+                                                                    if (fieldPourcentageConsommation.value > consommationMax){
+                                                                            fieldPourcentageConsommation.style = "background-color : red";
+                                                                    }else
+                                                                    if (fieldPourcentageConsommation.value < consommationMin) {
+                                                                        fieldPourcentageConsommation.style = "background-color : yellow";
+                                                                    }
+                                                                    else
+                                                                            fieldPourcentageConsommation.style = "background-color : green";
+                                                               }         
+                                                                     
+                                                           }
+                                                       }
+                                                    ]]>
+                                                </attribute>
+                                                <comboitem self="@{each=elementvehicule}" label="@{elementvehicule}"/>
+                                            </combobox>
+                                        </row>
+                                        <row>
+                                            <label value="Kilométrage départ "/>
+								 
+                                            <doublebox id="fieldKilometrageDepart" value="@{interventionWin.objet.kilometrageDepart, save-when='triggerBtn.onClick'}" onBindingSave='if(self.value == null)throw new WrongValueException(self, "Vous devriez indiquer une valeur");'/>
+                                        </row>												
+						
+                                        <row>
+                                            <label value="Kilométrage retour "/>
+								 
+                                            <doublebox id="fieldKilometrageRetour" value="@{interventionWin.objet.kilometrageRetour, save-when='triggerBtn.onClick'}" onBindingSave='if(self.value == null)throw new WrongValueException(self, "Vous devriez indiquer une valeur");'>
+                                                <attribute name="onChange">
+                                                    <![CDATA[
+                                                        fieldKilometrageDepart.constraint = "";
+                                                        fieldKilometrageRetour.constraint = "";
+                                                        if(fieldKilometrageDepart.value != null && fieldKilometrageRetour.value != null) {
+                                                            if (fieldKilometrageDepart.value >= fieldKilometrageRetour.value){
+                                                                fieldKilometrageRetour.value = fieldKilometrageDepart.value;
+                                                                
+                                                            } 
+                                                            fieldDistanceParcourue.value = fieldKilometrageRetour.value - fieldKilometrageDepart.value;
+                                                            fieldKilometrageDisque.value = fieldDistanceParcourue.value;
+                                                        }
+                                                        
+                                                        if (fieldConsommationGasoil.value != null){
+                                                            Double consommationMin, consommationMax;
+                                                            if (coetatChargement.value.equals("CHARGE")) {
+                                                                consommationMin = fieldConsommationGasoilMin.value;
+                                                                consommationMax = fieldConsommationGasoilMax.value;
+                                                            }else {
+                                                                consommationMin = fieldConsommationGasoilAvideMin.value;
+                                                                consommationMax = fieldConsommationGasoilAvideMax.value;
+                                                            }
+                                                            if (fieldKilometrageDisque.value != null && consommationMax != null && consommationMin != null){
+                                                                fieldPourcentageConsommation.value = fieldConsommationGasoil.value / fieldKilometrageDisque.value * 100;
+                                                                if (fieldPourcentageConsommation.value > consommationMax){
+                                                                        fieldPourcentageConsommation.style = "background-color : red";
+                                                                }else
+                                                                if (fieldPourcentageConsommation.value < consommationMin) {
+                                                                    fieldPourcentageConsommation.style = "background-color : yellow";
+                                                                }
+                                                                else
+                                                                        fieldPourcentageConsommation.style = "background-color : green";
+                                                            }
+                                                        }
+                                                        fieldKilometrageDepart.constraint = "no empty: Veillez indiquez une valeur";
+                                                    ]]>
+                                                </attribute>
+                                            </doublebox>
+                                        </row>
+                                        <row>
+                                            <label value="Distance parcourue"/>	 
+                                            <doublebox disabled="true" id="fieldDistanceParcourue"/>
+                                        </row>
+						       
+                                        <row>
+                                            <label value="Kilométrage disque"/>	 
+                                            <doublebox id="fieldKilometrageDisque" value="@{interventionWin.objet.kilometrageDisque, save-when='triggerBtn.onClick'}">
+                                                <attribute name="onChange">
+                                                    <![CDATA[
+                                                        if (fieldConsommationGasoil.value != null){
+                                                            Double consommationMin, consommationMax;
+                                                            if (coetatChargement.value.equals("CHARGE")) {
+                                                                consommationMin = fieldConsommationGasoilMin.value;
+                                                                consommationMax = fieldConsommationGasoilMax.value;
+                                                            }else {
+                                                                consommationMin = fieldConsommationGasoilAvideMin.value;
+                                                                consommationMax = fieldConsommationGasoilAvideMax.value;
+                                                            }
+                                                            if (fieldKilometrageDisque.value != null && consommationMax != null && consommationMin != null){
+                                                                fieldPourcentageConsommation.value = fieldConsommationGasoil.value / self.value * 100;
+                                                                if (fieldPourcentageConsommation.value > consommationMax){
+                                                                        fieldPourcentageConsommation.style = "background-color : red";
+                                                                }else
+                                                                if (fieldPourcentageConsommation.value < consommationMin) {
+                                                                    fieldPourcentageConsommation.style = "background-color : yellow";
+                                                                }
+                                                                else
+                                                                        fieldPourcentageConsommation.style = "background-color : green";
+                                                             }
+                                                        }    
+                                                    ]]>
+                                                </attribute>
+                                            </doublebox>
+                                        </row>	
+                                        
+                                        <row>
+                                            <label value="Consommation gasoil en Litre"/>
+                                            <doublebox id="fieldConsommationGasoil" readonly="true" format="#.0#" value="@{interventionWin.objet.consommationGasoil}" />
+                                        </row> 
+                                        
+                                        <row>
+                                            <hbox>
+                                                <label value="Consommation gasoil théorique"/>
+<!--                                            <label value="@{interventionWin.categorieFraisCirculationSelected.uniteMesure.idUnite}"/>-->
+                                            </hbox>  
+                                            <doublebox id="fieldChargeTheorique" format="#.0#" readonly="true" value="@{interventionWin.objet.trans_consommationGasoilTheorique}" >
+<!--                                                <attribute name="onChange">
+                                                    <![CDATA[
+
+                                                    ]]>
+                                                </attribute>-->
+                                            </doublebox>
+                                        </row>
+                                        
+                                        <row>
+                                            <label value="Surplus Consommation gasoil"/>
+                                            <doublebox id="fieldSurplusConsommation" readonly="true" format="#.0#" value="@{interventionWin.objet.trans_surplusGasoil}" >
+<!--                                                <attribute name="onChange">
+                                                    <![CDATA[
+
+                                                    ]]>
+                                                </attribute>-->
+                                            </doublebox>
+                                        </row>
+                                        
+                                        <row>
+                                            <label value="Consommation gasoil en %"/>
+                                            <cell>
+                                                <doublebox id="fieldConsommationGasoilAvideMin" visible="false" width="30px" readonly="true" format="#.0#" value="@{interventionWin.objet.vehicule.consommationGasoilAvideMin}" />
+                                                <doublebox id="fieldConsommationGasoilMin" visible="false" width="30px" readonly="true" format="#.0#" value="@{interventionWin.objet.vehicule.consommationGasoilMin}" />
+                                                <doublebox id="fieldPourcentageConsommation" width="30px" readonly="true" format="#.0#" value="@{interventionWin.objet.trans_pourcentageConsommation, save-when='triggerBtn.onClick'}"/>
+                                                <doublebox id="fieldConsommationGasoilAvideMax" visible="false" width="30px" readonly="true" format="#.0#" value="@{interventionWin.objet.vehicule.consommationGasoilAvideMax}" />
+                                                <doublebox id="fieldConsommationGasoilMax" visible="false" width="30px" readonly="true" format="#.0#" value="@{interventionWin.objet.vehicule.consommationGasoilMax}" />
+                                            </cell>
+                                        </row>
+                                        
+                                        <row>
+                                            <label value="Numéro B.Gasoil"/>		 
+                                            <textbox id="fieldNumBG" readonly="true" value="@{interventionWin.objet.trans_numBonGasoil}"/>
+                                        </row>
+                                        
+                                        <row>
+                                            <label value="Total charges en dirhams"/>
+                                            <doublebox id="fieldTotalCharges" readonly="true" format="#.0#" value="@{interventionWin.objet.totalCharges, save-when='triggerBtn.onClick'}" />
+                                        </row> 
+                                    </rows>		
+                                </grid>
+                            </tabpanel>
+                            <tabpanel>
+                                <grid fixedLayout="true">
+                                    <rows>
+                                        <row>
+                                            <label value="Numéro B.C."/>		 
+                                            <textbox id="fieldNumBC" value="@{interventionWin.objet.numBC, save-when='triggerBtn.onClick'}" onBindingSave='if(self.value == null)throw new WrongValueException(self, "Vous devriez indiquer une valeur");'/>
+                                        </row>	
+                                        
+                                        <row>
+                                            <label value="Numéro B.L."/>		 
+                                            <textbox id="fieldNumBL" value="@{interventionWin.objet.numBL, save-when='triggerBtn.onClick'}" onBindingSave='if(self.value == null)throw new WrongValueException(self, "Vous devriez indiquer une valeur");'/>
+                                        </row>
+                                        
+                                        <row>
+                                            <label value="Numéro facture"/>			 
+                                            <textbox id="fieldNumFacture" value="@{interventionWin.objet.numFacture, save-when='triggerBtn.onClick'}" />
+                                        </row>
+                                        
+                                        <row>
+                                            <label value="Lieu livraison"/>
+								 
+                                            <textbox id="fieldLieuLivraison" value="@{interventionWin.objet.lieuLivraison, save-when='triggerBtn.onClick'}" onBindingSave='if(self.value == null)throw new WrongValueException(self, "Vous devriez indiquer une valeur");'/>
+                                        </row>												
+						
+<!--                                        <row>
+                                            <label value="Lieu reprise"/>
+								 
+                                            <textbox id="fieldLieuReprise" value="@{interventionWin.objet.lieuReprise, save-when='triggerBtn.onClick'}" onBindingSave='if(self.value == null)throw new WrongValueException(self, "Vous devriez indiquer une valeur");'/>
+                                        </row>												-->
+						
+                                        <row>
+                                            <label value="Observations"/>
+								 
+                                            <textbox id="fieldObservations" value="@{interventionWin.objet.observations, save-when='triggerBtn.onClick'}" onBindingSave='if(self.value == null)throw new WrongValueException(self, "Vous devriez indiquer une valeur");'/>
+                                        </row>																								
+                                    </rows>
+                        
+                                </grid>
+                            </tabpanel>
+                            <tabpanel>
+                                <grid fixedLayout="true">
+                                    <rows>
+                         	
+                                        <row>
+                                            <label value="Chauffeur" />
+                                            <combobox id="coconducteurs" constraint="no empty: Veillez indiquez une valeur" model="@{interventionWin.conducteurs}" selectedItem="@{interventionWin.conducteurSelected}" onBindingSave='if(self.value == null)throw new WrongValueException(self, "Vous devriez indiquer une valeur");'>
+                                                <attribute name="onChange">
+                                                    <![CDATA[
+                                                        fieldPourcentageCommission.value = interventionWin.conducteurSelected.commission;
+                                                        if (fieldMontantDeBase.value != null && fieldPourcentageCommission.value != null)
+                                                            fieldCommission.value = interventionWin.arrondirePrix((fieldMontantDeBase.value * fieldPourcentageCommission.value)/100, 0.005, "Majoration");
+                                                    ]]>
+                                                </attribute>
+<!--                                                <attribute name="onBlur">
+                                                    <![CDATA[
+                                                        if (self.selectedItem == null) {
+                                                            self.focus = true;
+                                                        }
+                                                    ]]>
+                                                </attribute>-->
+                                                <comboitem self="@{each=elementconducteur}" label="@{elementconducteur}"/>
+                                            </combobox>
+                                        </row>
+                                        
+                                        <row>
+                                            <label value="Montant total pour commission"/>			 
+                                            <doublebox id="fieldMontantDeBase" format="#.0#" value="@{interventionWin.objet.montantDeBase, save-when='triggerBtn.onClick'}" onBindingSave='if(self.value == null)throw new WrongValueException(self, "Vous devriez indiquer une valeur");'>
+                                                <attribute name="onChange">
+                                                    <![CDATA[
+                                                      if(self.value != null && fieldPourcentageCommission.value != null)
+                                                        fieldCommission.value = interventionWin.arrondirePrix((fieldPourcentageCommission.value * self.value)/100, 0.005, "Majoration");
+                                                    ]]>   
+                                                </attribute>
+                                            </doublebox>
+                                        </row>
+                                        
+                                        <row>
+                                            <label value="Pourcentage commission"/>			 
+                                            <doublebox id="fieldPourcentageCommission" format="#.0#" value="@{interventionWin.objet.conducteur.commission}" >
+                                                <attribute name="onChange">
+                                                    <![CDATA[
+                                                      if(self.value != null && fieldMontantDeBase.value != null)
+                                                        fieldCommission.value = interventionWin.arrondirePrix((fieldMontantDeBase.value * self.value)/100, 0.005, "Majoration");
+                                                    ]]>   
+                                                </attribute>
+                                            </doublebox>
+                                        </row>
+                                        
+                                        <row>
+                                            <label value="Commission"/>			 
+                                            <doublebox id="fieldCommission" format="#.0#" value="@{interventionWin.objet.commissionChauffeur, save-when='triggerBtn.onClick'}" onBindingSave='if(self.value == null)throw new WrongValueException(self, "Vous devriez indiquer une valeur");'>
+                                                <attribute name="onChange">
+                                                    <![CDATA[
+                                                      if(self.value != null && fieldMontantDeBase.value != null && fieldMontantDeBase.value > 0)
+                                                        fieldPourcentageCommission.value = ( self.value * 100 )/ fieldMontantDeBase.value;
+                                                    ]]>   
+                                                </attribute>
+                                            </doublebox>
+                                        </row>
+						
+                                        <row>
+                                            <label value="Agent responsable" />
+                                            <combobox readonly="true" id="coagentLoueurResponsables" model="@{interventionWin.agentLoueurResponsables}" selectedItem="@{interventionWin.agentLoueurResponsableSelected}">
+                                                <comboitem self="@{each=elementagentLoueurResponsable}" label="@{elementagentLoueurResponsable}"/>
+                                            </combobox>
+                                        </row>
+						
+                                    </rows>
+                                </grid>
+                            </tabpanel>
+                        </tabpanels>
+                    </tabbox>
+					
+                    <separator />
+                    <button id="btnSave" label="Sauveguarder" image="/images/skin/database_save.png">
+                        <attribute name="onClick">
+                            <![CDATA[
+                                
+                                /*
+                                coclients.focus = true;
+                                coclients.constraint="no empty: Veillez indiquez une valeur";
+                                coclients.focus = false;
+                                
+                              
+                                coModeTarifs.focus = true;
+                                coModeTarifs.constraint="no empty: Veillez indiquez une valeur";
+                                coModeTarifs.focus = false;
+                                */
+                                Events.sendEvent(new Event(Events.ON_CLICK,triggerBtn));
+                                
+                                interventionWin.add();
+                             
+                            ]]>
+                        </attribute>
+                    </button>
+                    <button id="btnUpdate" label="Modifier" image="/images/skin/database_edit.png" visible="false">
+                        <attribute name="onClick">
+                            <![CDATA[
+                                Events.sendEvent(new Event(Events.ON_CLICK,triggerBtn));
+                                interventionWin.update();
+                                //cotype.disabled = !interventionWin.recordSelected;
+                                fieldDateDepart.disabled = !interventionWin.recordSelected;
+                                interventionWin.cancel();
+                            ]]>
+                        </attribute>
+                    </button>
+                    <button id="btnDelete" label="Supprimer" image="/images/skin/database_delete.png" visible="false">
+                        <attribute name="onClick">
+                            <![CDATA[
+                                Messagebox.show("Etes vous sûr de vouloir continuer ?", "Confirmation", Messagebox.OK | Messagebox.CANCEL, Messagebox.QUESTION, 
+                                new org.zkoss.zk.ui.event.EventListener() {
+                                    public void onEvent(Event evt) throws InterruptedException {
+                                        if (evt.getName().equals("onOK")) {
+                                            boolean isFIAdded = interventionWin.isFIAddedForCurrentIntervention();
+                                            if (isFIAdded){
+                                                Messagebox.show("Etes vous sûr de vouloir supprimer ces interventions ?", "Confirmation", Messagebox.OK | Messagebox.CANCEL, Messagebox.QUESTION, 
+                                                new org.zkoss.zk.ui.event.EventListener() {
+                                                    public void onEvent(Event evt) throws InterruptedException {
+                                                        if (evt.getName().equals("onOK")) {
+                                                            Events.sendEvent(new Event(Events.ON_CLICK,triggerBtn));
+                                                            interventionWin.deleteFIIntervention();
+                                                        } 
+                                                    }
+                                                });
+                                            }
+                                            Events.sendEvent(new Event(Events.ON_CLICK,triggerBtn));
+                                            interventionWin.delete();
+                                        } 
+                                    }
+                                });
+                            ]]>
+                        </attribute> 
+                    </button>
+                    <button id="btnCancel" label="Annuler" image="/images/skin/cancel.png" visible="true">
+                        <attribute name="onClick">
+                            <![CDATA[
+                                //cotype.disabled = !interventionWin.recordSelected;
+                                fieldDateDepart.disabled = !interventionWin.recordSelected;
+                                interventionWin.cancel();
+                            ]]>
+                        </attribute>
+                    </button>
+                    <button visible="false" id="triggerBtn" onBindingValidate=""/>
+                </groupbox>
+            </west>
+            <center border="none" flex="true">
+                <groupbox width="100%" height="100%">
+                    <attribute name="onClick">
+                        <![CDATA[
+                            //cotype.disabled = interventionWin.recordSelected;
+                            fieldDateDepart.disabled = !interventionWin.recordSelected;
+                        ]]>
+                    </attribute> 
+                    <listbox id="lstObjet" model="@{interventionWin.listeObjets}" selectedItem="@{interventionWin.objetSelected}" width="100%" height="100%" mold="paging" paginal="${paging}">
+                        <attribute name="onSelect">
+                            <![CDATA[
+                                //fieldDateDepart.disabled = !interventionWin.recordSelected;
+                                //interventionWin.actualiserValeurAssociation();
+                                interventionWin.select();
+                                //alert(interventionWin.modeTarifSelected);
+                                
+                                idClientRow.visible = true;
+                                idModeTarifRow.visible = true;
+                                coModeTarifs.value = interventionWin.modeTarifSelected;
+                                
+                                fieldDistanceParcourue.value = fieldKilometrageRetour.value - fieldKilometrageDepart.value;
+                                
+                                Double consommationMin, consommationMax;
+                                if (coetatChargement.value.equals("DECHARGE")) {
+                                    consommationMin = fieldConsommationGasoilAvideMin.value;
+                                    consommationMax = fieldConsommationGasoilAvideMax.value;
+                                    fieldConsommationGasoilAvideMin.visible = true;
+                                    fieldConsommationGasoilAvideMax.visible = true;
+                                    fieldConsommationGasoilMin.visible = false;
+                                    fieldConsommationGasoilMax.visible = false;
+                                }else {
+                                    coetatChargement.value = "CHARGE";
+                                    consommationMin = fieldConsommationGasoilMin.value;
+                                    consommationMax = fieldConsommationGasoilMax.value;
+                                    fieldConsommationGasoilMin.visible = true;
+                                    fieldConsommationGasoilMax.visible = true;
+                                    fieldConsommationGasoilAvideMin.visible = false;
+                                    fieldConsommationGasoilAvideMax.visible = false;
+                                }
+                                if (consommationMax != null && consommationMin != null){
+                                    if (fieldPourcentageConsommation.value > consommationMax){
+                                        fieldPourcentageConsommation.style = "background-color : red";
+                                    }else
+                                        if (fieldPourcentageConsommation.value < consommationMin) {
+                                            fieldPourcentageConsommation.style = "background-color : yellow";
+                                        }
+                                        else
+                                            fieldPourcentageConsommation.style = "background-color : green";
+                                }
+                                if(interventionWin.trajetSelected != null){
+                                    coTrajets.value = interventionWin.objetSelected.tarification.trajet.toString();
+                                    fieldPrix.value = fieldMontantFacture.value;
+                                    idTrajetRow.visible = true;
+                                    idRegionRow.visible = false;
+                                    idSourceRow.visible = true;
+                                    idPrixRow.visible = true;
+
+                                    if (interventionWin.modeTarifSelected.equals("Tonnage/Trajet"))
+                                        idQuantiteRow.visible = true;
+                                    else  idQuantiteRow.visible = false;
+                                    
+                                } else {
+                                    //alert(interventionWin.objetSelected.tarification.region);
+                                    if(interventionWin.regionSelected != null){
+                                        coRegions.value = interventionWin.objetSelected.tarification.region.toString();
+                                        fieldPrix.value = fieldMontantFacture.value;
+                                        idRegionRow.visible = true;
+                                        idTrajetRow.visible = false;
+                                        idSourceRow.visible = false;
+                                        idQuantiteRow.visible = false;
+                                        idPrixRow.visible = true;
+                                    } else
+                                       idQuantiteRow.visible = true;
+                                       idTrajetRow.visible = false;
+                                       idSourceRow.visible = false;
+                                       idRegionRow.visible = false;
+                                  }
+                                
+                            ]]>
+                        </attribute> 
+                        <auxhead sclass="category-center">
+				
+<!--                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <textbox id="filterNumIntervention" value="@{interventionWin.filtre.numIntervention}" onChanging="interventionWin.ofs; interventionWin.filtre.numIntervention=event.value; interventionWin.filtrer(); self.focus(); self.setSelectionRange(self.value.length(), self.value.length())" width="100%"/>
+                            </auxheader>-->
+                            
+                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <textbox id="filterNumBL" value="@{interventionWin.filtre.numBL}" onChanging="interventionWin.ofs; interventionWin.filtre.numBL=event.value; interventionWin.filtrer(); self.focus(); self.setSelectionRange(self.value.length(), self.value.length())" width="100%"/>
+                            </auxheader>
+                            
+                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <datebox id="filterDateDepart"  value="@{interventionWin.filtre.dateDepart}" onOK="interventionWin.ofs=0; interventionWin.filtrer(); self.focus();" width="90%"/>
+                            </auxheader>
+                            
+                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <textbox id="filterMission" value="@{interventionWin.filtre.mission}" onChanging="interventionWin.ofs; interventionWin.filtre.mission=event.value; interventionWin.filtrer(); self.focus(); self.setSelectionRange(self.value.length(), self.value.length())" width="100%"/>
+                            </auxheader>
+                            
+                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <doublebox id="filterTotalCharges" value="@{interventionWin.filtre.totalCharges}" width="100%">
+                                    <attribute name="onChanging">
+                                        <![CDATA[
+                                                interventionWin.ofs=0;
+                                                if(event.value.equals("")) {
+                                                    if(interventionWin.filtre.totalCharges != null) {
+                                                            interventionWin.filtre.totalCharges = null;
+                                                    }
+                                                } else {
+                                                        interventionWin.filtre.totalCharges=new Double(event.value.replaceAll(",", "."));
+                                                }
+                                                interventionWin.filtrer();
+                                                self.focus();
+                                                if(!event.value.equals("")) {
+                                                        self.setSelectionRange(self.value.toString().length(), self.value.toString().length());
+                                                }
+                                        ]]>
+                                    </attribute>    
+                                </doublebox>
+                            </auxheader>
+                            
+<!--                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <datebox id="filterDateRestitution" format="dd/MM/yyyy" value="@{interventionWin.filtre.dateRestitution}" onOK="interventionWin.ofs=0; interventionWin.filtrer(); self.focus();" width="90%"/>
+                            </auxheader>-->
+                            
+<!--                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <textbox id="filterNumBC" value="@{interventionWin.filtre.numBC}" onChanging="interventionWin.ofs; interventionWin.filtre.numBC=event.value; interventionWin.filtrer(); self.focus(); self.setSelectionRange(self.value.length(), self.value.length())" width="100%"/>
+                            </auxheader>-->
+				
+                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <doublebox id="filterconsommationGasoil" value="@{interventionWin.filtre.consommationGasoil}" width="100%">
+                                    <attribute name="onChanging">
+                                        <![CDATA[
+                                                interventionWin.ofs=0;
+                                                if(event.value.equals("")) {
+                                                        if(interventionWin.filtre.consommationGasoil != null) {
+                                                                interventionWin.filtre.consommationGasoil = null;
+                                                        }
+                                                } else {
+                                                        interventionWin.filtre.consommationGasoil=new Double(event.value.replaceAll(",", "."));
+                                                }
+                                                interventionWin.filtrer();
+                                                self.focus();
+                                                if(!event.value.equals("")) {
+                                                        self.setSelectionRange(self.value.toString().length(), self.value.toString().length());
+                                                }
+                                        ]]>
+                                    </attribute>    
+                                </doublebox>
+                            </auxheader> 
+<!--                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <textbox id="filterNumBonGasoil" value="@{interventionWin.filtre.numBonGasoil}" onChanging="interventionWin.ofs; interventionWin.filtre.numBonGasoil=event.value; interventionWin.filtrer(); self.focus(); self.setSelectionRange(self.value.length(), self.value.length())" width="100%"/>
+                            </auxheader>-->
+                            
+                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <doublebox id="filterpourcentageConsommation" value="@{interventionWin.filtre.pourcentageConsommation}" width="100%">
+                                    <attribute name="onChanging">
+                                        <![CDATA[
+                                                interventionWin.ofs=0;
+                                                if(event.value.equals("")) {
+                                                        if(interventionWin.filtre.pourcentageConsommation != null) {
+                                                                interventionWin.filtre.pourcentageConsommation = null;
+                                                        }
+                                                } else {
+                                                        interventionWin.filtre.pourcentageConsommation=new Double(event.value.replaceAll(",", "."));
+                                                }
+                                                interventionWin.filtrer();
+                                                self.focus();
+                                                if(!event.value.equals("")) {
+                                                        self.setSelectionRange(self.value.toString().length(), self.value.toString().length());
+                                                }
+                                        ]]>
+                                    </attribute>    
+                                </doublebox>
+                            </auxheader>   
+                            
+<!--                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <doublebox id="filterKilometrageDisque" value="@{interventionWin.filtre.kilometrageDisque}" width="100%">
+                                    <attribute name="onChanging">
+                                        <![CDATA[
+                                                interventionWin.ofs=0;
+                                                if(event.value.equals("")) {
+                                                        if(interventionWin.filtre.kilometrageDisque != null) {
+                                                                interventionWin.filtre.kilometrageDisque = null;
+                                                        }
+                                                } else {
+                                                        interventionWin.filtre.kilometrageDisque=new Integer(event.value);
+                                                }
+                                                interventionWin.filtrer();
+                                                self.focus();
+                                                if(!event.value.equals("")) {
+                                                        self.setSelectionRange(self.value.toString().length(), self.value.toString().length());
+                                                }
+                                        ]]>
+                                    </attribute>    
+                                </doublebox>
+                            </auxheader>   -->
+			
+                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+<!--                                <textbox id="filterClient" value="@{interventionWin.filtre.client.code}" onOK="interventionWin.ofs=0; interventionWin.filtrer(); self.focus();" width="90%"/>-->
+                                <combobox id="filterclient" model="@{interventionWin.clients}" selectedItem="@{interventionWin.filtre.client}" autocomplete="true" autodrop="true" mold="rounded" onSelect="interventionWin.ofs=0;interventionWin.filtrer()" onOK="interventionWin.ofs=0;interventionWin.filtrer()" width="85%">
+                                    <comboitem self="@{each=elementfiltreclient}" label="@{elementfiltreclient}"/>
+                                </combobox>
+                            </auxheader>
+                            
+                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+<!--                                <textbox id="filterVehicule" value="@{interventionWin.filtre.vehicule.code}" onOK="interventionWin.ofs=0; interventionWin.filtrer(); self.focus();" width="90%"/>-->
+                                <combobox id="filtervehicule" model="@{interventionWin.vehicules}" selectedItem="@{interventionWin.filtre.vehicule}" autocomplete="true" autodrop="true" mold="rounded" onSelect="interventionWin.ofs=0;interventionWin.filtrer()" onOK="interventionWin.ofs=0;interventionWin.filtrer()" width="85%">
+                                    <comboitem self="@{each=elementfiltrevehicule}" label="@{elementfiltrevehicule}"/>
+                                </combobox>
+                            </auxheader>
+                            
+                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+<!--                                <textbox id="filterConducteur" value="@{interventionWin.filtre.conducteur.code}" onOK="interventionWin.ofs=0; interventionWin.filtrer(); self.focus();" width="90%"/>-->
+                                <combobox id="filterconducteur" model="@{interventionWin.conducteurs}" selectedItem="@{interventionWin.filtre.conducteur}" autocomplete="true" autodrop="true" mold="rounded" onSelect="interventionWin.ofs=0;interventionWin.filtrer()" onOK="interventionWin.ofs=0;interventionWin.filtrer()" width="85%">
+                                    <comboitem self="@{each=elementfiltreconducteur}" label="@{elementfiltreconducteur}"/>
+                                </combobox>
+                            </auxheader>
+                            
+                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <doublebox id="filterCommission" value="@{interventionWin.filtre.commissionChauffeur}" width="100%">
+                                    <attribute name="onChanging">
+                                        <![CDATA[
+                                                interventionWin.ofs=0;
+                                                if(event.value.equals("")) {
+                                                        if(interventionWin.filtre.commissionChauffeur != null) {
+                                                                interventionWin.filtre.commissionChauffeur = null;
+                                                        }
+                                                } else {
+                                                        interventionWin.filtre.commissionChauffeur=new Double(event.value);
+                                                }
+                                                interventionWin.filtrer();
+                                                self.focus();
+                                                if(!event.value.equals("")) {
+                                                        self.setSelectionRange(self.value.toString().length(), self.value.toString().length());
+                                                }
+                                        ]]>
+                                    </attribute>    
+                                </doublebox>
+                            </auxheader>
+                            
+                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <doublebox id="filterMontantFacture" value="@{interventionWin.filtre.montantFacture}" width="100%">
+                                    <attribute name="onChanging">
+                                        <![CDATA[
+                                                interventionWin.ofs=0;
+                                                if(event.value.equals("")) {
+                                                        if(interventionWin.filtre.montantFacture != null) {
+                                                                interventionWin.filtre.montantFacture = null;
+                                                        }
+                                                } else {
+                                                        interventionWin.filtre.montantFacture=new Double(event.value);
+                                                }
+                                                interventionWin.filtrer();
+                                                self.focus();
+                                                if(!event.value.equals("")) {
+                                                        self.setSelectionRange(self.value.toString().length(), self.value.toString().length());
+                                                }
+                                        ]]>
+                                    </attribute>    
+                                </doublebox>
+                            </auxheader>
+                            
+                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <textbox id="filterObservation" value="@{interventionWin.filtre.observations}" onChanging="interventionWin.ofs; interventionWin.filtre.observations=event.value; interventionWin.filtrer(); self.focus(); self.setSelectionRange(self.value.length(), self.value.length())" width="100%"/>
+                            </auxheader>
+                            
+<!--                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <textbox id="filterNumFacture" value="@{interventionWin.filtre.numFacture}" onChanging="interventionWin.ofs; interventionWin.filtre.numFacture=event.value; interventionWin.filtrer(); self.focus(); self.setSelectionRange(self.value.length(), self.value.length())" width="100%"/>
+                            </auxheader>
+                            -->
+                            <!--                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <doublebox id="filterPrixParJour" value="@{interventionWin.filtre.prixParJour}" width="100%">
+                                    <attribute name="onChanging">
+										<![CDATA[
+											interventionWin.ofs=0;
+											if(event.value.equals("")) {
+												if(interventionWin.filtre.prixParJour != null) {
+													interventionWin.filtre.prixParJour = null;
+												}
+											} else {
+												interventionWin.filtre.prixParJour=new Double(event.value);
+											}
+											interventionWin.filtrer();
+											self.focus();
+											if(!event.value.equals("")) {
+												self.setSelectionRange(self.value.toString().length(), self.value.toString().length());
+											}
+										]]>
+                                    </attribute>    
+                                </doublebox>
+                            </auxheader>
+
+                          <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <intbox id="filterNombreDeJours" value="@{interventionWin.filtre.nombreDeJours}" width="100%">
+                                    <attribute name="onChanging">
+										<![CDATA[
+											interventionWin.ofs=0;
+											if(event.value.equals("")) {
+												if(interventionWin.filtre.nombreDeJours != null) {
+													interventionWin.filtre.nombreDeJours = null;
+												}
+											} else {
+												interventionWin.filtre.nombreDeJours=new Integer(event.value);
+											}
+											interventionWin.filtrer();
+											self.focus();
+											if(!event.value.equals("")) {
+												self.setSelectionRange(self.value.toString().length(), self.value.toString().length());
+											}
+										]]>
+                                    </attribute>    
+                                </intbox>
+                            </auxheader>
+								
+                           <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <doublebox id="filterKilometrageDepart" value="@{interventionWin.filtre.kilometrageDepart}" width="100%">
+                                    <attribute name="onChanging">
+										<![CDATA[
+											interventionWin.ofs=0;
+											if(event.value.equals("")) {
+												if(interventionWin.filtre.kilometrageDepart != null) {
+													interventionWin.filtre.kilometrageDepart = null;
+												}
+											} else {
+												interventionWin.filtre.kilometrageDepart=new Integer(event.value);
+											}
+											interventionWin.filtrer();
+											self.focus();
+											if(!event.value.equals("")) {
+												self.setSelectionRange(self.value.toString().length(), self.value.toString().length());
+											}
+										]]>
+                                    </attribute>    
+                                </doublebox>
+                            </auxheader>
+								
+                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <doublebox id="filterKilometrageRetour" value="@{interventionWin.filtre.kilometrageRetour}" width="100%">
+                                    <attribute name="onChanging">
+										<![CDATA[ 
+											interventionWin.ofs=0;
+											if(event.value.equals("")) {
+												if(interventionWin.filtre.kilometrageRetour != null) {
+													interventionWin.filtre.kilometrageRetour = null;
+												}
+											} else {
+												interventionWin.filtre.kilometrageRetour=new Integer(event.value);
+											}
+											interventionWin.filtrer();
+											self.focus();
+											if(!event.value.equals("")) {
+												self.setSelectionRange(self.value.toString().length(), self.value.toString().length());
+											}
+										]]>
+                                    </attribute>    
+                                </doublebox>
+                            </auxheader>
+
+								
+                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <textbox id="filterLieuLivraison" value="@{interventionWin.filtre.lieuLivraison}" onChanging="interventionWin.ofs; interventionWin.filtre.lieuLivraison=event.value; interventionWin.filtrer(); self.focus(); self.setSelectionRange(self.value.length(), self.value.length())" width="100%"/>
+                            </auxheader>
+								
+                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <textbox id="filterLieuReprise" value="@{interventionWin.filtre.lieuReprise}" onChanging="interventionWin.ofs; interventionWin.filtre.lieuReprise=event.value; interventionWin.filtrer(); self.focus(); self.setSelectionRange(self.value.length(), self.value.length())" width="100%"/>
+                            </auxheader>
+								
+                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <textbox id="filterObservations" value="@{interventionWin.filtre.observations}" onChanging="interventionWin.ofs; interventionWin.filtre.observations=event.value; interventionWin.filtrer(); self.focus(); self.setSelectionRange(self.value.length(), self.value.length())" width="100%"/>
+                            </auxheader>
+								
+                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <textbox id="filterContratNumeriser" value="@{interventionWin.filtre.contratNumeriser}" onChanging="interventionWin.ofs; interventionWin.filtre.contratNumeriser=event.value; interventionWin.filtrer(); self.focus(); self.setSelectionRange(self.value.length(), self.value.length())" width="100%"/>
+                            </auxheader>-->
+                            
+                            <auxheader colspan="1"/>
+								 
+                        </auxhead>
+                        <listhead sizable="true">
+							
+<!--                            <listheader id="hnumIntervention" label="N° Intervention" sort="auto(numIntervention)" onSort="interventionWin.sort(event);"/>	-->
+                            
+                            <listheader label="N° B.L." sort="auto(numBL)" onSort="interventionWin.sort(event)" width="80px"/>	
+
+                            <listheader id="hdateDepart" label="Date Départ" sort="auto(dateDepart)" onSort="interventionWin.sort(event)"/>	
+
+                            <listheader id="hmission" label="Mission" sort="auto(mission)" onSort="interventionWin.sort(event)" />	
+							
+<!--                            <listheader label="Date restitution" sort="auto(dateRestitution)" onSort="interventionWin.sort(event)"/>	-->
+                            
+                            <listheader id="htotalCharges" label="Charges(DH)" sort="auto(totalCharges)" onSort="interventionWin.sort(event)" width="80px"/>	
+                            
+                            <listheader id="hconsommationGasoil" label="Gasoil(Litre)" sort="auto(consommationGasoil)" onSort="interventionWin.sort(event)" width="80px"/>	
+                            
+<!--                            <listheader id="htrans_numBonGasoil" label="N°Bon Gasoil" sort="auto(trans_numBonGasoil)" onSort="interventionWin.sort(event)" width="80px"/>	-->
+                            
+                            <listheader id="htrans_pourcentageConsommation" label="Consom.(%)" sort="auto(trans_pourcentageConsommation)" onSort="interventionWin.sort(event)" width="80px"/>	
+                            
+<!--                            <listheader label="Kilométrage disque" sort="auto(kilometrageDisque)" onSort="interventionWin.sort(event)"/>	-->
+					
+                            <listheader id="hclient" label="Client" sort="auto(client.code)" onSort="interventionWin.sort(event)"/>
+                            
+                            <listheader id="hvehicule" label="Véhicule" sort="auto(vehicule.code)" onSort="interventionWin.sort(event)"/>	
+                            
+                            <listheader id="hconducteur" label="Chauffeur" sort="auto(conducteur.code)" onSort="interventionWin.sort(event)"/>	
+			    <!--				
+                            <listheader label="Kilométrage départ" sort="auto(kilometrageDepart)" onSort="interventionWin.sort(event)"/>	
+							
+                            <listheader label="Kilométrage retour" sort="auto(kilometrageRetour)" onSort="interventionWin.sort(event)"/>		
+							
+                            <listheader label="Lieu livraison" sort="auto(lieuLivraison)" onSort="interventionWin.sort(event)"/>	
+							
+                            <listheader label="Lieu reprise" sort="auto(lieuReprise)" onSort="interventionWin.sort(event)"/>	
+							
+-->                       					
+                            <listheader id="hcommissionChauffeur" label="Commission" sort="auto(commissionChauffeur)" onSort="interventionWin.sort(event)" width="80px"/>
+                            
+                            <listheader id="hmontantFacture" label="Mt Total(DH)" sort="auto(montantFacture)" onSort="interventionWin.sort(event)" width="80px"/>
+                            
+                            <listheader label="Validé ?" sort="auto(observations)" onSort="interventionWin.sort(event)" width="60px"/>
+                            
+<!--                            <listheader label="Num facture" sort="auto(numFacture)" onSort="interventionWin.sort(event)"/>	-->
+                            
+                            <listheader width="32px" />
+							                                 
+                        </listhead>
+                        <listitem self="@{each=element}">                         
+                            
+                            <listcell visible="false" label="@{element.numIntervention}"/>
+
+                            <listcell label="@{element.numBL}"/>
+                            
+                            <listcell>
+                                <datebox value="@{element.dateDepart}" inplace="true" readonly="true" width="99%"/>
+                            </listcell>
+
+                            <listcell>
+                                <textbox value="@{element.mission}" inplace="true" readonly="true" width="99%"/>
+                            </listcell>
+                            
+<!--                            <listcell label="@{element.dateRestitution}"/>-->
+                            
+                            <listcell >
+                                <doublebox readonly="true" inplace="true" format="#0.0" value="@{element.totalCharges}" width="65px" />
+                            </listcell>
+
+<!--                            <listcell label="@{element.consommationGasoil, converter='com.choranet.zk.DoubleConverter'}"/>-->
+                            <listcell>
+                                <doublebox readonly="true" inplace="true" format="#0.0" value="@{element.consommationGasoil}" width="65px" />
+                            </listcell>
+<!--                            <listcell label="@{element.trans_numBonGasoil}"/>-->
+                            
+                            <listcell >
+                                <doublebox readonly="true" inplace="true" format="#0.0" value="@{element.trans_pourcentageConsommation}" width="25px" />
+                                <label value="%"/>
+                            </listcell>
+                            
+                            <listcell>
+                                <textbox value="@{element.client}" inplace="true" readonly="true" width="99%"/>
+                            </listcell>
+                            
+                            <listcell>
+                                <textbox value="@{element.vehicule}" inplace="true" readonly="true" width="99%"/>
+                            </listcell>
+                            
+                            <listcell>
+                                <textbox value="@{element.conducteur}" inplace="true" readonly="true" width="99%"/>
+                            </listcell>
+							
+<!--                        <listcell label="@{element.prixParJour}"/>
+
+                            <listcell label="@{element.nombreDeJours}"/>
+							
+                            <listcell label="@{element.kilometrageDepart}"/>
+							
+                            <listcell label="@{element.kilometrageRetour}"/>
+							
+                            <listcell label="@{element.lieuLivraison}"/>
+							
+                            <listcell label="@{element.lieuReprise}"/>
+							
+                            <listcell label="@{element.contratNumeriser}"/>
+-->
+                            <listcell>
+                                <doublebox readonly="true" inplace="true" format="#0.0" value="@{element.commissionChauffeur}" width="65px" />
+                            </listcell>
+                            
+                            <listcell>
+                                <doublebox readonly="true" inplace="true" format="#0.0" value="@{element.montantFacture}" width="65px" />
+                            </listcell>
+                            
+                            <listcell>
+                                <textbox value="@{element.observations}" inplace="true" readonly="true" width="99%"/>
+                            </listcell>
+                            
+                            <listcell>
+                                <checkbox>
+                                    <attribute name="onCheck">
+                                        <![CDATA[
+                                            if (self.checked)
+                                                interventionWin.addElementToList(self.parent.parent.label);
+                                            else
+                                                interventionWin.RemoveElementFromList(self.parent.parent.label);
+                                        ]]>
+                                    </attribute>
+                                </checkbox>
+                            </listcell>
+                            
+<!--                            <listcell label="@{element.numFacture}"/>-->
+							     
+                        </listitem>
+                    </listbox>                   
+                    <paging id="paging" totalSize="@{interventionWin.tailleListe}" pageSize="@{interventionWin.maxNb}" onPaging="interventionWin.getNextElements(event);" />
+                    <separator/>
+                    <button id="btnNew" label="Nouveau" image="/images/skin/database_add.png">
+                        <attribute name="onClick">
+                            <![CDATA[
+                                interventionWin.tarificationSelected = null;
+                                interventionWin.cancel();
+                                interventionWin.objetSelected = null;
+                                interventionWin.newRecord();
+                                //interventionWin.rafraichirList();
+                                fieldDistanceParcourue.value = null;
+                               
+                                fieldNumIntervention.value = interventionWin.objet.numIntervention;
+                                //cotype.disabled = interventionWin.recordSelected;
+                                fieldDateDepart.disabled = interventionWin.recordSelected;
+                                //interventionWin.actualiserValeurAssociation();
+                                
+                                idClientRow.visible = false;
+                                idModeTarifRow.visible = false;
+                                coTrajets.value = null;
+                                idTrajetRow.visible = false;
+                                idSourceRow.visible = false;
+                                idRegionRow.visible = false;
+                                idQuantiteRow.visible = false;
+                                idPrixRow.visible = false;
+                            ]]>
+                        </attribute>
+                    </button>
+                    <button id="btnPdf" onClick="interventionWin.genererRapportPdf()" label="Generer rapport simplifié" image="/images/skin/pdf-soubor-logo.png"/>
+                    <button id="btnPdfComplet" onClick="interventionWin.genererRapportPdfVersionComplet()" label="Generer rapport" image="/images/skin/pdf-soubor-logo.png"/>
+                    <button id="btnExcel" onClick="interventionWin.genererRapportExcel()" label="Generer excel" image="/images/skin/excel-icon.png"/>
+                    <button id="btnAjoutFC" label="Frais Gasoil/Huile partagés" image="/images/skin/BriefcaseSpark-16x16.png" visible="true" onClick="interventionWin.doModalDialogFC()" />
+                    <button id="btnUpdateConsom" onClick="interventionWin.updateConsommationsGasoilTheorique()" label="Update consommation" image="/images/skin/excel-icon.png" visible="false"/>
+                    <button id="btnUpdateDateDepart" onClick="interventionWin.updateDateDepartMois_Annee()" label="Update dateDepart" image="/images/skin/excel-icon.png" visible="false"/>
+                </groupbox>
+            </center>
+        </borderlayout>
+        <window id="winFraisIntervention" title="Gestion des frais d'intervention" border="normal" width="845px" height="86%"
+                closable="true" action="show: slideDown;hide: slideUp" position="center,center" visible = "false" onClose="self.visible = false; event.stopPropagation();">
+            <borderlayout>
+                <north id="winFC" size="170px" open="true"  title="Frais Gasoil/Huile" flex="true" splittable="true"  collapsible="true">
+                    <grid id="grcrud" fixedLayout="true" visible="true">
+                        <rows>
+                            <row>
+                                <label value="N° Bon"/>		 
+                                <textbox id="fieldNumBon" constraint="no empty: Veillez indiquez une valeur" value="@{interventionWin.nvnumBon}" />
+                                <label value="Fournisseur" />
+                                <combobox id="cofournisseurs" model="@{interventionWin.fournisseurs}" selectedItem="@{interventionWin.fournisseurSelected}">
+                                    <comboitem self="@{each=elementfournisseur}" label="@{elementfournisseur}"/>
+                                </combobox>
+                            </row>                     
+                            <row>
+                                <label value="Date"/>				 
+                                <datebox id="fieldDate" constraint="no empty: Veillez indiquez une valeur" format="dd/MM/yyyy HH:mm" width="134px" value="@{interventionWin.nvdate}"/>
+                                <label value="Catégorie frais" />
+                                <combobox readonly="true" id="cocategorieFraisCirculations" model="@{interventionWin.categorieFraisCirculations}" selectedItem="@{interventionWin.categorieFraisCirculationSelected, save-when='self.onChange'}">
+                                    <attribute name="onSelect">
+                                       <![CDATA[ 
+                                            if(self.value.startsWith("Bon gasoil")){
+                                                htrans_consommationGasoilCoche.label = "Gasoil(Litre)";
+                                            }else{
+                                                htrans_consommationGasoilCoche.label = "Huile(Litre)";
+                                            }
+                                            //fieldMontant.value = 0;
+                                            //fieldChargeEnUM.value = 0;
+                                            fieldDetails.value = self.value;
+                                            interventionWin.nvdetails = self.value;
+                                       ]]>
+                                    </attribute>
+<!--                                    <comboitem label="Bon gasoil" value="gasoil"/>
+                                    <comboitem label="Bon huile" value="huile"/>-->
+                                    <comboitem self="@{each=elementcategorieFraisCirculation}" label="@{elementcategorieFraisCirculation}"/>
+                                </combobox>
+                            </row>  
+                            <row>
+                                <label value="Montant en dirham"/> 
+                                <doublebox id="fieldMontant" format="#.0##" constraint="no negative, no empty: Veillez indiquez une valeur" value="@{interventionWin.nvmontant}">
+                                    <attribute name="onChange">
+                                        <![CDATA[
+                                            if(self.value != null){
+                                                interventionWin.calculerChargeEnUM(self.value);
+                                                filterconsommationGasoilCoche.value = fieldChargeEnUM.value;
+                                                interventionWin.pourcentageConsommationCoche = fieldChargeEnUM.value / interventionWin.kilometrageDisqueCoche * 100;
+                                                interventionWin.getConsommationsGasoilForCheckedInterventions();
+                                                interventionWin.nvdetails += " ( " + Double.valueOf(fieldChargeEnUM.value) + " Litre, " + Double.valueOf(fieldMontant.value) + " DHs )"; 
+                                                interventionWin.totalConsommationGasoilTheoriqueMax = fieldChargeEnUM.value;
+                                            }
+                                        ]]>
+                                    </attribute>
+                                </doublebox>
+                                <hbox>
+                                    <label value="Consommation en "/>
+                                    <label value="@{interventionWin.categorieFraisCirculationSelected.uniteMesure.idUnite}"/>
+                                </hbox>                 
+                                <doublebox id="fieldChargeEnUM" format="#.0#" constraint="no negative, no empty: Veillez indiquez une valeur" value="@{interventionWin.nvchargeEnUM}" >
+                                    <attribute name="onChange">
+                                        <![CDATA[
+                                            if(self.value != null){
+                                                fieldMontant.value = self.value * interventionWin.categorieFraisCirculationSelected.uniteMesure.valeur;
+                                                interventionWin.nvmontant = fieldMontant.value;
+                                                filterconsommationGasoilCoche.value = self.value;
+                                                interventionWin.pourcentageConsommationCoche = self.value / interventionWin.kilometrageDisqueCoche * 100;
+                                                interventionWin.getConsommationsGasoilForCheckedInterventions();
+                                                interventionWin.nvdetails += " ( " + Double.valueOf(fieldChargeEnUM.value) + " Litre, " + Double.valueOf(fieldMontant.value) + " DHs )"; 
+                                                interventionWin.updatePourcentageConsomsAfterTotalChargeConsomUpdate();
+                                            }
+                                        ]]>
+                                    </attribute>
+                                </doublebox>                       
+                            </row>											                  
+                            <row>
+                                <label value="Détails"/>
+                                <textbox id="fieldDetails" value="@{interventionWin.nvdetails}" width="565px"/> 
+                                <hbox>
+                                    <label value="Consommation théorique"/>
+<!--                                    <label value="@{interventionWin.categorieFraisCirculationSelected.uniteMesure.idUnite}"/>-->
+                                </hbox>  
+<!--                                <cell>-->
+                                <doublebox id="fieldChargeTheorique" readonly="true" format="#.0#" value="@{interventionWin.totalConsommationGasoilTheoriqueMax}" >
+                                    <attribute name="onChange">
+                                        <![CDATA[
+                                            
+                                        ]]>
+                                    </attribute>
+                                </doublebox>  
+<!--                                    <doublebox id="fieldSurplus" format="#.0#" value="@{interventionWin.objet.surplusConsommationGasoil}" >
+                                        <attribute name="onChange">
+                                        <![CDATA[
+                                            
+                                        ]]>
+                                        </attribute>
+                                    </doublebox>
+                                </cell>-->
+                            </row>					
+                        </rows>
+                    </grid>
+                </north>
+                <center flex="true">
+                    <groupbox  width="100%" height="100%">
+                        <listbox id="lstInterventionsChoisis" model="@{interventionWin.interventionsChoisis}" selectedItem="@{interventionWin.interventionsChoisieSelected}"  width="800px" height="350px" rows="9">
+                            <auxhead sclass="category-center">
+<!--                                <auxheader colspan="1"/>-->
+                                <auxheader colspan="1">
+<!--                                    <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                    <textbox id="filterNumBLCoche" value="@{interventionWin.numBLCoche}" onChanging="interventionWin.ofs; interventionWin.numBLCoche=event.value; interventionWin.filtrer(); self.focus(); self.setSelectionRange(self.value.length(), self.value.length())" width="100%"/>-->
+                                </auxheader>
+                            
+                                <auxheader colspan="1">
+<!--                                    <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                    <textbox id="filterMissionCoche" value="@{interventionWin.missionCoche}" onChanging="interventionWin.ofs; interventionWin.missionCoche=event.value; interventionWin.filtrer(); self.focus(); self.setSelectionRange(self.value.length(), self.value.length())" width="100%"/>-->
+                                </auxheader>
+                    
+                                <auxheader colspan="1">
+                                    <doublebox id="totalconsommationGasoilCoche" readonly="true" format="#.0#" value="@{interventionWin.nvchargeEnUM}" width="100%"/>  
+                                </auxheader> 
+                    
+                                <auxheader colspan="1">
+                                    <doublebox id="totalkilometrageCoche" readonly="true" value="@{interventionWin.kilometrageDisqueCoche}" width="100%"/>
+                                </auxheader>     
+                                
+                                <auxheader colspan="1">
+                                    <doublebox id="totalpourcentageConsommationCoche" format="#.0#" readonly="true" value="@{interventionWin.pourcentageConsommationCoche}" width="100%"/>
+                                </auxheader>
+                                
+                                <auxheader colspan="1">
+                                    <doublebox id="totalSurplusConsommationGasoil" format="#.0#" readonly="true" value="@{interventionWin.totalSurplusConsommationGasoil}" width="100%"/>
+                                </auxheader>
+                    
+                                <auxheader colspan="1">
+<!--                                    <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                    <combobox id="filterclientCoche" model="@{interventionWin.clientsCoche}" selectedItem="@{interventionWin.clientCoche}" autocomplete="true" autodrop="true" mold="rounded" onSelect="interventionWin.ofs=0;interventionWin.filtrer()" onOK="interventionWin.ofs=0;interventionWin.filtrer()" width="85%">
+                                        <comboitem self="@{each=elementfiltreclientCoche}" label="@{elementfiltreclientCoche}"/>
+                                    </combobox>-->
+                                </auxheader>
+                            
+                                <auxheader colspan="1">
+<!--                                    <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                    <combobox id="filtervehiculeCoche" model="@{interventionWin.vehiculesCoche}" selectedItem="@{interventionWin.vehiculeCoche}" autocomplete="true" autodrop="true" mold="rounded" onSelect="interventionWin.ofs=0;interventionWin.filtrer()" onOK="interventionWin.ofs=0;interventionWin.filtrer()" width="85%">
+                                        <comboitem self="@{each=elementfiltrevehiculeCoche}" label="@{elementfiltrevehiculeCoche}"/>
+                                    </combobox>-->
+                                </auxheader>
+                            
+                                <auxheader colspan="1">
+<!--                                    <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                    <combobox id="filterconducteurCoche" model="@{interventionWin.conducteursCoche}" selectedItem="@{interventionWin.conducteurCoche}" autocomplete="true" autodrop="true" mold="rounded" onSelect="interventionWin.ofs=0;interventionWin.filtrer()" onOK="interventionWin.ofs=0;interventionWin.filtrer()" width="85%">
+                                        <comboitem self="@{each=elementfiltreconducteurCoche}" label="@{elementfiltreconducteurCoche}"/>
+                                    </combobox>-->
+                                </auxheader>
+                            </auxhead>
+                            <listhead sizable="true">
+<!--                                <listheader width="32px" />-->
+                                <listheader id="hnumbl" label="N° B.L." sort="auto(numBL)"/>	
+                                <listheader id="hmissionCoche" label="Mission" sort="auto(mission)" />
+                                <listheader id="htrans_consommationGasoilCoche" label="Gasoil(Litre)" sort="auto(trans_consommationGasoil)"/>
+                                <listheader id="hkilometrageDisqueCoche" label="Kilométrage disque" sort="auto(kilometrageDisque)" width="130px"/>			
+                                <listheader id="htrans_pourcentageConsommationCoche" label="Consom.(%)" sort="auto(trans_pourcentageConsommation)"/>	        
+                                <listheader id="hsurplusConsommationGasoil" label="Surplus"/>
+                                <listheader id="hclientCoche" label="Client" sort="auto(client.code)"/>
+                                <listheader id="hvehiculeCoche" label="Véhicule" sort="auto(vehicule.code)"/>	
+                                <listheader id="hconducteurCoche" label="Chauffeur" sort="auto(conducteur.code)"/>	
+                            </listhead>
+                            <listitem value="@{elementCoche}" self="@{each=elementCoche}" label="@{elementCoche.numIntervention}">    
+                                <listcell image="/images/skin/icon_selection.png" visible="false"/>
+                                <listcell label="@{elementCoche.numBL}" />
+                                <listcell>
+                                    <textbox value="@{elementCoche.mission}" inplace="true"/>
+                                </listcell>
+                                <listcell>
+                                    <doublebox value="@{elementCoche.consommationGasoil}" readonly="true" constraint= "no negative, no empty : Veillez indiquez une valeur inférieur à la consommation total"  format="#.0#" inplace="true">
+                                        <attribute name="onOK">
+                                            <![CDATA[
+                                               if (totalconsommationGasoilCoche.value >= self.value){                                                  
+                                                  interventionWin.updateConsommationsGasoilAfterConsommationUpdate(self.parent.parent.label);
+                                               }
+                                               else {
+                                                    self.constraint = null;
+                                                    self.value = null;
+                                                    self.constraint = "no negative, no empty : Veillez indiquez une valeur inférieur ou = à la consommation total";
+                                                    self.focus();
+                                                    totalconsommationGasoilCoche.focus();
+                                               }
+                                            ]]>
+                                        </attribute>
+                                        <attribute name="onCreate">
+                                            <![CDATA[
+                                                if (interventionWin.interventionsChoisis.size() > 1){
+                                                    self.readonly = false;
+                                                }else 
+                                                    self.readonly = true;
+                                            ]]>
+                                        </attribute>
+                                    </doublebox>
+                                </listcell>
+                                <listcell>
+                                    <doublebox value="@{elementCoche.kilometrageDisque}" format="#.0#" inplace="true">
+                                        <attribute name="onChange">
+                                            <![CDATA[
+                                                  interventionWin.updateConsommationsGasoilAfterkilometrageDisqueUpdate(self.parent.parent.label, self.value);
+                                            ]]>
+                                        </attribute>
+                                    </doublebox>
+                                </listcell>
+                                <listcell>
+                                    <doublebox value="@{elementCoche.trans_pourcentageConsommation}" readonly="true" format="#.0#" width="30px" inplace="true">
+                                        <attribute name="onChange">
+                                            <![CDATA[
+                                                  //interventionWin.updateConsommationGasoilAfterPourcentageConsomUpdate(self.parent.parent.label, self.value);
+                                            ]]>
+                                        </attribute>
+                                    </doublebox>
+                                    <label value="%"/>
+                                </listcell>
+                                <listcell label="@{elementCoche.surplusConsommationGasoil, converter=com.choranet.zk.DoubleConverter}"/>
+                                <listcell label="@{elementCoche.client}"/>
+                                <listcell label="@{elementCoche.vehicule}"/>
+                                <listcell>
+                                    <textbox value="@{elementCoche.conducteur}" inplace="true"/>
+                                </listcell>
+                            </listitem>
+                        </listbox>
+                        <separator/>
+                        <button id="triggerBtnNewFC" label="Partager Frais Gasoil/Huile" image="/images/skin/database_save.png">
+                            <attribute name="onClick">
+                                <![CDATA[
+                                        interventionWin.ajouterFraisCirculation(); 
+                                ]]>
+                            </attribute>
+                        </button>
+                        <button id="btnCancel" onClick="interventionWin.cancelWinFraisIntervention()" label="Annuler" image="/images/skin/cancel.png" />
+                    </groupbox>
+                </center>
+            </borderlayout>
+        </window>
+    </window>
+</zk>

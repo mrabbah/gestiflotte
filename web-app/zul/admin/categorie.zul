@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?init class="org.zkoss.zkplus.databind.AnnotateDataBinderInit" arg0="./categorieWin" ?>
+<?variable-resolver class="org.zkoss.zkplus.spring.DelegatingVariableResolver"?>
+
+
+<zk xmlns="http://www.zkoss.org/2005/zul"
+    xmlns:h="http://www.w3.org/1999/xhtml"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.zkoss.org/2005/zul http://www.zkoss.org/2005/zul/zul.xsd">
+
+    <window id="categorieWin" height="100%" width="100%" style="margin:auto;" use="${categorieWindow}">
+    <!-- <zscript src="/zs/categorie.zs"/> -->
+        <borderlayout>
+            <north id="eastPanel" size="65px" open="false"  title="Recherche avancée" flex="true" splittable="true"  collapsible="true"  >
+                <hlayout spacing="10px" style="margin-top:9px;margin-left:10px">
+					
+                    <label value="Catégorie parente :" />
+                    <combobox id="filtercategoryParente" model="@{categorieWin.categoryParentes}" selectedItem="@{categorieWin.filtre.categoryParente}" autocomplete="true" autodrop="true" mold="rounded" onSelect="categorieWin.ofs=0;categorieWin.filtrer()" onOK="categorieWin.ofs=0;categorieWin.filtrer()">
+                        <comboitem self="@{each=elementfiltrecategoryParente}" label="@{elementfiltrecategoryParente}"/>
+                    </combobox>
+										                    
+                </hlayout>
+            </north>
+            <west id="westPanel" title="Gestion des catégories, et sous catégories véhicules" size="40%" flex="true" splittable="true" collapsible="true" open="false">
+                <groupbox id="gbCrud" width="100%" height="100%">
+                    <grid fixedLayout="true">
+                        <rows>
+						
+                            <row>
+                                <label value="Libelle"/>
+								 
+                                <textbox id="fieldLibelle" constraint="no empty: Veillez indiquez une valeur" value="@{categorieWin.objet.libelle, save-when='triggerBtn.onClick'}" onBindingSave='if(self.value == null)throw new WrongValueException(self, "Vous devriez indiquer une valeur");'/>
+                            </row>												
+						
+                            <row>
+                                <label value="Prix journalier"/>
+								 
+                                <doublebox id="fieldPrixJournalier" constraint="no empty: Veillez indiquez une valeur" value="@{categorieWin.objet.prixJournalier, save-when='triggerBtn.onClick'}" onBindingSave='if(self.value == null)throw new WrongValueException(self, "Vous devriez indiquer une valeur");'/>
+                            </row>												
+						 
+						
+                            <row>
+                                <label value="Categorie parente" />
+                                <combobox id="cocategoryParentes" model="@{categorieWin.categoryParentes}" selectedItem="@{categorieWin.categoryParenteSelected}">
+                                    <comboitem self="@{each=elementcategoryParente}" label="@{elementcategoryParente}"/>
+                                </combobox>
+                            </row>
+						
+                        </rows>
+                    </grid>					
+					
+                    <separator />
+                    <button id="btnSave" onClick="Events.sendEvent(new Event(Events.ON_CLICK,triggerBtn));categorieWin.add()" label="Sauveguarder" image="/images/skin/database_save.png"/>
+                    <button id="btnUpdate" onClick="Events.sendEvent(new Event(Events.ON_CLICK,triggerBtn));categorieWin.update()" label="Modifier" image="/images/skin/database_edit.png" visible="false"/>
+                    <button id="btnDelete" onClick="Events.sendEvent(new Event(Events.ON_CLICK,triggerBtn));categorieWin.delete()" label="Supprimer" image="/images/skin/database_delete.png" visible="false"/>
+                    <!-- <button id="btnNew" onClick="categorieWin.newRecord()" label="Nouveau enregistrement" image="/images/skin/database_add.png"/> -->
+                    <button id="btnCancel" onClick="categorieWin.cancel()" label="Annuler" image="/images/skin/cancel.png" visible="false"/>
+                    <button visible="false" id="triggerBtn" onBindingValidate=""/>
+                </groupbox>
+            </west>
+            <center border="none" flex="true">
+                <groupbox width="100%" height="100%">
+                    <listbox id="lstObjet" onSelect="categorieWin.select()" model="@{categorieWin.listeObjets}" selectedItem="@{categorieWin.objetSelected}"  width="100%" height="100%" mold="paging" paginal="${paging}">
+                        <auxhead sclass="category-center">
+							
+                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <textbox id="filterLibelle" value="@{categorieWin.filtre.libelle}" onChanging="categorieWin.ofs; categorieWin.filtre.libelle=event.value; categorieWin.filtrer(); self.focus(); self.setSelectionRange(self.value.length(), self.value.length())" width="100%"/>
+                            </auxheader>
+								
+                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <doublebox id="filterPrixJournalier" value="@{categorieWin.filtre.prixJournalier}" width="100%">
+                                    <attribute name="onChanging">
+										<![CDATA[
+											categorieWin.ofs=0;
+											if(event.value.equals("")) {
+												if(categorieWin.filtre.prixJournalier != null) {
+													categorieWin.filtre.prixJournalier = null;
+												}
+											} else {
+												categorieWin.filtre.prixJournalier=new Double(event.value);
+											}
+											categorieWin.filtrer();
+											self.focus();
+											if(!event.value.equals("")) {
+												self.setSelectionRange(self.value.toString().length(), self.value.toString().length());
+											}
+										]]>
+                                    </attribute>    
+                                </doublebox>
+                            </auxheader>
+								 
+                        </auxhead>
+                        <listhead sizable="true">
+							
+                            <listheader id="hlibelle" label="Libelle" sort="auto(libelle)" onSort="categorieWin.sort(event)"/>	
+							
+                            <listheader id="hprixJournalier" label="Prix journalier" sort="auto(prixJournalier)" onSort="categorieWin.sort(event)"/>	
+							                                 
+                        </listhead>
+                        <listitem self="@{each=element}">                         
+                            
+                            <listcell label="@{element.libelle}"/>
+							
+                            <listcell label="@{element.prixJournalier}"/>
+							     
+                        </listitem>
+                    </listbox>
+                    <paging id="paging" totalSize="@{categorieWin.tailleListe}" pageSize="@{categorieWin.maxNb}" onPaging="categorieWin.getNextElements(event);" />
+                    <separator/>
+                    <button id="btnNew" onClick="categorieWin.newRecord()" label="Nouveau" image="/images/skin/database_add.png"/>
+                    <button id="btnPdf" onClick="categorieWin.genererRapportPdf()" label="Generer rapport" image="/images/skin/pdf-soubor-logo.png"/>
+                    <button id="btnExcel" onClick="categorieWin.genererRapportExcel()" label="Generer excel" image="/images/skin/excel-icon.png"/>
+                </groupbox>
+            </center>
+        </borderlayout>
+    </window>
+</zk>

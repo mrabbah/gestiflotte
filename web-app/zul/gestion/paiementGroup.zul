@@ -1,0 +1,331 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?init class="org.zkoss.zkplus.databind.AnnotateDataBinderInit" arg0="./paiementGroupWin" ?>
+<?variable-resolver class="org.zkoss.zkplus.spring.DelegatingVariableResolver"?>
+
+
+<zk xmlns="http://www.zkoss.org/2005/zul"
+    xmlns:h="http://www.w3.org/1999/xhtml"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.zkoss.org/2005/zul http://www.zkoss.org/2005/zul/zul.xsd">
+
+    <window id="paiementGroupWin" height="100%" width="100%" style="margin:auto;" use="${paiementGroupWindow}">
+    <!-- <zscript src="/zs/paiementGroup.zs"/> -->
+        <zscript><![CDATA[
+        String imgPath = "/images/skin";
+        ]]>
+        </zscript>
+        <borderlayout>
+            
+            <west id="westPanel" title="Gestion des paiements cheque du group" size="100%" flex="true" splittable="true" collapsible="true" open="false">
+                <groupbox id="gbCrud" width="100%" height="100%">
+                    <tabbox mold="accordion-lite">
+                        <tabs>
+                            <tab label="Informations chèque" />
+                            <tab label="Frais circulation" />
+                            <tab label="Frais circulation périodiques" />
+                            <tab label="Entretiens" />
+                            <tab label="Entretiens périodiques" />
+                        </tabs>
+                        <tabpanels>
+                            <tabpanel>
+                                <grid fixedLayout="true">
+                                    <rows>
+                                        <row>
+                                            <label value="Société du groupe" />
+                                            <combobox id="cosocieteGroups" model="@{paiementGroupWin.societeGroups}" selectedItem="@{paiementGroupWin.societeGroupSelected}">
+                                                <comboitem self="@{each=elementsocieteGroup}" label="@{elementsocieteGroup}"/>
+                                            </combobox>
+                                        </row>
+                            
+                                        <row>
+                                            <label value="Fournisseur" />
+                                            <combobox id="cofournisseurs" model="@{paiementGroupWin.fournisseurs}" selectedItem="@{paiementGroupWin.fournisseurSelected}">
+                                                <comboitem self="@{each=elementfournisseur}" label="@{elementfournisseur}"/>
+                                            </combobox>
+                                        </row>
+                                        
+                                        <row>
+                                            <label value="Numéro chèque"/>
+								 
+                                            <textbox id="fieldNumCheque" constraint="no empty: Veillez indiquez une valeur" value="@{paiementGroupWin.objet.numCheque, save-when='triggerBtn.onClick'}" onBindingSave='if(self.value == null)throw new WrongValueException(self, "Vous devriez indiquer une valeur");'/>
+                                        </row>	
+						
+                                        <row>
+                                            <label value="Date"/>
+								 
+                                            <datebox id="fieldDate" constraint="no empty: Veillez indiquez une valeur" format="dd/MM/yyyy" value="@{paiementGroupWin.objet.date, save-when='triggerBtn.onClick'}" onBindingSave='if(self.value == null)throw new WrongValueException(self, "Vous devriez indiquer une valeur");'/>
+                                        </row>												
+						
+                                        <row>
+                                            <label value="Montant chèque"/>
+								 
+                                            <doublebox id="fieldMontantCheque" format="#.0#" constraint="no empty: Veillez indiquez une valeur" value="@{paiementGroupWin.objet.montantCheque, save-when='triggerBtn.onClick'}" onBindingSave='if(self.value == null)throw new WrongValueException(self, "Vous devriez indiquer une valeur");'/>
+                                        </row>												
+                                        					
+                                    </rows>
+                                </grid>	
+                            </tabpanel>
+                            <tabpanel>
+                                <box pack="center" align="center" width="100%" height="100%">
+                                    <hlayout height="330px" style="padding:10px" width="100%"> 
+                                        <listbox id="lstbonFraisCirculations" multiple="true" vflex="true" model="@{paiementGroupWin.bonFraisCirculations}" selectedItem="@{paiementGroupWin.bfcSelected, converter=com.choranet.zk.SelectedItemsConverterV3}"  width="500px" height="100%">
+                                            <listhead sizable="true">
+                                                <listheader label="N° Bon"/>
+                                                <listheader label="Date"/>	
+                                                <listheader label="Détails"/>	
+                                                <listheader label="Montant"/>	
+                                            </listhead>
+                                            <listitem self="@{each=element}">
+                                                <listcell label="@{element.numBon}"/>
+                                                <listcell label="@{element.date}"/>
+                                                <listcell label="@{element.details}"/>
+                                                <listcell label="@{element.montant}"/>
+                                            </listitem>
+                                        </listbox>
+                                    
+                                        <vbox spacing="10px"> 
+                                            <image style="cursor:pointer" src="${imgPath}/rightrightarrow_g.png" onClick="paiementGroupWin.choisirTout(1)"/>
+                                            <image style="cursor:pointer" src="${imgPath}/rightarrow_g.png" onClick="paiementGroupWin.choisirDesElements(1)"/>
+                                            <image style="cursor:pointer" src="${imgPath}/leftarrow_g.png" onClick="paiementGroupWin.enleverDesElements(1)"/>
+                                            <image style="cursor:pointer" src="${imgPath}/leftleftarrow_g.png" onClick="paiementGroupWin.enleverTout(1)"/>
+                                        </vbox>
+                                        <listbox id="lstbonFraisCirculationsPayes" multiple="true" vflex="true" model="@{paiementGroupWin.bonFraisCirculationsSelected}" selectedItem="@{paiementGroupWin.bfcPayesSelected, converter=com.choranet.zk.SelectedItemsConverterV3}"  width="500px" height="100%">
+                                            <listhead sizable="true">
+                                                <listheader label="N° Bon"/>
+                                                <listheader label="Date"/>	
+                                                <listheader label="Détails"/>	
+                                                <listheader label="Montant"/>	
+                                                <listheader label="Charge en UM"/>	
+                                            </listhead>
+                                            <listitem self="@{each=element}">    
+                                                <listcell label="@{element.numBon}"/>
+                                                <listcell label="@{element.date}"/>
+                                                <listcell label="@{element.details}"/>
+                                                <listcell label="@{element.montant}"/>
+                                                <listcell label="@{element.chargeEnUM}"/>
+                                            </listitem>
+                                        </listbox>
+                                    </hlayout>
+                                </box>
+                            </tabpanel>
+                            <tabpanel>
+                                <box pack="center" align="center" width="100%" height="100%">
+                                    <hlayout height="330px" style="padding:10px" width="100%"> 
+                                        <listbox id="lstfraisCirculationPeriodiques" multiple="true" vflex="true" model="@{paiementGroupWin.fraisCirculationPeriodiques}" selectedItem="@{paiementGroupWin.fcpSelected, converter=com.choranet.zk.SelectedItemsConverterV3}"  width="500px" height="100%">
+                                            <listhead sizable="true">
+                                                <listheader label="N° Bon"/>
+                                                <listheader label="Date"/>	
+                                                <listheader label="Détails"/>	
+                                                <listheader label="Montant"/>	
+                                            </listhead>
+                                            <listitem self="@{each=element}">
+                                                <listcell label="@{element.numBon}"/>
+                                                <listcell label="@{element.date}"/>
+                                                <listcell label="@{element.details}"/>
+                                                <listcell label="@{element.montant}"/>
+                                            </listitem>
+                                        </listbox>
+                                    
+                                        <vbox spacing="10px"> 
+                                            <image style="cursor:pointer" src="${imgPath}/rightrightarrow_g.png" onClick="paiementGroupWin.choisirTout(2)"/>
+                                            <image style="cursor:pointer" src="${imgPath}/rightarrow_g.png" onClick="paiementGroupWin.choisirDesElements(2)"/>
+                                            <image style="cursor:pointer" src="${imgPath}/leftarrow_g.png" onClick="paiementGroupWin.enleverDesElements(2)"/>
+                                            <image style="cursor:pointer" src="${imgPath}/leftleftarrow_g.png" onClick="paiementGroupWin.enleverTout(2)"/>
+                                        </vbox>
+                                        <listbox id="lstfraisCirculationPeriodiquesPayes" multiple="true" vflex="true" model="@{paiementGroupWin.fraisCirculationPeriodiquesSelected}" selectedItem="@{paiementGroupWin.fcpPayesSelected, converter=com.choranet.zk.SelectedItemsConverterV3}"  width="500px" height="100%">
+                                            <listhead sizable="true">
+                                                <listheader label="N° Bon"/>
+                                                <listheader label="Date"/>	
+                                                <listheader label="Détails"/>	
+                                                <listheader label="Montant"/>	
+                                            </listhead>
+                                            <listitem self="@{each=element}">
+                                                <listcell label="@{element.numBon}"/>
+                                                <listcell label="@{element.date}"/>
+                                                <listcell label="@{element.details}"/>
+                                                <listcell label="@{element.montant}"/>
+                                            </listitem>
+                                        </listbox>
+                                    </hlayout>
+                                </box>
+                            </tabpanel>
+                            <tabpanel>
+                                <box pack="center" align="center" width="100%" height="100%">
+                                    <hlayout height="330px" style="padding:10px" width="100%"> 
+                                        <listbox id="lstentretiens" multiple="true" vflex="true" model="@{paiementGroupWin.entretiens}" selectedItem="@{paiementGroupWin.enSelected, converter=com.choranet.zk.SelectedItemsConverterV3}"  width="500px" height="100%">
+                                            <listhead sizable="true">
+                                                <listheader label="N° Bon"/>
+                                                <listheader label="Date entretien" />	
+                                                <listheader label="Détails" />	
+                                                <listheader label="Montant" />	
+                                            </listhead>
+                                            <listitem self="@{each=element}">
+                                                <listcell label="@{element.numBon}"/>
+                                                <listcell label="@{element.dateEntretien}"/>
+                                                <listcell label="@{element.details}"/>
+                                                <listcell label="@{element.montant}"/>
+                                            </listitem>
+                                        </listbox>
+                                    
+                                        <vbox spacing="10px"> 
+                                            <image style="cursor:pointer" src="${imgPath}/rightrightarrow_g.png" onClick="paiementGroupWin.choisirTout(3)"/>
+                                            <image style="cursor:pointer" src="${imgPath}/rightarrow_g.png" onClick="paiementGroupWin.choisirDesElements(3)"/>
+                                            <image style="cursor:pointer" src="${imgPath}/leftarrow_g.png" onClick="paiementGroupWin.enleverDesElements(3)"/>
+                                            <image style="cursor:pointer" src="${imgPath}/leftleftarrow_g.png" onClick="paiementGroupWin.enleverTout(3)"/>
+                                        </vbox>
+                                        <listbox id="lstentretiensPayes" multiple="true" vflex="true" model="@{paiementGroupWin.entretiensSelected}" selectedItem="@{paiementGroupWin.enPayesSelected, converter=com.choranet.zk.SelectedItemsConverterV3}"  width="500px" height="100%">
+                                            <listhead sizable="true">
+                                                <listheader label="N° Bon"/>
+                                                <listheader label="Date entretien" />	
+                                                <listheader label="Détails" />	
+                                                <listheader label="Montant" />	
+                                            </listhead>
+                                            <listitem self="@{each=element}">
+                                                <listcell label="@{element.numBon}"/>
+                                                <listcell label="@{element.dateEntretien}"/>
+                                                <listcell label="@{element.details}"/>
+                                                <listcell label="@{element.montant}"/>
+                                            </listitem>
+                                        </listbox>
+                                    </hlayout>
+                                </box>
+                            </tabpanel>
+                            <tabpanel>
+                                <box pack="center" align="center" width="100%" height="100%">
+                                    <hlayout height="330px" style="padding:10px" width="100%"> 
+                                        <listbox id="lstentretienPeriodiques" multiple="true" vflex="true" model="@{paiementGroupWin.entretienPeriodiques}" selectedItem="@{paiementGroupWin.epSelected, converter=com.choranet.zk.SelectedItemsConverterV3}"  width="500px" height="100%">
+                                            <listhead sizable="true">
+                                                <listheader label="N° Bon"/>
+                                                <listheader label="Date entretien"/>	
+                                                <listheader label="Détails"/>	
+                                                <listheader label="Montant"/>	
+                                            </listhead>
+                                            <listitem self="@{each=element}">
+                                                <listcell label="@{element.numBon}"/>
+                                                <listcell label="@{element.dateEntretien}"/>
+                                                <listcell label="@{element.details}"/>
+                                                <listcell label="@{element.montant}"/>
+                                            </listitem>
+                                        </listbox>
+                                    
+                                        <vbox spacing="10px"> 
+                                            <image style="cursor:pointer" src="${imgPath}/rightrightarrow_g.png" onClick="paiementGroupWin.choisirTout(4)"/>
+                                            <image style="cursor:pointer" src="${imgPath}/rightarrow_g.png" onClick="paiementGroupWin.choisirDesElements(4)"/>
+                                            <image style="cursor:pointer" src="${imgPath}/leftarrow_g.png" onClick="paiementGroupWin.enleverDesElements(4)"/>
+                                            <image style="cursor:pointer" src="${imgPath}/leftleftarrow_g.png" onClick="paiementGroupWin.enleverTout(4)"/>
+                                        </vbox>
+                                        <listbox id="lstentretienPeriodiquesPayes" multiple="true" vflex="true" model="@{paiementGroupWin.entretienPeriodiquesSelected}" selectedItem="@{paiementGroupWin.epPayesSelected, converter=com.choranet.zk.SelectedItemsConverterV3}"  width="500px" height="100%">
+                                            <listhead sizable="true">
+                                                <listheader label="N° Bon"/>
+                                                <listheader label="Date entretien"/>	
+                                                <listheader label="Détails"/>	
+                                                <listheader label="Montant"/>	
+                                            </listhead>
+                                            <listitem self="@{each=element}">
+                                                <listcell label="@{element.numBon}"/>
+                                                <listcell label="@{element.dateEntretien}"/>
+                                                <listcell label="@{element.details}"/>
+                                                <listcell label="@{element.montant}"/>
+                                            </listitem>
+                                        </listbox>
+                                    </hlayout>
+                                </box>
+                            </tabpanel>
+                        </tabpanels>
+                    </tabbox>
+                    <button id="btnSave" onClick="Events.sendEvent(new Event(Events.ON_CLICK,triggerBtn));paiementGroupWin.add()" label="Sauveguarder" image="/images/skin/database_save.png"/>
+                    <button id="btnUpdate" onClick="Events.sendEvent(new Event(Events.ON_CLICK,triggerBtn));paiementGroupWin.update()" label="Modifier" image="/images/skin/database_edit.png" visible="false"/>
+                    <button id="btnDelete" onClick="Events.sendEvent(new Event(Events.ON_CLICK,triggerBtn));paiementGroupWin.delete()" label="Supprimer" image="/images/skin/database_delete.png" visible="false"/>
+                    <!-- <button id="btnNew" onClick="paiementGroupWin.newRecord()" label="Nouveau enregistrement" image="/images/skin/database_add.png"/> -->
+                    <button id="btnCancel" onClick="paiementGroupWin.cancel()" label="Annuler" image="/images/skin/cancel.png" />
+                    <button visible="false" id="triggerBtn" onBindingValidate=""/>
+                </groupbox>
+            </west>
+            <center border="none" flex="true">
+                <groupbox width="100%" height="100%">
+                    <listbox id="lstObjet" onSelect="paiementGroupWin.select()" model="@{paiementGroupWin.listeObjets}" selectedItem="@{paiementGroupWin.objetSelected}"  width="99,9%" height="500px" rows="@{paiementGroupWin.maxNb}" mold="paging" paginal="${paging}">
+                        <auxhead sclass="category-center">
+							
+                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <textbox id="filterNumCheque" value="@{paiementGroupWin.filtre.numCheque}" onChanging="paiementGroupWin.ofs; paiementGroupWin.filtre.numCheque=event.value; paiementGroupWin.filtrer(); self.focus(); self.setSelectionRange(self.value.length(), self.value.length())" width="100%"/>
+                            </auxheader>
+								
+                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <datebox id="filterDate" format="dd/MM/yyyy" value="@{paiementGroupWin.filtre.date}" onOK="paiementGroupWin.ofs=0; paiementGroupWin.filtrer(); self.focus();" width="90%"/>
+                            </auxheader>
+								
+                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <doublebox id="filterMontantCheque" value="@{paiementGroupWin.filtre.montantCheque}" width="100%">
+                                    <attribute name="onChanging">
+                                        <![CDATA[
+                                                paiementGroupWin.ofs=0;
+                                                if(event.value.equals("")) {
+                                                        if(paiementGroupWin.filtre.montantCheque != null) {
+                                                                paiementGroupWin.filtre.montantCheque = null;
+                                                        }
+                                                } else {
+                                                        paiementGroupWin.filtre.montantCheque=new Double(event.value);
+                                                }
+                                                paiementGroupWin.filtrer();
+                                                self.focus();
+                                                if(!event.value.equals("")) {
+                                                        self.setSelectionRange(self.value.toString().length(), self.value.toString().length());
+                                                }
+                                        ]]>
+                                    </attribute>    
+                                </doublebox>
+                            </auxheader>
+                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <combobox id="filtersocieteGroup" model="@{paiementGroupWin.societeGroups}" selectedItem="@{paiementGroupWin.filtre.societeGroup}" autocomplete="true" autodrop="true" mold="rounded" onSelect="paiementGroupWin.ofs=0;paiementGroupWin.filtrer()" onOK="paiementGroupWin.ofs=0;paiementGroupWin.filtrer()">
+                                    <comboitem self="@{each=elementfiltresocieteGroup}" label="@{elementfiltresocieteGroup}"/>
+                                </combobox>	
+                            </auxheader>
+                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <combobox id="filterfournisseurs" model="@{paiementGroupWin.fournisseurs}" selectedItem="@{paiementGroupWin.filtre.fournisseur}" autocomplete="true" autodrop="true" mold="rounded" onSelect="paiementGroupWin.ofs=0;paiementGroupWin.filtrer()" onOK="paiementGroupWin.ofs=0;paiementGroupWin.filtrer()" width="85%">
+                                    <comboitem self="@{each=elementfiltrefournisseur}" label="@{elementfiltrefournisseur}"/>
+                                </combobox>
+                            </auxheader>
+							 
+                        </auxhead>
+                        <listhead sizable="true">
+							
+                            <listheader id="hnumCheque" label="Numéro du chèque" sort="auto(numCheque)" onSort="paiementGroupWin.sort(event)"/>	
+							
+                            <listheader id="hdate" label="Date" sort="auto(date)" onSort="paiementGroupWin.sort(event)"/>	
+							
+                            <listheader id="hmontantCheque" label="Montant du chèque" sort="auto(montantCheque)" onSort="paiementGroupWin.sort(event)"/>
+                            
+                            <listheader id="hsocieteGroup" label="Société" sort="auto(societeGroup.raisonSociale)" onSort="paiementGroupWin.sort(event)"/>
+                            
+                            <listheader id="hfournisseur" label="Fournisseur" sort="auto(fournisseur.raisonSociale)" onSort="paiementGroupWin.sort(event)"/>	
+							                                 
+                        </listhead>
+                        <listitem self="@{each=element}">                         
+                            
+                            <listcell label="@{element.numCheque}"/>
+							
+                            <listcell label="@{element.date}"/>
+							
+                            <listcell label="@{element.montantCheque, converter=com.choranet.zk.DoubleConverter}"/>
+                            
+                            <listcell label="@{element.societeGroup.raisonSociale}"/>
+                            
+                            <listcell label="@{element.fournisseur.raisonSociale}"/>
+							     
+                        </listitem>
+                    </listbox>
+                    <paging id="paging" totalSize="@{paiementGroupWin.tailleListe}" pageSize="@{paiementGroupWin.maxNb}" onPaging="paiementGroupWin.getNextElements(event);" />
+                    <separator/>
+                    <button id="btnNew" onClick="paiementGroupWin.newRecord()" label="Nouveau" image="/images/skin/database_add.png"/>
+                    <button id="btnPdf" onClick="paiementGroupWin.genererRapportPdf()" label="Generer rapport" image="/images/skin/pdf-soubor-logo.png"/>
+                    <button id="btnExcel" onClick="paiementGroupWin.genererRapportExcel()" label="Generer excel" image="/images/skin/excel-icon.png"/>
+                </groupbox>
+            </center>
+        </borderlayout>
+    </window>
+</zk>

@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?init class="org.zkoss.zkplus.databind.AnnotateDataBinderInit" arg0="./trajetWin" ?>
+<?variable-resolver class="org.zkoss.zkplus.spring.DelegatingVariableResolver"?>
+
+
+<zk xmlns="http://www.zkoss.org/2005/zul"
+    xmlns:h="http://www.w3.org/1999/xhtml"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.zkoss.org/2005/zul http://www.zkoss.org/2005/zul/zul.xsd">
+
+    <window id="trajetWin" height="100%" width="100%" style="margin:auto;" use="${trajetWindow}">
+    <!-- <zscript src="/zs/trajet.zs"/> -->
+        <borderlayout>
+            <west id="westPanel" title="Gestion des trajets" size="40%" flex="true" splittable="true" collapsible="true" open="false">
+                <groupbox id="gbCrud" width="100%" height="100%">
+                    <grid fixedLayout="true">
+                        <rows>
+						
+                            <row>
+                                <label value="code"/>				 
+                                <textbox id="fieldCode" constraint="no empty: Veillez indiquez une valeur" value="@{trajetWin.objet.code, save-when='triggerBtn.onClick'}" onBindingSave='if(self.value == null)throw new WrongValueException(self, "Vous devriez indiquer une valeur");'/>
+                            </row>
+                            <row>
+                                <label value="source"/>				 
+                                <textbox id="fieldSource" constraint="no empty: Veillez indiquez une valeur" value="@{trajetWin.objet.source, save-when='triggerBtn.onClick'}" onBindingSave='if(self.value == null)throw new WrongValueException(self, "Vous devriez indiquer une valeur");'/>
+                            </row>
+                            <row>
+                                <label value="destination"/>				 
+                                <textbox id="fieldDestination" constraint="no empty: Veillez indiquez une valeur" value="@{trajetWin.objet.destination, save-when='triggerBtn.onClick'}" onBindingSave='if(self.value == null)throw new WrongValueException(self, "Vous devriez indiquer une valeur");'/>
+                            </row>
+                            <row>
+                                <label value="kilometrage"/>				 
+                                <doublebox id="fieldKilometrage" constraint="no empty: Veillez indiquez une valeur" value="@{trajetWin.objet.kilometrage, save-when='triggerBtn.onClick'}" onBindingSave='if(self.value == null)throw new WrongValueException(self, "Vous devriez indiquer une valeur");'/>
+                            </row>
+						 		
+                        </rows>
+                    </grid>					
+					
+                    <separator />
+                    <button id="btnSave" onClick="Events.sendEvent(new Event(Events.ON_CLICK,triggerBtn));trajetWin.add()" label="Sauveguarder" image="/images/skin/database_save.png"/>
+                    <button id="btnUpdate" onClick="Events.sendEvent(new Event(Events.ON_CLICK,triggerBtn));trajetWin.update()" label="Modifier" image="/images/skin/database_edit.png" visible="false"/>
+                    <button id="btnDelete" onClick="Events.sendEvent(new Event(Events.ON_CLICK,triggerBtn));trajetWin.delete()" label="Supprimer" image="/images/skin/database_delete.png" visible="false"/>
+                    <!-- <button id="btnNew" onClick="trajetWin.newRecord()" label="Nouveau enregistrement" image="/images/skin/database_add.png"/> -->
+                    <button id="btnCancel" onClick="trajetWin.cancel()" label="Annuler" image="/images/skin/cancel.png" visible="false"/>
+                    <button visible="false" id="triggerBtn" onBindingValidate=""/>
+                </groupbox>
+            </west>
+            <center border="none" flex="true">
+                <groupbox width="100%" height="100%">
+                    <listbox id="lstObjet" onSelect="trajetWin.select()" model="@{trajetWin.listeObjets}" selectedItem="@{trajetWin.objetSelected}" width="100%" height="100%" mold="paging" paginal="${paging}">
+                        <auxhead sclass="category-center">
+							
+                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <textbox id="filterCode" value="@{trajetWin.filtre.code}" onChanging="trajetWin.ofs; trajetWin.filtre.code=event.value; trajetWin.filtrer(); self.focus(); self.setSelectionRange(self.value.length(), self.value.length())" width="100%"/>
+                            </auxheader>
+                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <textbox id="filterSource" value="@{trajetWin.filtre.source}" onChanging="trajetWin.ofs; trajetWin.filtre.source=event.value; trajetWin.filtrer(); self.focus(); self.setSelectionRange(self.value.length(), self.value.length())" width="100%"/>
+                            </auxheader>
+                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <textbox id="filterDestination" value="@{trajetWin.filtre.destination}" onChanging="trajetWin.ofs; trajetWin.filtre.destination=event.value; trajetWin.filtrer(); self.focus(); self.setSelectionRange(self.value.length(), self.value.length())" width="100%"/>
+                            </auxheader>
+                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <doublebox id="filterKilometrage" value="@{trajetWin.filtre.kilometrage}" width="100%">
+                                    <attribute name="onChanging">
+                                            <![CDATA[
+                                                    trajetWin.ofs=0;
+                                                    if(event.value.equals("")) {
+                                                            if(trajetWin.filtre.kilometrage != null) {
+                                                                    trajetWin.filtre.kilometrage = null;
+                                                            }
+                                                    } else {
+                                                            trajetWin.filtre.kilometrage=new Double(event.value);
+                                                    }
+                                                    trajetWin.filtrer();
+                                                    self.focus();
+                                                    if(!event.value.equals("")) {
+                                                            self.setSelectionRange(self.value.toString().length(), self.value.toString().length());
+                                                    }
+                                            ]]>
+                                    </attribute>    
+                                </doublebox>
+                            </auxheader>
+								 
+                        </auxhead>
+                        <listhead sizable="true">
+							
+                            <listheader id="hcode" label="Code" sort="auto(code)" onSort="trajetWin.sort(event)"/>	
+                            <listheader id="hsource" label="Source" sort="auto(source)" onSort="trajetWin.sort(event)"/>
+                            <listheader id="hdestination" label="Destination" sort="auto(destination)" onSort="trajetWin.sort(event)"/>
+                            <listheader id="hkilometrage" label="Kilometrage" sort="auto(kilometrage)" onSort="trajetWin.sort(event)"/>
+							                                 
+                        </listhead>
+                        <listitem self="@{each=element}">                         
+                            
+                            <listcell label="@{element.code}"/>
+                            <listcell label="@{element.source}"/>
+                            <listcell label="@{element.destination}"/>
+                            <listcell label="@{element.kilometrage}"/>
+							     
+                        </listitem>
+                    </listbox>
+                    <paging id="paging" totalSize="@{trajetWin.tailleListe}" pageSize="@{trajetWin.maxNb}" onPaging="trajetWin.getNextElements(event);" />
+                    <separator/>
+                    <button id="btnNew" onClick="trajetWin.newRecord()" label="Nouveau" image="/images/skin/database_add.png"/>
+                    <button id="btnPdf" onClick="trajetWin.genererRapportPdf()" label="Generer rapport" image="/images/skin/pdf-soubor-logo.png"/>
+                    <button id="btnExcel" onClick="trajetWin.genererRapportExcel()" label="Generer excel" image="/images/skin/excel-icon.png"/>
+                    <fileupload id="btnImport" label="Import en masse" onUpload="trajetWin.importation(event.getMedia())" image="/images/skin/BriefcaseOpen-16x16.png"/>
+                </groupbox>
+            </center>
+        </borderlayout>
+    </window>
+</zk>

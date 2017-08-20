@@ -1,0 +1,417 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?init class="org.zkoss.zkplus.databind.AnnotateDataBinderInit" arg0="./tarificationWin" ?>
+<?variable-resolver class="org.zkoss.zkplus.spring.DelegatingVariableResolver"?>
+
+
+<zk xmlns="http://www.zkoss.org/2005/zul"
+    xmlns:h="http://www.w3.org/1999/xhtml"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.zkoss.org/2005/zul http://www.zkoss.org/2005/zul/zul.xsd">
+
+    <window id="tarificationWin" height="100%" width="100%" style="margin:auto;" use="${tarificationWindow}">
+    <!-- <zscript src="/zs/facturation.zs"/> -->
+    
+        <borderlayout>
+            <north id="eastPanel" size="65px" open="false"  title="Recherche avancée" flex="true" splittable="true"  collapsible="true"  >
+                <hlayout spacing="10px" style="margin-top:9px;margin-left:10px">
+					
+                    <label value="Clients :" />
+                    <bandbox autodrop="true" mold="rounded" width="220px">
+                        <bandpopup>
+                            <listbox id="filterclients" model="@{tarificationWin.clients}" 
+                                     selectedItem="@{tarificationWin.filtre.clients, converter=com.choranet.zk.SelectedItemsConverterV3}"
+                                     onSelect="tarificationWin.ofs=0;tarificationWin.filtrer();"
+                                     fixedLayout="true" multiple="true" checkmark="true">
+                                <listhead>
+                                    <listheader label=""/>							
+                                </listhead>
+                                <listitem self="@{each=elementfiltreclient}">
+                                    <listcell label="@{elementfiltreclient}"/>							
+                                </listitem>								
+                            </listbox>
+                        </bandpopup>
+                    </bandbox>
+											                    
+                </hlayout>
+            </north>
+            <west id="westPanel" title="Gestion de tarification clientèle" size="40%" flex="true" splittable="true" collapsible="true" open="false">
+                <groupbox id="gbCrud" width="100%" height="100%">
+                    <grid fixedLayout="true">
+                        <rows>
+                            <row>
+                                <label value="code"/>				 
+                                <textbox id="fieldCode" constraint="no empty: Veillez indiquez une valeur" value="@{tarificationWin.objet.code, save-when='triggerBtn.onClick'}" onBindingSave='if(self.value == null)throw new WrongValueException(self, "Vous devriez indiquer une valeur");'/>
+                            </row>
+                            <row>
+                                <label value="Mode Tarification"/>
+                                <combobox id="comode" readonly="true" selectedItem="@{tarificationWin.modeTarificationSelected, save-when='self.onChange'}">
+                                    <comboitem label="Journalier" value="Journalier"/>
+                                    <comboitem label="Forfitaire Par Trajet" value="Forfitaire/Trajet"/>
+                                    <comboitem label="Forfitaire Par Région" value="Forfitaire/Region"/>
+                                    <comboitem label="Tonnage Par Trajet" value="Tonnage/Trajet"/>
+                                    <comboitem label="Kilométrage" value="Kilometrage"/>
+                                    <attribute name="onChange">
+                                        <![CDATA[
+                                            if (self.selectedItem.value.equals("Journalier")) {
+                                               tarificationWin.objet.unite = "Jour";
+                                               idQuantiteRow.visible = true;
+                                               idTrajetRow.visible = false;
+                                               idSourceRow.visible = false;
+                                               idDestinationRow.visible = false;
+                                               idRegionRow.visible = false;
+                                            } else
+                                               if (self.selectedItem.value.equals("Forfitaire/Trajet")) {
+                                                  tarificationWin.objet.unite = "Trajet";
+                                                  tarificationWin.objet.quantite = 1;
+                                                  idQuantiteRow.visible = false;
+                                                  idTrajetRow.visible = true;
+                                                  idSourceRow.visible = true;
+                                                  idDestinationRow.visible = true;
+                                                  idRegionRow.visible = false;
+                                               } else
+                                                    if (self.selectedItem.value.equals("Forfitaire/Region")) {
+                                                        tarificationWin.objet.unite = "Region";
+                                                        tarificationWin.objet.quantite = 1;
+                                                        idQuantiteRow.visible = false;
+                                                        idTrajetRow.visible = false;
+                                                        idSourceRow.visible = false;
+                                                        idDestinationRow.visible = false;
+                                                        idRegionRow.visible = true;
+                                                    } else
+                                                        if (self.selectedItem.value.equals("Kilometrage")) {
+                                                            tarificationWin.objet.unite = "Km";
+                                                            idQuantiteRow.visible = true;
+                                                            idTrajetRow.visible = false;
+                                                            idSourceRow.visible = false;
+                                                            idDestinationRow.visible = false;
+                                                            idRegionRow.visible = false;
+                                                        } else
+                                                            if (self.selectedItem.value.equals("Tonnage/Trajet")) {
+                                                                tarificationWin.objet.unite = "Tonne";
+                                                                tarificationWin.objet.quantite = 1;
+                                                                idQuantiteRow.visible = true;
+                                                                idTrajetRow.visible = true;
+                                                                idSourceRow.visible = true;
+                                                                idDestinationRow.visible = true;
+                                                                idRegionRow.visible = false;
+                                                            }
+                                               tarificationWin.objet.debutPeriode = 1;
+                                               tarificationWin.objet.finPeriode = 2;
+                                               tarificationWin.objet.annee = 2012;
+                                               //if (tarificationWin.trajetSelected != null){
+                                               //     tarificationWin.objet.trajet = tarificationWin.trajetSelected;
+                                               //}
+                                        ]]>
+                                    </attribute>
+                                </combobox>
+                            </row>	
+                            
+                            <row id="idTrajetRow">
+                                <label value="Trajet"/>		 
+                                <combobox id="cotrajets" model="@{tarificationWin.trajets}" selectedItem="@{tarificationWin.trajetSelected}">
+                                    <attribute name="onChange">
+                                        <![CDATA[
+                                           if (self.selectedItem != null) {
+                                             fieldSource.value = tarificationWin.trajetSelected.source;
+                                             fieldDestination.value = tarificationWin.trajetSelected.destination;
+                                           }else {
+                                             fieldSource.value = null;
+                                             fieldDestination.value = null; 
+                                           }
+                                            
+                                        ]]>
+                                    </attribute>
+<!--                                    <attribute name="onBlur">
+                                        <![CDATA[
+                                            if (self.selectedItem == null) {
+                                                self.focus = true;
+                                            }
+                                        ]]>
+                                    </attribute>-->
+                                    <comboitem self="@{each=elementtrajet}" label="@{elementtrajet}"/>
+                                </combobox>
+                            </row>
+                            
+<!--                            <row id="idSourceRow">
+                                <label value="Source"/>		 
+                                <textbox id="fieldSource" readonly="true" value="@{tarificationWin.objet.source, save-when='triggerBtn.onClick'}"/>
+                            </row>
+                            
+                            <row id="idDestinationRow">
+                                <label value="Destination"/>		 
+                                <textbox id="fieldDestination" readonly="true" value="@{tarificationWin.objet.destination, save-when='triggerBtn.onClick'}"/>
+                            </row>-->
+                            
+                            <row id="idSourceRow">
+                                <label value="Source/Destination"/>
+                                <cell>
+                                    <textbox id="fieldSource" width="75px" readonly="true" value="@{tarificationWin.objet.trajet.source}"/>
+                                    <textbox id="fieldDestination" width="75px" readonly="true" value="@{tarificationWin.objet.trajet.destination}"/>
+                                </cell>
+                            </row>
+                            
+                            <row id="idRegionRow">
+                                <label value="Région"/>		 
+                                <combobox id="coregions" model="@{tarificationWin.regions}" selectedItem="@{tarificationWin.regionSelected}">
+                                    <attribute name="onBlur">
+                                        <![CDATA[
+                                            if (self.selectedItem == null) {
+                                                self.focus = true;
+                                            }
+                                        ]]>
+                                    </attribute>
+                                    <comboitem self="@{each=elementregion}" label="@{elementregion}"/>
+                                </combobox>
+                            </row>
+				
+                            <row>
+                                <label value="Année"/>
+                                <spinner id="fieldAnnee" constraint="no empty,min 2012" value="@{tarificationWin.objet.annee, save-when='triggerBtn.onClick'}"/>    
+                            </row>
+                            
+                            <row>
+                                <label value="Période de "/>
+                                <cell colspan="1">
+                                    <spinner id="fieldDebutPeriode" width="40px" constraint="no empty,min 1 max 30" value="@{tarificationWin.objet.debutPeriode, save-when='triggerBtn.onClick'}"/>    
+                                    <label value=" Au "/>
+                                    <spinner id="fieldFinPeriode" width="40px" constraint="no empty,min 2 max 31" value="@{tarificationWin.objet.finPeriode, save-when='triggerBtn.onClick'}"/>
+                                    <label value=" DU MOIS"/>
+                                </cell>
+                            </row>
+                            
+<!--                            <row id="idQuantiteRow">
+                                <label value="Quantité"/>			 
+                                <cell colspan="1">
+                                    <doublebox id="fieldQuantite" value="@{tarificationWin.objet.quantite, save-when='triggerBtn.onClick'}"/>
+                                    <label value="@{tarificationWin.objet.unite}"/>
+                                </cell>
+                            </row>-->
+                            
+<!--                            <row>
+                                <label value="Unité"/>		 
+                                <textbox id="fieldUnite" readonly="true" value="@{tarificationWin.objet.unite, save-when='triggerBtn.onClick'}">
+                                </textbox>
+                            </row>												-->
+	
+                            <row>
+                                <label value="Prix unitaire"/>			 
+                                <doublebox id="fieldPrix" value="@{tarificationWin.objet.prix, save-when='triggerBtn.onClick'}"/>
+                            </row>												
+                            
+                            <row>
+                                <label value="Clients" />
+                                <bandbox autodrop="true" mold="rounded" width="220px">
+                                    <bandpopup>
+                                        <listbox id="lstclients" model="@{tarificationWin.clients}" selectedItem="@{tarificationWin.clientsSelected, converter=com.choranet.zk.SelectedItemsConverterV3}" fixedLayout="true" multiple="true" checkmark="true">
+                                            <listhead>
+                                                <listheader label=""/>							
+                                            </listhead>
+                                            <listitem self="@{each=elementclients}">
+                                                <listcell label="@{elementclients}"/>							
+                                            </listitem>								
+                                        </listbox>	
+                                    </bandpopup>
+                                </bandbox>
+                            </row>						
+					
+                        </rows>
+                    </grid>					
+					
+                    <separator />
+                    <button id="btnSave" onClick="Events.sendEvent(new Event(Events.ON_CLICK,triggerBtn));tarificationWin.add()" label="Sauveguarder" image="/images/skin/database_save.png"/>
+                    <button id="btnUpdate" onClick="Events.sendEvent(new Event(Events.ON_CLICK,triggerBtn));tarificationWin.update()" label="Modifier" image="/images/skin/database_edit.png" visible="false"/>
+                    <button id="btnDelete" onClick="Events.sendEvent(new Event(Events.ON_CLICK,triggerBtn));tarificationWin.delete()" label="Supprimer" image="/images/skin/database_delete.png" visible="false"/>
+                    <!-- <button id="btnNew" onClick="tarificationWin.newRecord()" label="Nouveau enregistrement" image="/images/skin/database_add.png"/> -->
+                    <button id="btnCancel" onClick="tarificationWin.cancel(); tarificationWin.actualiserValeurAssociation()" label="Annuler" image="/images/skin/cancel.png" visible="false"/>
+                    <button visible="false" id="triggerBtn" onBindingValidate=""/>
+                </groupbox>
+            </west>
+            <center border="none" flex="true">
+                <groupbox width="100%" height="100%">
+                    <listbox id="lstObjet" model="@{tarificationWin.listeObjets}" selectedItem="@{tarificationWin.objetSelected}" width="100%" height="100%" mold="paging" paginal="${paging}">
+                        <attribute name="onSelect">
+                            <![CDATA[
+                                if (tarificationWin.objetSelected.modeTarif.equals("Journalier")) {
+                                    tarificationWin.objet.unite = "Jour";
+                                    idQuantiteRow.visible = true;
+                                    idTrajetRow.visible = false;
+                                    idSourceRow.visible = false;
+                                    idDestinationRow.visible = false;
+                                    idRegionRow.visible = false;
+                                } else
+                                    if (tarificationWin.objetSelected.modeTarif.equals("Forfitaire/Trajet")) {
+                                        tarificationWin.objet.unite = "Trajet";
+                                        tarificationWin.objet.quantite = 1;
+                                        idQuantiteRow.visible = false;
+                                        idTrajetRow.visible = true;
+                                        idSourceRow.visible = true;
+                                        idDestinationRow.visible = true;
+                                        idRegionRow.visible = false;
+                                    } else
+                                        if (tarificationWin.objetSelected.modeTarif.equals("Forfitaire/Region")) {
+                                            tarificationWin.objet.unite = "Region";
+                                            tarificationWin.objet.quantite = 1;
+                                            idQuantiteRow.visible = false;
+                                            idTrajetRow.visible = false;
+                                            idSourceRow.visible = false;
+                                            idDestinationRow.visible = false;
+                                            idRegionRow.visible = true;
+                                        } else
+                                            if (tarificationWin.objetSelected.modeTarif.equals("Kilometrage")) {
+                                                tarificationWin.objet.unite = "Km";
+                                                idQuantiteRow.visible = true;
+                                                idTrajetRow.visible = false;
+                                                idSourceRow.visible = false;
+                                                idDestinationRow.visible = false;
+                                                idRegionRow.visible = false;
+                                            } else
+                                                if (tarificationWin.objetSelected.modeTarif.equals("Tonnage/Trajet")) {
+                                                    tarificationWin.objet.unite = "Tonne";
+                                                    idQuantiteRow.visible = true;
+                                                    idTrajetRow.visible = true;
+                                                    idSourceRow.visible = true;
+                                                    idDestinationRow.visible = true;
+                                                    idRegionRow.visible = false;
+                                                }
+                                    tarificationWin.objet.debutPeriode = 1;
+                                    tarificationWin.objet.finPeriode = 2;
+                                    tarificationWin.objet.annee = 2012;
+                                    tarificationWin.select();
+                            ]]>
+                        </attribute>
+                        <auxhead sclass="category-center">
+				
+                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <textbox id="filterCode" value="@{tarificationWin.filtre.code}" onChanging="tarificationWin.ofs; tarificationWin.filtre.code=event.value; tarificationWin.filtrer(); self.focus(); self.setSelectionRange(self.value.length(), self.value.length())" width="100%"/>
+                            </auxheader>
+                            
+                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+<!--                                <textbox id="filterModeTarif" value="@{tarificationWin.filtre.modeTarif}" onChanging="tarificationWin.ofs; tarificationWin.filtre.modeTarif=event.value; tarificationWin.filtrer(); self.focus(); self.setSelectionRange(self.value.length(), self.value.length())" width="100%"/>-->
+                                <combobox id="filterModeTarif" selectedItem="@{tarificationWin.filtre.modeTarif}" autocomplete="true" autodrop="true" mold="rounded" onSelect="tarificationWin.ofs=0;tarificationWin.filtrer()" onOK="tarificationWin.ofs=0;tarificationWin.filtrer()" width="90%">
+                                    <comboitem label="Journalier" value="Journalier"/>
+                                    <comboitem label="Forfitaire Par Trajet" value="Forfitaire/Trajet"/>
+                                    <comboitem label="Forfitaire Par Région" value="Forfitaire/Region"/>
+                                    <comboitem label="Tonnage Par Trajet" value="Tonnage/Trajet"/>
+                                    <comboitem label="Kilométrage" value="Kilometrage"/>
+                                </combobox>
+                            </auxheader>
+								
+                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <doublebox id="filterQuantite" value="@{tarificationWin.filtre.Quantite}" width="100%">
+                                    <attribute name="onChanging">
+                                        <![CDATA[
+                                                tarificationWin.ofs=0;
+                                                if(event.value.equals("")) {
+                                                    if(tarificationWin.filtre.quantite != null) {
+                                                            tarificationWin.filtre.quantite = null;
+                                                    }
+                                                } else {
+                                                    tarificationWin.filtre.quantite=new Double(event.value);
+                                                }
+                                                tarificationWin.filtrer();
+                                                self.focus();
+                                                if(!event.value.equals("")) {
+                                                        self.setSelectionRange(self.value.toString().length(), self.value.toString().length());
+                                                }
+                                        ]]>
+                                    </attribute>    
+                                </doublebox>
+                            </auxheader>
+								
+                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <textbox id="filterUnite" value="@{tarificationWin.filtre.unite}" onChanging="tarificationWin.ofs; tarificationWin.filtre.unite=event.value; tarificationWin.filtrer(); self.focus(); self.setSelectionRange(self.value.length(), self.value.length())" width="100%"/>
+                            </auxheader>
+								
+                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <doublebox id="filterPrix" value="@{tarificationWin.filtre.prix}" width="100%">
+                                    <attribute name="onChanging">
+                                        <![CDATA[
+                                                tarificationWin.ofs=0;
+                                                if(event.value.equals("")) {
+                                                        if(tarificationWin.filtre.prix != null) {
+                                                                tarificationWin.filtre.prix = null;
+                                                        }
+                                                } else {
+                                                        tarificationWin.filtre.prix=new Double(event.value);
+                                                }
+                                                tarificationWin.filtrer();
+                                                self.focus();
+                                                if(!event.value.equals("")) {
+                                                        self.setSelectionRange(self.value.toString().length(), self.value.toString().length());
+                                                }
+                                        ]]>
+                                    </attribute>    
+                                </doublebox>
+                            </auxheader>
+								
+<!--                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <textbox id="filterCodeTrajet" value="@{tarificationWin.filtre.codeTrajet}" onChanging="tarificationWin.ofs; tarificationWin.filtre.codeTrajet=event.value; tarificationWin.filtrer(); self.focus(); self.setSelectionRange(self.value.length(), self.value.length())" width="100%"/>
+                            </auxheader>-->
+                            
+                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <datebox id="filterDebutPeriode" value="@{tarificationWin.filtre.debutPeriode}" format="dd/MM" onOK="tarificationWin.ofs; tarificationWin.filtrer(); self.focus();" width="90%"/>
+                            </auxheader>
+                            
+                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <datebox id="filterFinPeriode" value="@{tarificationWin.filtre.finPeriode}" format="dd/MM" onOK="tarificationWin.ofs; tarificationWin.filtrer(); self.focus();" width="90%"/>
+                            </auxheader>
+								 
+                        </auxhead>
+                        <listhead sizable="true">
+							
+                            <listheader id="hcode" label="Code" sort="auto(code)" onSort="tarificationWin.sort(event)"/>
+                            
+                            <listheader label="Mode Tarification" sort="auto(modeTarif)" onSort="tarificationWin.sort(event)"/>	
+							
+                            <listheader label="Quantité" sort="auto(quantite)" onSort="tarificationWin.sort(event)"/>	
+							
+                            <listheader label="Unite" sort="auto(unite)" onSort="tarificationWin.sort(event)"/>	
+							
+                            <listheader label="Prix" sort="auto(prix)" onSort="tarificationWin.sort(event)"/>	
+							
+<!--                            <listheader label="Code Trajet" sort="auto(codeTrajet)" onSort="tarificationWin.sort(event)"/>	-->
+                            
+                            <listheader label="Début Période" sort="auto(debutPeriode)" onSort="tarificationWin.sort(event)"/>
+                            
+                            <listheader label="Fin Période" sort="auto(finPeriode)" onSort="tarificationWin.sort(event)"/>
+							                                 
+                        </listhead>
+                        <listitem self="@{each=element}">                         
+                            
+                            <listcell label="@{element.code}"/>
+                            
+                            <listcell label="@{element.modeTarif}"/>
+							
+                            <listcell label="@{element.quantite}"/>
+							
+                            <listcell label="@{element.unite}"/>
+							
+                            <listcell label="@{element.prix}"/>
+							
+<!--                            <listcell label="@{element.codeTrajet}"/>-->
+                            
+                            <listcell label="@{element.debutPeriode}"/>
+                            
+                            <listcell label="@{element.finPeriode}"/>
+							     
+                        </listitem>
+                    </listbox>
+                    <paging id="paging" totalSize="@{tarificationWin.tailleListe}" pageSize="@{tarificationWin.maxNb}" onPaging="tarificationWin.getNextElements(event);" />
+                    <separator/>
+                    <button id="btnNew" onClick="tarificationWin.newRecord(); " label="Nouveau" image="/images/skin/database_add.png"/>
+                    <button id="btnPdf" onClick="tarificationWin.genererRapportPdf()" label="Generer rapport" image="/images/skin/pdf-soubor-logo.png"/>
+                    <button id="btnExcel" onClick="tarificationWin.genererRapportExcel()" label="Generer excel" image="/images/skin/excel-icon.png"/>
+                    <fileupload id="btnImport" label="Import en masse" onUpload="tarificationWin.importation(event.getMedia())" image="/images/skin/BriefcaseOpen-16x16.png"/>
+                </groupbox>
+            </center>
+        </borderlayout>
+    </window>
+</zk>

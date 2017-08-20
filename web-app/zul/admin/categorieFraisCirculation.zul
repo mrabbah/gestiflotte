@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?init class="org.zkoss.zkplus.databind.AnnotateDataBinderInit" arg0="./categorieFraisCirculationWin" ?>
+<?variable-resolver class="org.zkoss.zkplus.spring.DelegatingVariableResolver"?>
+
+
+<zk xmlns="http://www.zkoss.org/2005/zul"
+    xmlns:h="http://www.w3.org/1999/xhtml"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.zkoss.org/2005/zul http://www.zkoss.org/2005/zul/zul.xsd">
+
+    <window id="categorieFraisCirculationWin" height="100%" width="100%" style="margin:auto;" use="${categorieFraisCirculationWindow}">
+    <!-- <zscript src="/zs/categorieFraisCirculation.zs"/> -->
+        <borderlayout>
+            <west id="westPanel" title="Gestion des catégories de frais de circulation" size="40%" flex="true" splittable="true" collapsible="true" open="false">
+                <groupbox id="gbCrud" width="100%" height="100%">
+                    <grid fixedLayout="true">
+                        <rows>
+						
+                            <row>
+                                <label value="Libelle"/>
+								 
+                                <textbox id="fieldLibelle" constraint="no empty: Veillez indiquez une valeur" value="@{categorieFraisCirculationWin.objet.libelle, save-when='triggerBtn.onClick'}" onBindingSave='if(self.value == null)throw new WrongValueException(self, "Vous devriez indiquer une valeur");'/>
+                            </row>												
+						
+                            <row>
+                                <label value="Unité de mesure"/>
+								 
+<!--                                <textbox id="fieldUniteMesure" constraint="no empty: Veillez indiquez une valeur" value="@{categorieFraisCirculationWin.objet.uniteMesure, save-when='triggerBtn.onClick'}" onBindingSave='if(self.value == null)throw new WrongValueException(self, "Vous devriez indiquer une valeur");'/>-->
+                                <combobox id="coUniteMesure" model="@{categorieFraisCirculationWin.uniteMesures}" selectedItem="@{categorieFraisCirculationWin.uniteMesureSelected}">
+                                    <attribute name="onChange">
+                                        <![CDATA[
+                                            if (self.selectedItem != null) {
+                                                fieldValeurConversion.value = categorieFraisCirculationWin.uniteMesureSelected.valeur;
+                                            }
+                                        ]]>
+                                    </attribute>
+                                    <comboitem self="@{each=elementunitemesure}" label="@{elementunitemesure}"/>
+                                </combobox>
+                            </row>
+                            
+                            <row>
+                                <label value="Valeur Conversion"/>
+                                <doublebox id="fieldValeurConversion" readonly="true" value="@{categorieFraisCirculationWin.objet.uniteMesure.valeur, save-when='triggerBtn.onClick'}"/>
+                            </row>
+						 
+						
+                        </rows>
+                    </grid>					
+					
+                    <separator />
+                    <button id="btnSave" onClick="Events.sendEvent(new Event(Events.ON_CLICK,triggerBtn));categorieFraisCirculationWin.add()" label="Sauveguarder" image="/images/skin/database_save.png"/>
+                    <button id="btnUpdate" onClick="Events.sendEvent(new Event(Events.ON_CLICK,triggerBtn));categorieFraisCirculationWin.update()" label="Modifier" image="/images/skin/database_edit.png" visible="false"/>
+                    <button id="btnDelete" onClick="Events.sendEvent(new Event(Events.ON_CLICK,triggerBtn));categorieFraisCirculationWin.delete()" label="Supprimer" image="/images/skin/database_delete.png" visible="false"/>
+                    <!-- <button id="btnNew" onClick="categorieFraisCirculationWin.newRecord()" label="Nouveau enregistrement" image="/images/skin/database_add.png"/> -->
+                    <button id="btnCancel" onClick="categorieFraisCirculationWin.cancel()" label="Annuler" image="/images/skin/cancel.png" visible="false"/>
+                    <button visible="false" id="triggerBtn" onBindingValidate=""/>
+                </groupbox>
+            </west>
+            <center border="none" flex="true">
+                <groupbox width="100%" height="100%">
+                    <listbox id="lstObjet" onSelect="categorieFraisCirculationWin.select()" model="@{categorieFraisCirculationWin.listeObjets}" selectedItem="@{categorieFraisCirculationWin.objetSelected}"  width="100%" height="100%" mold="paging" paginal="${paging}">
+                        <auxhead sclass="category-center">
+							
+                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <textbox id="filterLibelle" value="@{categorieFraisCirculationWin.filtre.libelle}" onChanging="categorieFraisCirculationWin.ofs; categorieFraisCirculationWin.filtre.libelle=event.value; categorieFraisCirculationWin.filtrer(); self.focus(); self.setSelectionRange(self.value.length(), self.value.length())" width="100%"/>
+                            </auxheader>
+								
+                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+<!--                                <textbox id="filterClient" value="@{interventionWin.filtre.client.code}" onOK="interventionWin.ofs=0; interventionWin.filtrer(); self.focus();" width="90%"/>-->
+                                <combobox id="filterUniteMesures" model="@{categorieFraisCirculationWin.uniteMesures}" selectedItem="@{categorieFraisCirculationWin.filtre.uniteMesure}" autocomplete="true" autodrop="true" mold="rounded" onSelect="categorieFraisCirculationWin.ofs=0;categorieFraisCirculationWin.filtrer()" onOK="categorieFraisCirculationWin.ofs=0;categorieFraisCirculationWin.filtrer()" width="90%">
+                                    <comboitem self="@{each=elementfiltreUniteMesure}" label="@{elementfiltreUniteMesure}"/>
+                                </combobox>
+                            </auxheader>
+								 
+                        </auxhead>
+                        <listhead sizable="true">
+							
+                            <listheader id="hlibelle" label="Libelle" sort="auto(libelle)" onSort="categorieFraisCirculationWin.sort(event)"/>	
+							
+                            <listheader  id="huniteMesure" label="Unité de mesure" sort="auto(uniteMesure)" onSort="categorieFraisCirculationWin.sort(event)"/>	
+							                                 
+                        </listhead>
+                        <listitem self="@{each=element}">                         
+                            
+                            <listcell label="@{element.libelle}"/>
+							
+                            <listcell label="@{element.uniteMesure}"/>
+							     
+                        </listitem>
+                    </listbox>
+                    <paging id="paging" totalSize="@{categorieFraisCirculationWin.tailleListe}" pageSize="@{categorieFraisCirculationWin.maxNb}" onPaging="categorieFraisCirculationWin.getNextElements(event);" />
+                    <separator/>
+                    <button id="btnNew" onClick="categorieFraisCirculationWin.newRecord()" label="Nouveau" image="/images/skin/database_add.png"/>
+                    <button id="btnPdf" onClick="categorieFraisCirculationWin.genererRapportPdf()" label="Generer rapport" image="/images/skin/pdf-soubor-logo.png"/>
+                    <button id="btnExcel" onClick="categorieFraisCirculationWin.genererRapportExcel()" label="Generer excel" image="/images/skin/excel-icon.png"/>
+                </groupbox>
+            </center>
+        </borderlayout>
+    </window>
+</zk>

@@ -1,0 +1,373 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?init class="org.zkoss.zkplus.databind.AnnotateDataBinderInit" arg0="./bonFraisCirculationWin" ?>
+<?variable-resolver class="org.zkoss.zkplus.spring.DelegatingVariableResolver"?>
+
+
+<zk xmlns="http://www.zkoss.org/2005/zul"
+    xmlns:h="http://www.w3.org/1999/xhtml"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.zkoss.org/2005/zul http://www.zkoss.org/2005/zul/zul.xsd">
+
+    <window id="bonFraisCirculationWin" height="100%" width="100%" style="margin:auto;" use="${bonFraisCirculationWindow}">
+    <!-- <zscript src="/zs/bonFraisCirculation.zs"/> -->
+        <borderlayout>
+            <north id="eastPanel" size="65px" open="false"  title="Recherche avancée" flex="true" splittable="true"  collapsible="true"  >
+                <hlayout spacing="10px" style="margin-top:9px;margin-left:10px">
+					
+                    <label value="Catégorie Frais :" />
+                    <combobox id="filtercategorieFraisCirculation" model="@{bonFraisCirculationWin.categorieFraisCirculations}" selectedItem="@{bonFraisCirculationWin.filtre.categorieFraisCirculation}" autocomplete="true" autodrop="true" mold="rounded" onSelect="bonFraisCirculationWin.ofs=0;bonFraisCirculationWin.filtrer()" onOK="bonFraisCirculationWin.ofs=0;bonFraisCirculationWin.filtrer()" width="80px">
+                        <comboitem self="@{each=elementfiltrecategorieFraisCirculation}" label="@{elementfiltrecategorieFraisCirculation}"/>
+                    </combobox>
+                    
+                    <label value="vehicule :" />
+                    <combobox id="filtervehicule" model="@{bonFraisCirculationWin.vehicules}" selectedItem="@{bonFraisCirculationWin.filtre.immatriculation_vehicule}" autocomplete="true" autodrop="true" mold="rounded" onSelect="bonFraisCirculationWin.ofs=0;bonFraisCirculationWin.filtrer()" onOK="bonFraisCirculationWin.ofs=0;bonFraisCirculationWin.filtrer()" width="80px">
+                        <comboitem self="@{each=elementfiltreimmatriculation_vehicule}" label="@{elementfiltreimmatriculation_vehicule}"/>
+                    </combobox>
+					
+                    <label value="Déplacement :" />
+                    <combobox id="filterdeplacement" model="@{bonFraisCirculationWin.deplacements}" selectedItem="@{bonFraisCirculationWin.filtre.deplacement}" autocomplete="true" autodrop="true" mold="rounded" onSelect="bonFraisCirculationWin.ofs=0;bonFraisCirculationWin.filtrer()" onOK="bonFraisCirculationWin.ofs=0;bonFraisCirculationWin.filtrer()">
+                        <comboitem self="@{each=elementfiltredeplacement}" label="@{elementfiltredeplacement}"/>
+                    </combobox>
+					
+                    <label value="Intervention :" />
+                    <combobox id="filterintervention" model="@{bonFraisCirculationWin.interventions}" selectedItem="@{bonFraisCirculationWin.filtre.intervention}" autocomplete="true" autodrop="true" mold="rounded" onOK="bonFraisCirculationWin.ofs=0;bonFraisCirculationWin.filtrer()">
+                        <attribute name="onSelect">
+                            <![CDATA[
+                                if(self.value != null){
+                                    bonFraisCirculationWin.ofs=0;
+                                    bonFraisCirculationWin.filtrer();
+                                    fieldChauffeur.value = bonFraisCirculationWin.getChauffeurIntervention(bonFraisCirculationWin.filtre.intervention.numIntervention);
+                                }
+                            ]]>
+                        </attribute>
+                        <comboitem self="@{each=elementfiltreintervention}" label="@{elementfiltreintervention}"/>
+                    </combobox>
+                    
+                    <label value="Chauffeur : " />
+                    <textbox id="fieldChauffeur"/>
+										                    
+                </hlayout>
+            </north>
+            <west id="westPanel" title="Gestion des frais Interventions/Deplacements" size="45%" flex="true" splittable="true" collapsible="true" open="false">
+                <groupbox id="gbCrud" width="100%" height="100%">
+                    <vbox id="vbchoix" width="100%">
+                        <label value="Frais circulation concernant:" />
+                        <radiogroup onCheck="bonFraisCirculationWin.choixTypeBfc(self.selectedItem.id)" >
+                            <grid>
+                                <rows>
+                                    <row>
+                                        <radio id="r1" label="Intervention" />
+                                        <radio id="r2" label="Déplacement" />
+                                    </row>
+                                </rows>
+                            </grid>
+                        </radiogroup>
+                    </vbox>
+                    <grid id="grcrud" fixedLayout="true" visible="false">
+                        <rows>
+				
+                            <row>
+                                <label value="N° Bon"/>
+								 
+                                <textbox id="fieldNumBon" constraint="no empty: Veillez indiquez une valeur" value="@{bonFraisCirculationWin.objet.numBon, save-when='triggerBtn.onClick'}" onBindingSave='if(self.value == null)throw new WrongValueException(self, "Vous devriez indiquer une valeur");'/>
+                            </row>
+                            
+                            <row>
+                                <label value="Fournisseur" />
+                                <combobox id="cofournisseurs" model="@{bonFraisCirculationWin.fournisseurs}" selectedItem="@{bonFraisCirculationWin.fournisseurSelected}">
+                                    <comboitem self="@{each=elementfournisseur}" label="@{elementfournisseur}"/>
+                                </combobox>
+                            </row>
+                            
+                            <row>
+                                <label value="Date"/>
+								 
+                                <datebox id="fieldDate" constraint="no empty: Veillez indiquez une valeur" format="dd/MM/yyyy HH:mm" width="120px" value="@{bonFraisCirculationWin.objet.date, save-when='triggerBtn.onClick'}" onBindingSave='if(self.value == null)throw new WrongValueException(self, "Vous devriez indiquer une valeur");'/>
+                            </row>	
+						
+                            <row id="rwd">
+                                <label value="Déplacement" />
+                                <combobox id="codeplacements" constraint="no empty:Veuillez choisir une intervention dans la liste" model="@{bonFraisCirculationWin.deplacements}" selectedItem="@{bonFraisCirculationWin.deplacementSelected}">
+                                    <attribute name="onBlur">
+                                        <![CDATA[
+                                            if (r2.checked && self.selectedItem == null) {
+                                                self.focus = true;
+                                            }
+                                        ]]>
+                                    </attribute>
+                                    <comboitem self="@{each=elementdeplacement}" label="@{elementdeplacement}"/>
+                                </combobox>
+                            </row>
+						
+                            <row id="rwi">
+                                <label value="Intervention" />
+                                <combobox id="cointerventions" constraint="no empty:Veuillez choisir une intervention dans la liste proposée" model="@{bonFraisCirculationWin.interventions}" selectedItem="@{bonFraisCirculationWin.interventionSelected}" width="230px">
+                                    <attribute name="onBlur">
+                                        <![CDATA[
+                                            //alert(self.selectedItem);
+                                            if (r1.checked && self.selectedItem == null) {
+                                                self.focus = true;
+                                            }
+                                        ]]>
+                                    </attribute>
+                                    <comboitem self="@{each=elementintervention}" label="@{elementintervention}"/>
+                                </combobox>
+                            </row>
+                            
+                            <row>
+                                <label value="Catégorie frais" />
+                                <combobox readonly="true" id="cocategorieFraisCirculations" model="@{bonFraisCirculationWin.categorieFraisCirculations}" selectedItem="@{bonFraisCirculationWin.categorieFraisCirculationSelected}">
+                                    <attribute name="onChange">
+                                        <![CDATA[
+                                            fieldDetails.value = bonFraisCirculationWin.categorieFraisCirculationSelected.libelle;
+                                            fieldMontant.value = 0;
+                                            fieldChargeEnUM.value = 0;
+                                            fieldChargeTheorique.value = 0;
+                                            if(cocategorieFraisCirculations.value.startsWith("Bon gasoil") && r1.checked){
+                                               chargeTheoriqueRow.visible = true;
+                                               surplusRow.visible = true;
+                                            }   
+                                            else {
+                                              chargeTheoriqueRow.visible = false;
+                                              surplusRow.visible = false;
+                                            }  
+                                        ]]>
+                                    </attribute>
+                                    <comboitem self="@{each=elementcategorieFraisCirculation}" label="@{elementcategorieFraisCirculation}"/>
+                                </combobox>
+                            </row>
+                            
+                            <row>
+                                <label value="Montant en dirham"/>
+								 
+                                <doublebox id="fieldMontant" format="#.0" constraint="no negative, no empty: Veillez indiquez une valeur" value="@{bonFraisCirculationWin.objet.montant, save-when='triggerBtn.onClick'}" onBindingSave='if(self.value == null)throw new WrongValueException(self, "Vous devriez indiquer une valeur");'>
+                                    <attribute name="onChange">
+                                        <![CDATA[
+                                            if(self.value != null){
+                                                bonFraisCirculationWin.calculerChargeEnUM(self.value);
+                                                if(r1.checked){
+                                                    bonFraisCirculationWin.calculerChargeTheorique(fieldChargeEnUM.value);
+                                                    fieldTrans_surplus.value = bonFraisCirculationWin.objet.getTrans_surplus() ;
+                                                }
+                                            }
+                                        ]]>
+                                    </attribute>
+                                </doublebox>
+                            </row>
+                            
+                            <row>
+                                <hbox>
+                                    <label value="Charge consommée en "/>
+                                    <label value="@{bonFraisCirculationWin.categorieFraisCirculationSelected.uniteMesure.idUnite}"/>
+                                </hbox>
+								 
+                                <doublebox id="fieldChargeEnUM" format="#.0#" value="@{bonFraisCirculationWin.objet.chargeEnUM, save-when='triggerBtn.onClick'}" >
+                                    <attribute name="onChange">
+                                        <![CDATA[
+                                            if(self != null){
+                                                fieldMontant.value = self.value * bonFraisCirculationWin.categorieFraisCirculationSelected.uniteMesure.valeur;
+                                                if(r1.checked){
+                                                    bonFraisCirculationWin.calculerChargeTheorique(self.value);
+                                                    if(fieldChargeTheorique.value != null){
+                                                        fieldTrans_surplus.value = self.value - fieldChargeTheorique.value;
+                                                        if (fieldTrans_surplus.value < 0)  fieldTrans_surplus.value = 0d;
+                                                    }
+                                                }     
+                                            }
+                                        ]]>
+                                    </attribute>
+                                </doublebox>
+                            </row>
+                            
+                            <row id="chargeTheoriqueRow" visible="r1.checked">
+                                <hbox>
+                                    <label value="Charge théorique en "/>
+                                    <label value="@{bonFraisCirculationWin.categorieFraisCirculationSelected.uniteMesure.idUnite}"/>
+                                </hbox>			 
+                                <doublebox id="fieldChargeTheorique" readonly="true" format="#.0#" value="@{bonFraisCirculationWin.objet.chargeTheorique, save-when='triggerBtn.onClick'}" >
+                                </doublebox>
+                            </row>
+                            
+                            <row id="surplusRow" visible="r1.checked">
+                                <hbox>
+                                    <label value="Surplus en "/>
+                                    <label value="@{bonFraisCirculationWin.categorieFraisCirculationSelected.uniteMesure.idUnite}"/>
+                                </hbox>			 
+                                <doublebox id="fieldTrans_surplus" readonly="true" format="#.0#" value="@{bonFraisCirculationWin.objet.trans_surplus}" >
+                                </doublebox>
+                            </row>
+                            
+                            <row>
+                                <label value="Détails"/>
+								 
+                                <textbox id="fieldDetails" value="@{bonFraisCirculationWin.objet.details, save-when='triggerBtn.onClick'}" width="200px"/>
+                            </row>	
+				
+<!--                        <row>
+                                <label value="Unité de Mesure"/>		 
+                                <textbox id="fieldUM"   disabled="true" value="@{bonFraisCirculationWin.objet.categorieFraisCirculation.uniteMesure, save-when='triggerBtn.onClick'}" />
+                            </row>    -->
+						
+                        </rows>
+                    </grid>					
+					
+                    <separator />
+                    <button id="btnSave" onClick="Events.sendEvent(new Event(Events.ON_CLICK,triggerBtn));bonFraisCirculationWin.add()" label="Sauveguarder" image="/images/skin/database_save.png"/>
+                    <button id="btnUpdate" onClick="Events.sendEvent(new Event(Events.ON_CLICK,triggerBtn));bonFraisCirculationWin.update()" label="Modifier" image="/images/skin/database_edit.png" visible="false"/>
+                    <button id="btnDelete" onClick="Events.sendEvent(new Event(Events.ON_CLICK,triggerBtn));bonFraisCirculationWin.delete()" label="Supprimer" image="/images/skin/database_delete.png" visible="false"/>
+                    <!-- <button id="btnNew" onClick="bonFraisCirculationWin.newRecord()" label="Nouveau enregistrement" image="/images/skin/database_add.png"/> -->
+                    <button id="btnCancel" onClick="bonFraisCirculationWin.cancel()" label="Annuler" image="/images/skin/cancel.png" />
+                    <button visible="false" id="triggerBtn" onBindingValidate=""/>
+                </groupbox>
+            </west>
+            <center border="none" flex="true">
+                <groupbox width="100%" height="100%">
+                    <listbox id="lstObjet" model="@{bonFraisCirculationWin.listeObjets}" selectedItem="@{bonFraisCirculationWin.objetSelected}"  width="99,9%" height="442px" rows="@{bonFraisCirculationWin.maxNb}">
+                        <attribute name="onSelect">
+                            <![CDATA[ 
+                                cointerventions.disabled = true;
+                                bonFraisCirculationWin.select();
+                                if(bonFraisCirculationWin.categorieFraisCirculationSelected.libelle.startsWith("Bon gasoil")){
+                                    chargeTheoriqueRow.visible = true;
+                                    surplusRow.visible = true;
+                                }   
+                                else {
+                                    chargeTheoriqueRow.visible = false;
+                                    surplusRow.visible = false;
+                                }  
+                            ]]>
+                        </attribute>
+                        <auxhead sclass="category-center">
+							
+                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <textbox id="filterNumBon" value="@{bonFraisCirculationWin.filtre.numBon}" onChanging="bonFraisCirculationWin.ofs; bonFraisCirculationWin.filtre.numBon=event.value; bonFraisCirculationWin.filtrer(); self.focus(); self.setSelectionRange(self.value.length(), self.value.length())" width="100%"/>
+                            </auxheader>
+                            
+                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <combobox id="filterfournisseurs" model="@{bonFraisCirculationWin.fournisseurs}" selectedItem="@{bonFraisCirculationWin.filtre.fournisseur}" autocomplete="true" autodrop="true" mold="rounded" onSelect="bonFraisCirculationWin.ofs=0;bonFraisCirculationWin.filtrer()" onOK="bonFraisCirculationWin.ofs=0;bonFraisCirculationWin.filtrer()" width="85%">
+                                    <comboitem self="@{each=elementfiltrefournisseur}" label="@{elementfiltrefournisseur}"/>
+                                </combobox>
+                            </auxheader>
+                            
+                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <datebox id="filterDate" format="dd/MM/yyyy" value="@{bonFraisCirculationWin.filtre.date}" onOK="bonFraisCirculationWin.ofs=0; bonFraisCirculationWin.filtrer(); self.focus();" width="90%"/>
+                            </auxheader>
+								
+                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <textbox id="filterDetails" value="@{bonFraisCirculationWin.filtre.details}" onChanging="bonFraisCirculationWin.ofs; bonFraisCirculationWin.filtre.details=event.value; bonFraisCirculationWin.filtrer(); self.focus(); self.setSelectionRange(self.value.length(), self.value.length())" width="100%"/>
+                            </auxheader>
+								
+                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <doublebox id="filterMontant" value="@{bonFraisCirculationWin.filtre.montant}" width="100%">
+                                    <attribute name="onChanging">
+                                        <![CDATA[
+                                                bonFraisCirculationWin.ofs=0;
+                                                if(event.value.equals("")) {
+                                                        if(bonFraisCirculationWin.filtre.montant != null) {
+                                                                bonFraisCirculationWin.filtre.montant = null;
+                                                        }
+                                                } else {
+                                                        bonFraisCirculationWin.filtre.montant=new Double(event.value);
+                                                }
+                                                bonFraisCirculationWin.filtrer();
+                                                self.focus();
+                                                if(!event.value.equals("")) {
+                                                        self.setSelectionRange(self.value.toString().length(), self.value.toString().length());
+                                                }
+                                        ]]>
+                                    </attribute>    
+                                </doublebox>
+                            </auxheader>
+								
+                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <doublebox id="filterChargeEnUM" format="#.0#" value="@{bonFraisCirculationWin.filtre.chargeEnUM}" width="100%">
+                                    <attribute name="onChanging">
+                                        <![CDATA[
+                                                bonFraisCirculationWin.ofs=0;
+                                                if(event.value.equals("")) {
+                                                        if(bonFraisCirculationWin.filtre.chargeEnUM != null) {
+                                                                bonFraisCirculationWin.filtre.chargeEnUM = null;
+                                                        }
+                                                } else {
+                                                        bonFraisCirculationWin.filtre.chargeEnUM=new Integer(event.value);
+                                                }
+                                                bonFraisCirculationWin.filtrer();
+                                                self.focus();
+                                                if(!event.value.equals("")) {
+                                                        self.setSelectionRange(self.value.toString().length(), self.value.toString().length());
+                                                }
+                                        ]]>
+                                    </attribute>    
+                                </doublebox>
+                            </auxheader>
+                            
+<!--                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <textbox id="filteruniteMesure" value="@{bonFraisCirculationWin.filtre.categorieFraisCirculation.uniteMesure.libelle}" onChanging="bonFraisCirculationWin.ofs; bonFraisCirculationWin.filtre.categorieFraisCirculation.uniteMesure.libelle=event.value; bonFraisCirculationWin.filtrer(); self.focus(); self.setSelectionRange(self.value.length(), self.value.length())" width="100%"/>
+                            </auxheader>-->
+								 
+                        </auxhead>
+                        <listhead sizable="true">
+					
+                            <listheader id="hnumBon" label="N° Bon" sort="auto(numBon)" onSort="bonFraisCirculationWin.sort(event)"/>
+                            
+                            <listheader id="hfournisseur" label="Fournisseur" sort="auto(fournisseur.raisonSociale)" onSort="bonFraisCirculationWin.sort(event)"/>
+                            
+                            <listheader id="hdate" label="Date" sort="auto(date)" onSort="bonFraisCirculationWin.sort(event)"/>	
+							
+                            <listheader id="hdetails" label="Détails" sort="auto(details)" onSort="bonFraisCirculationWin.sort(event)"  width="300px"/>	
+							
+                            <listheader id="hmontant" label="Montant" sort="auto(montant)" onSort="bonFraisCirculationWin.sort(event)"/>	
+							
+                            <listheader id="hchargeEnUM" label="Charge" sort="auto(chargeEnUM)" onSort="bonFraisCirculationWin.sort(event)"/>	
+                            
+                            <listheader id="hcategorieFraisCirculation" label="Unite de Mesure"  onSort="bonFraisCirculationWin.sort(event)"/>	
+							                                 
+                        </listhead>
+                        <listitem self="@{each=element}">                         
+                            
+                            <listcell label="@{element.numBon}"/>
+                                
+                            <listcell>
+                                <textbox value="@{element.fournisseur.raisonSociale}" inplace="true" readonly="true" width="99%"/>
+                            </listcell>
+                            
+                            <listcell>
+                                <datebox value="@{element.date}" inplace="true" readonly="true" width="99%"/>
+                            </listcell>
+							
+                            <listcell>
+<!--                                label="@{element.details, converter=com.choranet.zk.TextConverter}">-->
+                                <textbox value="@{element.details}" inplace="true" readonly="true" width="99%"/>
+                            </listcell>
+							
+                            <listcell >
+                                <doublebox readonly="true" inplace="true" format="#0.0" value="@{element.montant}" width="65px" />
+                            </listcell>
+							
+                            <listcell label="@{element.chargeEnUM, converter=com.choranet.zk.DoubleConverter}"/>
+                            
+                            <listcell label="@{element.categorieFraisCirculation.uniteMesure.libelle}"/>
+							     
+                        </listitem>
+                    </listbox>
+                    <paging id="paging" totalSize="@{bonFraisCirculationWin.tailleListe}" pageSize="@{bonFraisCirculationWin.maxNb}" onPaging="bonFraisCirculationWin.getNextElements(event);" />
+                    <separator/>
+                    <button id="btnNew" onClick="bonFraisCirculationWin.cancel(); bonFraisCirculationWin.newRecord(); cointerventions.disabled = false" label="Nouveau" image="/images/skin/database_add.png"/>
+                    <button id="btnPdf" onClick="bonFraisCirculationWin.genererRapportPdf()" label="Generer rapport" image="/images/skin/pdf-soubor-logo.png"/>
+                    <button id="btnExcel" onClick="bonFraisCirculationWin.genererRapportExcel()" label="Generer excel" image="/images/skin/excel-icon.png"/>
+<!--                    <button id="btnGener" visible="true" onClick="bonFraisCirculationWin.updateListe()" label="update enregistrements" image="/images/skin/database_add.png"/>-->
+<!--                    <button id="btnUpdateConsom" onClick="bonFraisCirculationWin.updateConsommationsGasoilTheorique()" label="Update consommation" image="/images/skin/excel-icon.png"/>
+                    <button id="btnInitInter" onClick="bonFraisCirculationWin.initIntervention()" label="init inteventiio" image="/images/skin/excel-icon.png"/>-->
+                    
+                </groupbox>
+            </center>
+        </borderlayout>
+    </window>
+</zk>

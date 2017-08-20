@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?init class="org.zkoss.zkplus.databind.AnnotateDataBinderInit" arg0="./cleWin" ?>
+<?variable-resolver class="org.zkoss.zkplus.spring.DelegatingVariableResolver"?>
+
+
+<zk xmlns="http://www.zkoss.org/2005/zul"
+    xmlns:h="http://www.w3.org/1999/xhtml"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.zkoss.org/2005/zul http://www.zkoss.org/2005/zul/zul.xsd">
+    <zscript>
+            <![CDATA[
+                String raisonSociale = (String) session.getAttribute("raisonSociale");
+                String idInstance = (String) session.getAttribute("idInstance");
+                String produit = (String) session.getAttribute("produit");
+                String version = (String) session.getAttribute("version");
+                String mailto = "mailto:contact@choranet.com?subject=Demande clÃ© d'activation&body=Bonjour, %0A%0AVeuillez nous communiquer une clÃ© pour une durÃ©e de : %0AInformations produit :%0A Raison social : " + raisonSociale + "%0AID INSTANCE :" + idInstance + "%0APRODUIT : " + produit + "%0AVersion : " + version + "%0A%0ACordialement.";
+            ]]>
+    </zscript>
+    <window id="cleWin" title="Gestion des clés d'activation" border="normal" 
+    width="500px" height="460px"  position="center" visible="true"
+    closable="true" action="show: slideIn({duration: 1000}); hide: slideUp({duration: 300})" 
+    xmlns:c="client" use="${clePopUpWindow}">
+        <vbox width="100%">
+            <listbox id="lstObjet" onSelect="cleWin.select()" model="@{cleWin.listeObjets}" selectedItem="@{cleWin.objetSelected}"  width="100%" height="100%" mold="paging" paginal="${paging}">
+                <listhead sizable="true">
+                    <listheader label="Clé Produit" sort="auto(cleProduit)" onSort="cleWin.sort(event)"/>	
+                    <listheader label="Date Activation" sort="auto(dateActivation)" onSort="cleWin.sort(event)"/>	
+                    <listheader label="Date Expiration" sort="auto(dateFinActivation)" onSort="cleWin.sort(event)"/>	
+                </listhead>
+                <listitem self="@{each=element}">   
+                    <listcell label="@{element.cleProduit}"/>
+                    <listcell label="@{element.dateActivation}"/>
+                    <listcell label="@{element.dateFinActivation}"/>
+                </listitem>
+            </listbox>
+            <paging id="paging" totalSize="@{cleWin.tailleListe}" pageSize="@{cleWin.maxNb}" onPaging="cleWin.getNextElements(event);" />
+            <separator/>
+            <grid fixedLayout="true">
+                <rows>						
+                    <row>
+                        <label value="Clé Produit"/>
+                        <textbox id="fieldCleProduit" constraint="no empty: Veillez indiquez une valeur" value="@{cleWin.objet.cleProduit, save-when='triggerBtn.onClick'}" onBindingSave='if(self.value == null)throw new WrongValueException(self, "Vous devriez indiquer une valeur");'/>
+<!--                        <label value="Date Activation"/>								 
+                        <datebox id="fieldDateActivation" constraint="no empty: Veillez indiquez une valeur" format="dd/MM/yyyy" value="@{cleWin.objet.dateActivation, save-when='triggerBtn.onClick'}" onBindingSave='if(self.value == null)throw new WrongValueException(self, "Vous devriez indiquer une valeur");'/>
+                        -->
+                    </row>												
+                </rows>
+            </grid>
+            <separator/>
+            <hbox>
+                <button id="btnSave" onClick="Events.sendEvent(new Event(Events.ON_CLICK,triggerBtn));cleWin.add()" label="Sauveguarder" image="/images/skin/database_save.png"/>
+                <button visible="false" id="triggerBtn" onBindingValidate=""/>
+                <button id="btnDemanderCle" href="${mailto}"  label="Demander une clé" image="/images/skin/EnvelopeOpen-16x16.png" />
+            </hbox>
+        </vbox>
+    </window>
+</zk>

@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?init class="org.zkoss.zkplus.databind.AnnotateDataBinderInit" arg0="./typeEntretienPeriodiqueWin" ?>
+<?variable-resolver class="org.zkoss.zkplus.spring.DelegatingVariableResolver"?>
+
+
+<zk xmlns="http://www.zkoss.org/2005/zul"
+    xmlns:h="http://www.w3.org/1999/xhtml"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.zkoss.org/2005/zul http://www.zkoss.org/2005/zul/zul.xsd">
+
+    <window id="typeEntretienPeriodiqueWin" height="100%" width="100%" style="margin:auto;" use="${typeEntretienPeriodiqueWindow}">
+    <!-- <zscript src="/zs/typeEntretienPeriodique.zs"/> -->
+        <borderlayout>
+            <north id="eastPanel" size="65px" open="false"  title="Recherche avancée" flex="true" splittable="true"  collapsible="true"  >
+                <hlayout spacing="10px" style="margin-top:9px;margin-left:10px">
+                    
+                    <label value="categorieVehicules :" />
+                    <bandbox autodrop="true" mold="rounded">
+                        <bandpopup>
+                            <listbox id="filtercategorieVehicules" model="@{typeEntretienPeriodiqueWin.categorieVehicules}" 
+                                     selectedItem="@{typeEntretienPeriodiqueWin.filtre.categorieVehicules, converter=com.choranet.zk.SelectedItemsConverterV3}"
+                                     onSelect="typeEntretienPeriodiqueWin.ofs=0;typeEntretienPeriodiqueWin.filtrer();"
+                                     fixedLayout="true" multiple="true" checkmark="true">
+                                <listhead>
+                                    <listheader label=""/>							
+                                </listhead>
+                                <listitem self="@{each=elementfiltrecategorieVehicules}">
+                                    <listcell label="@{elementfiltrecategorieVehicules}"/>							
+                                </listitem>								
+                            </listbox>
+                        </bandpopup>
+                    </bandbox>
+                    
+                </hlayout>
+            </north>
+            <west id="westPanel" title="Gestion des types d'entretiens périodiques" size="40%" flex="true" splittable="true" collapsible="true" open="false">
+                <groupbox id="gbCrud" width="100%" height="100%">
+                    <grid fixedLayout="true">
+                        <rows>
+						
+                            <row>
+                                <label value="Libelle"/>
+								 
+                                <textbox id="fieldLibelle" constraint="no empty: Veillez indiquez une valeur" value="@{typeEntretienPeriodiqueWin.objet.libelle, save-when='triggerBtn.onClick'}" onBindingSave='if(self.value == null)throw new WrongValueException(self, "Vous devriez indiquer une valeur");'/>
+                            </row>												
+						
+                            <row>
+                                <label value="Périodicité"/>
+								 
+                                <intbox id="fieldPeriodicite" constraint="no empty: Veillez indiquez une valeur" value="@{typeEntretienPeriodiqueWin.objet.periodicite, save-when='triggerBtn.onClick'}" onBindingSave='if(self.value == null)throw new WrongValueException(self, "Vous devriez indiquer une valeur");'/>
+                            </row>												
+						
+                            <row>
+                                <label value="Charge de base"/>
+								 
+                                <doublebox id="fieldChargeDeBase" constraint="no empty: Veillez indiquez une valeur" value="@{typeEntretienPeriodiqueWin.objet.chargeDeBase, save-when='triggerBtn.onClick'}" onBindingSave='if(self.value == null)throw new WrongValueException(self, "Vous devriez indiquer une valeur");'/>
+                            </row>
+                            
+                            <row>
+                                <label value="CategorieVehicules" />
+                                <bandbox    autodrop="true" mold="rounded">
+                                    <bandpopup>
+                                        <listbox id="lstcategorieVehicules" model="@{typeEntretienPeriodiqueWin.categorieVehicules}" selectedItem="@{typeEntretienPeriodiqueWin.categorieVehiculesSelected, converter=com.choranet.zk.SelectedItemsConverterV3}" fixedLayout="true" multiple="true" checkmark="true">
+                                            <listhead>
+                                                <listheader label=""/>							
+                                            </listhead>
+                                            <listitem self="@{each=elementcategorieVehicules}" >
+                                                <listcell label="@{elementcategorieVehicules}" >
+<!--                                                    <attribute name="onClick">
+                                                        <![CDATA[ 
+                                                            if(self.parent.selected) {
+                                                                event.stopPropagation();
+                                                                self.parent.selected = true;
+                                                            }
+                                                        ]]>
+                                                    </attribute>-->
+                                                </listcell>
+                                                
+                                            </listitem>								
+                                        </listbox>
+                                   
+                                    </bandpopup>
+                                </bandbox>
+<!--                                <zscript>
+                                    <![CDATA[ 
+                                        import java.util.List;
+                                        List<Listitem> list = getFellows("lstcategorieVehicules").getItems();
+                                        for(Listitem item : list) {
+                                            if(item.isSelectd()) {
+                                                item.setDisabled(true);
+                                            }
+                                        }
+                                        
+                                    ]]>
+                                </zscript>-->
+                            </row>
+						 
+						
+                        </rows>
+                    </grid>					
+					
+                    <separator />
+                    <button id="btnSave" onClick="Events.sendEvent(new Event(Events.ON_CLICK,triggerBtn));typeEntretienPeriodiqueWin.add()" label="Sauveguarder" image="/images/skin/database_save.png">
+<!--                        <attribute name="onClick">
+                            <![CDATA[
+                            Messagebox.show("Voulez vous générer les entretiens périodiques pour les voitures dont la catégorie correspond au type courant", "Confirmation", Messagebox.OK | Messagebox.CANCEL, Messagebox.QUESTION, 
+                            new org.zkoss.zk.ui.event.EventListener(){
+                                public void onEvent(Event evt) throws InterruptedException {
+                                    if (evt.getName().equals("onOK")) {
+                                        Clients.showBusy("Génération en cours veillez patientez...");
+                                        try
+                                        {
+                                            typeEntretienPeriodiqueWin.add()
+                                            Clients.clearBusy();
+                                            alert("Opération effectuée avec succés");
+                                        }
+                                        catch (err)
+                                        {
+                                            Clients.clearBusy();
+                                            alert("Erreur lors de la génération !\n" + err);
+                                        }
+                                    } 
+                                }
+                            });
+
+                            ]]>
+                        </attribute>-->
+                    </button>
+                    <button id="btnUpdate" onClick="Events.sendEvent(new Event(Events.ON_CLICK,triggerBtn));typeEntretienPeriodiqueWin.update()" label="Modifier" image="/images/skin/database_edit.png" visible="false"/>
+                    <button id="btnDelete" onClick="Events.sendEvent(new Event(Events.ON_CLICK,triggerBtn));typeEntretienPeriodiqueWin.delete()" label="Supprimer" image="/images/skin/database_delete.png" visible="false"/>
+                    <!-- <button id="btnNew" onClick="typeEntretienPeriodiqueWin.newRecord()" label="Nouveau enregistrement" image="/images/skin/database_add.png"/> -->
+                    <button id="btnCancel" onClick="typeEntretienPeriodiqueWin.cancel()" label="Annuler" image="/images/skin/cancel.png" visible="false"/>
+                    <button visible="false" id="triggerBtn" onBindingValidate=""/>
+                </groupbox>
+            </west>
+            <center border="none" flex="true">
+                <groupbox width="100%" height="100%">
+                    <listbox id="lstObjet" onSelect="typeEntretienPeriodiqueWin.select()" model="@{typeEntretienPeriodiqueWin.listeObjets}" selectedItem="@{typeEntretienPeriodiqueWin.objetSelected}"  width="100%" height="100%" mold="paging" paginal="${paging}">
+                        <auxhead sclass="category-center">
+							
+                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <textbox id="filterLibelle" value="@{typeEntretienPeriodiqueWin.filtre.libelle}" onChanging="typeEntretienPeriodiqueWin.ofs; typeEntretienPeriodiqueWin.filtre.libelle=event.value; typeEntretienPeriodiqueWin.filtrer(); self.focus(); self.setSelectionRange(self.value.length(), self.value.length())" width="100%"/>
+                            </auxheader>
+								
+                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <intbox id="filterPeriodicite" value="@{typeEntretienPeriodiqueWin.filtre.periodicite}" width="100%">
+                                    <attribute name="onChanging">
+										<![CDATA[
+											typeEntretienPeriodiqueWin.ofs=0;
+											if(event.value.equals("")) {
+												if(typeEntretienPeriodiqueWin.filtre.periodicite != null) {
+													typeEntretienPeriodiqueWin.filtre.periodicite = null;
+												}
+											} else {
+												typeEntretienPeriodiqueWin.filtre.periodicite=new Integer(event.value);
+											}
+											typeEntretienPeriodiqueWin.filtrer();
+											self.focus();
+											if(!event.value.equals("")) {
+												self.setSelectionRange(self.value.toString().length(), self.value.toString().length());
+											}
+										]]>
+                                    </attribute>    
+                                </intbox>
+                            </auxheader>
+								
+                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <doublebox id="filterChargeDeBase" value="@{typeEntretienPeriodiqueWin.filtre.chargeDeBase}" width="100%">
+                                    <attribute name="onChanging">
+										<![CDATA[
+											typeEntretienPeriodiqueWin.ofs=0;
+											if(event.value.equals("")) {
+												if(typeEntretienPeriodiqueWin.filtre.chargeDeBase != null) {
+													typeEntretienPeriodiqueWin.filtre.chargeDeBase = null;
+												}
+											} else {
+												typeEntretienPeriodiqueWin.filtre.chargeDeBase=new Double(event.value);
+											}
+											typeEntretienPeriodiqueWin.filtrer();
+											self.focus();
+											if(!event.value.equals("")) {
+												self.setSelectionRange(self.value.toString().length(), self.value.toString().length());
+											}
+										]]>
+                                    </attribute>    
+                                </doublebox>
+                            </auxheader>
+								 
+                        </auxhead>
+                        <listhead sizable="true">
+							
+                            <listheader id="hlibelle" label="Libelle" sort="auto(libelle)" onSort="typeEntretienPeriodiqueWin.sort(event)"/>	
+							
+                            <listheader id="hperiodicite"  label="Périodicité" sort="auto(periodicite)" onSort="typeEntretienPeriodiqueWin.sort(event)"/>	
+							
+                            <listheader id="hchargeDeBase" label="Charge de base" sort="auto(chargeDeBase)" onSort="typeEntretienPeriodiqueWin.sort(event)"/>	
+							                                 
+                        </listhead>
+                        <listitem self="@{each=element}">                         
+                            
+                            <listcell label="@{element.libelle}"/>
+							
+                            <listcell label="@{element.periodicite}"/>
+							
+                            <listcell label="@{element.chargeDeBase}"/>
+							     
+                        </listitem>
+                    </listbox>
+                    <paging id="paging" totalSize="@{typeEntretienPeriodiqueWin.tailleListe}" pageSize="@{typeEntretienPeriodiqueWin.maxNb}" onPaging="typeEntretienPeriodiqueWin.getNextElements(event);" />
+                    <separator/>
+                    <button id="btnNew" onClick="typeEntretienPeriodiqueWin.newRecord()" label="Nouveau" image="/images/skin/database_add.png"/>
+                    <button id="btnPdf" onClick="typeEntretienPeriodiqueWin.genererRapportPdf()" label="Generer rapport" image="/images/skin/pdf-soubor-logo.png"/>
+                    <button id="btnExcel" onClick="typeEntretienPeriodiqueWin.genererRapportExcel()" label="Generer excel" image="/images/skin/excel-icon.png"/>
+                </groupbox>
+            </center>
+        </borderlayout>
+    </window>
+</zk>

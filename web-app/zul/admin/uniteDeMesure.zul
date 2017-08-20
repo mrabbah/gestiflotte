@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?init class="org.zkoss.zkplus.databind.AnnotateDataBinderInit" arg0="./uniteDeMesureWin" ?>
+<?variable-resolver class="org.zkoss.zkplus.spring.DelegatingVariableResolver"?>
+
+
+<zk xmlns="http://www.zkoss.org/2005/zul"
+    xmlns:h="http://www.w3.org/1999/xhtml"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.zkoss.org/2005/zul http://www.zkoss.org/2005/zul/zul.xsd">
+
+    <window id="uniteDeMesureWin" height="100%" width="100%" style="margin:auto;" use="${uniteDeMesureWindow}">
+    <!-- <zscript src="/zs/uniteDeMesure.zs"/> -->
+        <borderlayout>
+            <west id="westPanel" title="Gestion des valeur de conversion des unités de mesure" size="40%" flex="true" splittable="true" collapsible="true" open="false">
+                <groupbox id="gbCrud" width="100%" height="100%">
+                    <grid fixedLayout="true">
+                        <rows>
+						
+                            <row>
+                                <label value="Identifiant Unité"/>
+								 
+                                <textbox id="fieldIdUnite" constraint="no empty: Veillez indiquez une valeur" value="@{uniteDeMesureWin.objet.idUnite, save-when='triggerBtn.onClick'}" onBindingSave='if(self.value == null)throw new WrongValueException(self, "Vous devriez indiquer une valeur");'/>
+                            </row>												
+						
+                            <row>
+                                <label value="Valeur conversion"/>
+								 
+                                <textbox id="fieldValeur" constraint="no empty: Veillez indiquez une valeur" value="@{uniteDeMesureWin.objet.valeur, save-when='triggerBtn.onClick'}" onBindingSave='if(self.value == null)throw new WrongValueException(self, "Vous devriez indiquer une valeur");'/>
+                            </row>		 
+						
+                        </rows>
+                    </grid>					
+					
+                    <separator />
+                    <button id="btnSave" onClick="Events.sendEvent(new Event(Events.ON_CLICK,triggerBtn));uniteDeMesureWin.add()" label="Sauveguarder" image="/images/skin/database_save.png"/>
+                    <button id="btnUpdate" onClick="Events.sendEvent(new Event(Events.ON_CLICK,triggerBtn));uniteDeMesureWin.update()" label="Modifier" image="/images/skin/database_edit.png" visible="false"/>
+                    <button id="btnDelete" onClick="Events.sendEvent(new Event(Events.ON_CLICK,triggerBtn));uniteDeMesureWin.delete()" label="Supprimer" image="/images/skin/database_delete.png" visible="false"/>
+                    <button id="btnCancel" onClick="uniteDeMesureWin.cancel()" label="Annuler" image="/images/skin/cancel.png" visible="false"/>
+                    <button visible="false" id="triggerBtn" onBindingValidate=""/>
+                </groupbox>
+            </west>
+            <center border="none" flex="true">
+                <groupbox width="100%" height="100%">
+                    <listbox id="lstObjet" onSelect="uniteDeMesureWin.select()" model="@{uniteDeMesureWin.listeObjets}" selectedItem="@{uniteDeMesureWin.objetSelected}"  width="100%" height="100%" mold="paging" paginal="${paging}">
+                        <auxhead sclass="category-center">
+							
+                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <textbox id="filterIdUnite" value="@{uniteDeMesureWin.filtre.idUnite}" onChanging="uniteDeMesureWin.ofs; uniteDeMesureWin.filtre.idUnite=event.value; uniteDeMesureWin.filtrer(); self.focus(); self.setSelectionRange(self.value.length(), self.value.length())" width="100%"/>
+                            </auxheader>
+								
+                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <textbox id="filterValeur" value="@{uniteDeMesureWin.filtre.valeur}" onChanging="uniteDeMesureWin.ofs; uniteDeMesureWin.filtre.valeur=event.value; uniteDeMesureWin.filtrer(); self.focus(); self.setSelectionRange(self.value.length(), self.value.length())" width="100%"/>
+                            </auxheader>
+								 
+                        </auxhead>
+                        <listhead sizable="true">
+							
+                            <listheader id="hidUnite" label="IdUnite" sort="auto(idUnite)" onSort="uniteDeMesureWin.sort(event)"/>	
+							
+                            <listheader id="huniteMesure" label="Valeur conversion" sort="auto(uniteMesure)" onSort="uniteDeMesureWin.sort(event)"/>	
+							                                 
+                        </listhead>
+                        <listitem self="@{each=element}">                         
+                            
+                            <listcell label="@{element.idUnite}"/>
+							
+                            <listcell label="@{element.valeur}"/>
+							     
+                        </listitem>
+                    </listbox>
+                    <paging id="paging" totalSize="@{uniteDeMesureWin.tailleListe}" pageSize="@{uniteDeMesureWin.maxNb}" onPaging="uniteDeMesureWin.getNextElements(event);" />
+                    <separator/>
+                    <button id="btnNew" onClick="uniteDeMesureWin.newRecord()" label="Nouveau" image="/images/skin/database_add.png"/>
+                    <button id="btnPdf" onClick="uniteDeMesureWin.genererRapportPdf()" label="Generer rapport" image="/images/skin/pdf-soubor-logo.png"/>
+                    <button id="btnExcel" onClick="uniteDeMesureWin.genererRapportExcel()" label="Generer excel" image="/images/skin/excel-icon.png"/>
+                </groupbox>
+            </center>
+        </borderlayout>
+    </window>
+</zk>

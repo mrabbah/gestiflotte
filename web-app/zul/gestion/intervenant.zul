@@ -1,0 +1,328 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?init class="org.zkoss.zkplus.databind.AnnotateDataBinderInit" arg0="./intervenantWin" ?>
+<?variable-resolver class="org.zkoss.zkplus.spring.DelegatingVariableResolver"?>
+
+
+<zk xmlns="http://www.zkoss.org/2005/zul"
+    xmlns:h="http://www.w3.org/1999/xhtml"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.zkoss.org/2005/zul http://www.zkoss.org/2005/zul/zul.xsd">
+
+    <window id="intervenantWin" height="100%" width="100%" style="margin:auto;" use="${intervenantWindow}">
+    <!-- <zscript src="/zs/intervenant.zs"/> -->
+        <borderlayout>
+            <north id="eastPanel" size="65px" open="false"  title="Recherche avancée" flex="true" splittable="true"  collapsible="true"  >
+                <hlayout spacing="10px" style="margin-top:9px;margin-left:10px">
+					
+                    <label value="Nationalité :" />
+                    <combobox id="filternationalite" model="@{intervenantWin.nationalites}" selectedItem="@{intervenantWin.filtre.nationalite}" autocomplete="true" autodrop="true" mold="rounded" onSelect="intervenantWin.ofs=0;intervenantWin.filtrer()" onOK="intervenantWin.ofs=0;intervenantWin.filtrer()">
+                        <comboitem self="@{each=elementfiltrenationalite}" label="@{elementfiltrenationalite}"/>
+                    </combobox>
+					
+                    <label value="Employeur :" />
+                    <combobox id="filteremployer" model="@{intervenantWin.employers}" selectedItem="@{intervenantWin.filtre.employer}" autocomplete="true" autodrop="true" mold="rounded" onSelect="intervenantWin.ofs=0;intervenantWin.filtrer()" onOK="intervenantWin.ofs=0;intervenantWin.filtrer()">
+                        <comboitem self="@{each=elementfiltreemployer}" label="@{elementfiltreemployer}"/>
+                    </combobox>
+										                    
+                </hlayout>
+            </north>
+            <west id="westPanel" title="Gestion des intervenants" size="100%" flex="true" splittable="true" collapsible="true" open="false">
+                <groupbox id="gbCrud" width="100%" height="100%">
+                    <vbox id="vbchoix" width="100%">
+                        <label value="Intervenant appartenant:" />
+                        <radiogroup onCheck="intervenantWin.choixGenreIntervenant(self.selectedItem.id)" >
+                            <grid>
+                                <rows>
+                                    <row>
+                                        <radio id="r1" label="Au groupe" />
+                                        <radio id="r2" label="Société externe" />
+                                        <radio id="r3" label="Particulier" /> 
+                                    </row>
+                                </rows>
+                            </grid>
+                                            
+                        </radiogroup>
+                    </vbox>
+                    <grid id="grcrud" fixedLayout="true" visible="false">
+                        <rows>
+				
+                            <row>
+                                <label value="Code"/>
+								 
+                                <textbox id="fieldCode" constraint="no empty: Veillez indiquez une valeur" value="@{intervenantWin.objet.code, save-when='triggerBtn.onClick'}" onBindingSave='if(self.value == null)throw new WrongValueException(self, "Vous devriez indiquer une valeur");'/>
+<!--                            </row>
+                            
+                            <row>-->
+                                <label value="Cin"/>
+								 
+                                <textbox id="fieldCin" constraint="no empty: Veillez indiquez une valeur" value="@{intervenantWin.objet.cin, save-when='triggerBtn.onClick'}" onBindingSave='if(self.value == null)throw new WrongValueException(self, "Vous devriez indiquer une valeur");'/>
+                            </row>												
+						
+                            <row>
+                                <label value="Nom"/>
+								 
+                                <textbox id="fieldNom" constraint="no empty: Veillez indiquez une valeur" value="@{intervenantWin.objet.nom, save-when='triggerBtn.onClick'}" onBindingSave='if(self.value == null)throw new WrongValueException(self, "Vous devriez indiquer une valeur");'/>
+<!--                            </row>												
+						
+                            <row>-->
+                                <label value="Prénom"/>
+								 
+                                <textbox id="fieldPrenom" constraint="no empty: Veillez indiquez une valeur" value="@{intervenantWin.objet.prenom, save-when='triggerBtn.onClick'}" onBindingSave='if(self.value == null)throw new WrongValueException(self, "Vous devriez indiquer une valeur");'/>
+                            </row>												
+						
+                            <row>
+                                <label value="Type permis"/>
+								 
+                                <textbox id="fieldTypePermis" constraint="no empty: Veillez indiquez une valeur" value="@{intervenantWin.objet.typePermis, save-when='triggerBtn.onClick'}" onBindingSave='if(self.value == null)throw new WrongValueException(self, "Vous devriez indiquer une valeur");'/>
+<!--                            </row>												
+						
+                            <row>-->
+                                <label value="Numéro permis"/>
+								 
+                                <textbox id="fieldNumeroPermis" value="@{intervenantWin.objet.numeroPermis, save-when='triggerBtn.onClick'}"/>
+                            </row>												
+						
+<!--                            <row>
+                                <label value="Sous Traitant"/>
+								 
+                                <checkbox id="fieldSousTraite" label="?" checked="@{intervenantWin.objet.sousTraite, save-when='triggerBtn.onClick'}"/>
+                            </row>												
+						-->
+                            <row>
+                                <label value="Lieu naissance"/>
+								 
+                                <textbox id="fieldLieuNaissance" value="@{intervenantWin.objet.lieuNaissance, save-when='triggerBtn.onClick'}" />
+<!--                            </row>												
+						
+                            <row>-->
+                                <label value="Date naissance"/>
+								 
+                                <datebox id="fieldDateNaissance" format="dd/MM/yyyy HH:mm" width="132px" value="@{intervenantWin.objet.dateNaissance, save-when='triggerBtn.onClick'}" />
+                            </row>												
+						
+                            <row>
+                                <label value="Adresse"/>				 
+                                <cell colspan="3">
+                                    <textbox id="fieldAdresse" value="@{intervenantWin.objet.adresse, save-when='triggerBtn.onClick'}" width="733px"/>
+                                </cell>
+                            </row>												
+						
+                            <row>
+                                <label value="Gsm"/>
+								 
+                                <textbox id="fieldGsm" constraint="no empty: Veillez indiquez une valeur" value="@{intervenantWin.objet.gsm, save-when='triggerBtn.onClick'}" onBindingSave='if(self.value == null)throw new WrongValueException(self, "Vous devriez indiquer une valeur");'/>
+<!--                            </row>												
+						
+                            <row>-->
+                                <label value="Email"/>
+								 
+                                <textbox id="fieldEmail" value="@{intervenantWin.objet.email, save-when='triggerBtn.onClick'}" />
+                            </row>
+                            
+                            <row>
+                                <label value="Commission (%)"/>
+                                <doublebox id="fieldCommission" format="#.0#" value="@{intervenantWin.objet.commission, save-when='triggerBtn.onClick'}" width="130px"/>
+<!--                            </row>
+                                		
+                            <row>-->
+                                <label value="Nationalité" />
+                                <combobox id="conationalites" model="@{intervenantWin.nationalites}" selectedItem="@{intervenantWin.nationaliteSelected}" width="132px">
+                                    <comboitem self="@{each=elementnationalite}" label="@{elementnationalite}"/>
+                                </combobox>
+                            </row>
+						
+                            <row id="rwemp">
+                                <label value="Employeur" />
+                                <cell colspan="3">
+                                    <combobox id="coemployers" model="@{intervenantWin.employers}" selectedItem="@{intervenantWin.employerSelected}">
+                                        <comboitem self="@{each=elementemployer}" label="@{elementemployer}"/>
+                                    </combobox>
+                                </cell>    
+                            </row>
+						
+                        </rows>
+                    </grid>					
+					
+                    <separator />
+                    <button id="btnSave" onClick="Events.sendEvent(new Event(Events.ON_CLICK,triggerBtn));intervenantWin.add()" label="Sauveguarder" image="/images/skin/database_save.png"/>
+                    <button id="btnUpdate" onClick="Events.sendEvent(new Event(Events.ON_CLICK,triggerBtn));intervenantWin.update()" label="Modifier" image="/images/skin/database_edit.png" visible="false"/>
+                    <button id="btnDelete" onClick="Events.sendEvent(new Event(Events.ON_CLICK,triggerBtn));intervenantWin.delete()" label="Supprimer" image="/images/skin/database_delete.png" visible="false"/>
+                    <!-- <button id="btnNew" onClick="intervenantWin.newRecord()" label="Nouveau enregistrement" image="/images/skin/database_add.png"/> -->
+                    <button id="btnCancel" onClick="intervenantWin.cancel()" label="Annuler" image="/images/skin/cancel.png" />
+                    <button visible="false" id="triggerBtn" onBindingValidate=""/>
+                </groupbox>
+            </west>
+            <center border="none" flex="true">
+                <groupbox width="100%" height="100%">
+                    <listbox id="lstObjet" onSelect="intervenantWin.select()" model="@{intervenantWin.listeObjets}" selectedItem="@{intervenantWin.objetSelected}"  width="100%" height="100%" mold="paging" paginal="${paging}">
+                        <auxhead sclass="category-center">
+							
+                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <textbox id="filterCode" value="@{intervenantWin.filtre.code}" onChanging="intervenantWin.ofs; intervenantWin.filtre.code=event.value; intervenantWin.filtrer(); self.focus(); self.setSelectionRange(self.value.length(), self.value.length())" width="100%"/>
+                            </auxheader>
+                            
+                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <textbox id="filterCin" value="@{intervenantWin.filtre.cin}" onChanging="intervenantWin.ofs; intervenantWin.filtre.cin=event.value; intervenantWin.filtrer(); self.focus(); self.setSelectionRange(self.value.length(), self.value.length())" width="100%"/>
+                            </auxheader>
+								
+                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <textbox id="filterNom" value="@{intervenantWin.filtre.nom}" onChanging="intervenantWin.ofs; intervenantWin.filtre.nom=event.value; intervenantWin.filtrer(); self.focus(); self.setSelectionRange(self.value.length(), self.value.length())" width="100%"/>
+                            </auxheader>
+								
+                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <textbox id="filterPrenom" value="@{intervenantWin.filtre.prenom}" onChanging="intervenantWin.ofs; intervenantWin.filtre.prenom=event.value; intervenantWin.filtrer(); self.focus(); self.setSelectionRange(self.value.length(), self.value.length())" width="100%"/>
+                            </auxheader>
+								
+                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <textbox id="filterTypePermis" value="@{intervenantWin.filtre.typePermis}" onChanging="intervenantWin.ofs; intervenantWin.filtre.typePermis=event.value; intervenantWin.filtrer(); self.focus(); self.setSelectionRange(self.value.length(), self.value.length())" width="100%"/>
+                            </auxheader>
+								
+<!--                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <textbox id="filterNumeroPermis" value="@{intervenantWin.filtre.numeroPermis}" onChanging="intervenantWin.ofs; intervenantWin.filtre.numeroPermis=event.value; intervenantWin.filtrer(); self.focus(); self.setSelectionRange(self.value.length(), self.value.length())" width="100%"/>
+                            </auxheader>-->
+								
+                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <checkbox id="filterSousTraite" onCheck="intervenantWin.ofs=0;intervenantWin.filtre.sousTraite=self.checked; intervenantWin.filtrer()" />
+                            </auxheader>
+								
+                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <textbox id="filterLieuNaissance" value="@{intervenantWin.filtre.lieuNaissance}" onChanging="intervenantWin.ofs; intervenantWin.filtre.lieuNaissance=event.value; intervenantWin.filtrer(); self.focus(); self.setSelectionRange(self.value.length(), self.value.length())" width="100%"/>
+                            </auxheader>
+								
+                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <datebox id="filterDateNaissance" format="dd/MM/yyyy" value="@{intervenantWin.filtre.dateNaissance}" onOK="intervenantWin.ofs=0; intervenantWin.filtrer(); self.focus();" width="90%"/>
+                            </auxheader>
+								
+                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <textbox id="filterAdresse" value="@{intervenantWin.filtre.adresse}" onChanging="intervenantWin.ofs; intervenantWin.filtre.adresse=event.value; intervenantWin.filtrer(); self.focus(); self.setSelectionRange(self.value.length(), self.value.length())" width="100%"/>
+                            </auxheader>
+								
+                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <textbox id="filterGsm" value="@{intervenantWin.filtre.gsm}" onChanging="intervenantWin.ofs; intervenantWin.filtre.gsm=event.value; intervenantWin.filtrer(); self.focus(); self.setSelectionRange(self.value.length(), self.value.length())" width="100%"/>
+                            </auxheader>
+								
+<!--                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <textbox id="filterEmail" value="@{intervenantWin.filtre.email}" onChanging="intervenantWin.ofs; intervenantWin.filtre.email=event.value; intervenantWin.filtrer(); self.focus(); self.setSelectionRange(self.value.length(), self.value.length())" width="100%"/>
+                            </auxheader>-->
+                            
+                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <doublebox id="filterCommission" value="@{interventionWin.filtre.commission}" width="100%">
+                                    <attribute name="onChanging">
+                                        <![CDATA[
+                                                intervenantWin.ofs=0;
+                                                if(event.value.equals("")) {
+                                                        if(intervenantWin.filtre.commission != null) {
+                                                                intervenantWin.filtre.commission = null;
+                                                        }
+                                                } else {
+                                                        intervenantWin.filtre.commission=new Double(event.value);
+                                                }
+                                                intervenantWin.filtrer();
+                                                self.focus();
+                                                if(!event.value.equals("")) {
+                                                        self.setSelectionRange(self.value.toString().length(), self.value.toString().length());
+                                                }
+                                        ]]>
+                                    </attribute>    
+                                </doublebox>
+                            </auxheader>
+								 
+                        </auxhead>
+                        <listhead sizable="true">
+							
+                            <listheader id="hcode" label="Code" sort="auto(code)" onSort="intervenantWin.sort(event)"/>	
+                            
+                            <listheader id="hcin" label="Cin" sort="auto(cin)" onSort="intervenantWin.sort(event)"/>	
+							
+                            <listheader id="hnom" label="Nom" sort="auto(nom)" onSort="intervenantWin.sort(event)"/>	
+							
+                            <listheader id="hprenom" label="Prénom" sort="auto(prenom)" onSort="intervenantWin.sort(event)"/>	
+							
+                            <listheader id="htypePermis" label="Type permis" sort="auto(typePermis)" onSort="intervenantWin.sort(event)" width="80px"/>	
+							
+<!--                            <listheader label="Numéro permis" sort="auto(numeroPermis)" onSort="intervenantWin.sort(event)"/>	-->
+							
+                            <listheader id="hsousTraite" label="Sous Traité" sort="auto(sousTraite)" onSort="intervenantWin.sort(event)" width="75px"/>	
+							
+                            <listheader id="hlieuNaissance" label="Lieu naissance" sort="auto(lieuNaissance)" onSort="intervenantWin.sort(event)"/>	
+							
+                            <listheader id="hdateNaissance" label="D. Naissance" sort="auto(dateNaissance)" onSort="intervenantWin.sort(event)" width="85px"/>	
+							
+                            <listheader id="hadresse" label="Adresse" sort="auto(adresse)" onSort="intervenantWin.sort(event)" width="120px"/>	
+							
+                            <listheader id="hgsm" label="Gsm" sort="auto(gsm)" onSort="intervenantWin.sort(event)"/>	
+							
+<!--                            <listheader id="hemail" label="Email" sort="auto(email)" onSort="intervenantWin.sort(event)"/>	-->
+                            
+                            <listheader id="hcommission" label="Commission" sort="auto(commission)" onSort="intervenantWin.sort(event)"/>	
+							                                 
+                        </listhead>
+                        <listitem self="@{each=element}">                         
+                            
+                            <listcell label="@{element.code}"/>
+                            
+                            <listcell>
+                                <textbox value="@{element.cin}" inplace="true" readonly="true" width="99%"/>
+                            </listcell>
+							
+                            <listcell>
+                                <textbox value="@{element.nom}" inplace="true" readonly="true" width="99%"/>
+                            </listcell>
+							
+                            <listcell>
+                                <textbox value="@{element.prenom}" inplace="true" readonly="true" width="99%"/>
+                            </listcell>
+							
+                            <listcell label="@{element.typePermis}"/>
+							
+<!--                            <listcell label="@{element.numeroPermis}"/>-->
+						
+                            <listcell label="@{element.sousTraite, converter=com.choranet.zk.TrueFalseConverter}"/>
+							
+                            <listcell>
+                                <textbox value="@{element.lieuNaissance}" inplace="true" readonly="true" width="99%"/>
+                            </listcell>
+							
+                            <listcell>
+<!--                                label="@{element.dateNaissance, converter=com.choranet.zk.DateConverter}">-->
+                                <textbox value="@{element.dateNaissance}" inplace="true" readonly="true" width="99%"/>
+                            </listcell>
+							
+                            <listcell>
+                                <textbox value="@{element.adresse}" inplace="true" readonly="true" width="99%"/>
+                            </listcell>
+							
+                            <listcell>
+                                <textbox value="@{element.gsm}" inplace="true" readonly="true" width="99%"/>
+                            </listcell>
+							
+<!--                            <listcell label="@{element.email}"/>-->
+                            
+                            <listcell label="@{element.commission}"/>
+							     
+                        </listitem>
+                    </listbox>
+                   <paging id="paging" totalSize="@{intervenantWin.tailleListe}" pageSize="@{intervenantWin.maxNb}" onPaging="intervenantWin.getNextElements(event);" />
+                    <separator/>
+                    <button id="btnNew" onClick="intervenantWin.newRecord()" label="Nouveau" image="/images/skin/database_add.png"/>
+                    <button id="btnPdf" onClick="intervenantWin.genererRapportPdf()" label="Generer rapport" image="/images/skin/pdf-soubor-logo.png"/>
+                    <button id="btnExcel" onClick="intervenantWin.genererRapportExcel()" label="Generer excel" image="/images/skin/excel-icon.png"/>
+                    <fileupload id="btnImport" label="Import en masse" onUpload="intervenantWin.importation(event.getMedia())" image="/images/skin/BriefcaseOpen-16x16.png"/>
+                </groupbox>
+            </center>
+        </borderlayout>
+    </window>
+</zk>

@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?init class="org.zkoss.zkplus.databind.AnnotateDataBinderInit" arg0="./regionWin" ?>
+<?variable-resolver class="org.zkoss.zkplus.spring.DelegatingVariableResolver"?>
+
+
+<zk xmlns="http://www.zkoss.org/2005/zul"
+    xmlns:h="http://www.w3.org/1999/xhtml"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.zkoss.org/2005/zul http://www.zkoss.org/2005/zul/zul.xsd">
+
+    <window id="regionWin" height="100%" width="100%" style="margin:auto;" use="${regionWindow}">
+    <!-- <zscript src="/zs/trajet.zs"/> -->
+        <borderlayout>
+            <west id="westPanel" title="Gestion des regions" size="40%" flex="true" splittable="true" collapsible="true" open="false">
+                <groupbox id="gbCrud" width="100%" height="100%">
+                    <grid fixedLayout="true">
+                        <rows>
+						
+                            <row>
+                                <label value="Code"/>				 
+                                <textbox id="fieldCode" constraint="no empty: Veillez indiquez une valeur" value="@{regionWin.objet.code, save-when='triggerBtn.onClick'}" onBindingSave='if(self.value == null)throw new WrongValueException(self, "Vous devriez indiquer une valeur");'/>
+                            </row>
+                            <row>
+                                <label value="Intitule"/>				 
+                                <textbox id="fieldIntitule" constraint="no empty: Veillez indiquez une valeur" value="@{regionWin.objet.intitule, save-when='triggerBtn.onClick'}" onBindingSave='if(self.value == null)throw new WrongValueException(self, "Vous devriez indiquer une valeur");'/>
+                            </row>
+                            <row>
+                                <label value="Kilométrage Min"/>				 
+                                <doublebox id="fieldKilometrageMin" constraint="no empty: Veillez indiquez une valeur" value="@{regionWin.objet.kilometrageMin, save-when='triggerBtn.onClick'}" onBindingSave='if(self.value == null)throw new WrongValueException(self, "Vous devriez indiquer une valeur");'/>
+                            </row>
+                            <row>
+                                <label value="Kilométrage Max"/>				 
+                                <doublebox id="fieldKilometrageMax" constraint="no empty: Veillez indiquez une valeur" value="@{regionWin.objet.kilometrageMax, save-when='triggerBtn.onClick'}" onBindingSave='if(self.value == null)throw new WrongValueException(self, "Vous devriez indiquer une valeur");'/>
+                            </row>
+						 		
+                        </rows>
+                    </grid>					
+					
+                    <separator />
+                    <button id="btnSave" onClick="Events.sendEvent(new Event(Events.ON_CLICK,triggerBtn));regionWin.add()" label="Sauveguarder" image="/images/skin/database_save.png"/>
+                    <button id="btnUpdate" onClick="Events.sendEvent(new Event(Events.ON_CLICK,triggerBtn));regionWin.update()" label="Modifier" image="/images/skin/database_edit.png" visible="false"/>
+                    <button id="btnDelete" onClick="Events.sendEvent(new Event(Events.ON_CLICK,triggerBtn));regionWin.delete()" label="Supprimer" image="/images/skin/database_delete.png" visible="false"/>
+                    <!-- <button id="btnNew" onClick="regionWin.newRecord()" label="Nouveau enregistrement" image="/images/skin/database_add.png"/> -->
+                    <button id="btnCancel" onClick="regionWin.cancel()" label="Annuler" image="/images/skin/cancel.png" visible="false"/>
+                    <button visible="false" id="triggerBtn" onBindingValidate=""/>
+                </groupbox>
+            </west>
+            <center border="none" flex="true">
+                <groupbox width="100%" height="100%">
+                    <listbox id="lstObjet" onSelect="regionWin.select()" model="@{regionWin.listeObjets}" selectedItem="@{regionWin.objetSelected}"  width="99,9%" height="500px">
+                        <auxhead sclass="category-center">
+							
+                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <textbox id="filterCode" value="@{regionWin.filtre.code}" onChanging="regionWin.ofs; regionWin.filtre.code=event.value; regionWin.filtrer(); self.focus(); self.setSelectionRange(self.value.length(), self.value.length())" width="100%"/>
+                            </auxheader>
+                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <textbox id="filterIntitule" value="@{regionWin.filtre.intitule}" onChanging="regionWin.ofs; regionWin.filtre.intitule=event.value; regionWin.filtrer(); self.focus(); self.setSelectionRange(self.value.length(), self.value.length())" width="100%"/>
+                            </auxheader>
+                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <doublebox id="filterKilometrageMin" value="@{regionWin.filtre.kilometrageMin}" width="100%">
+                                    <attribute name="onChanging">
+                                            <![CDATA[
+                                                    regionWin.ofs=0;
+                                                    if(event.value.equals("")) {
+                                                            if(regionWin.filtre.kilometrageMin != null) {
+                                                                    regionWin.filtre.kilometrageMin = null;
+                                                            }
+                                                    } else {
+                                                            regionWin.filtre.kilometrageMin=new Double(event.value);
+                                                    }
+                                                    regionWin.filtrer();
+                                                    self.focus();
+                                                    if(!event.value.equals("")) {
+                                                            self.setSelectionRange(self.value.toString().length(), self.value.toString().length());
+                                                    }
+                                            ]]>
+                                    </attribute>    
+                                </doublebox>
+                            </auxheader>
+                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <doublebox id="filterKilometrageMax" value="@{regionWin.filtre.kilometrageMax}" width="100%">
+                                    <attribute name="onChanging">
+                                            <![CDATA[
+                                                    regionWin.ofs=0;
+                                                    if(event.value.equals("")) {
+                                                            if(regionWin.filtre.kilometrageMax != null) {
+                                                                    regionWin.filtre.kilometrageMax = null;
+                                                            }
+                                                    } else {
+                                                            regionWin.filtre.kilometrageMax=new Double(event.value);
+                                                    }
+                                                    regionWin.filtrer();
+                                                    self.focus();
+                                                    if(!event.value.equals("")) {
+                                                            self.setSelectionRange(self.value.toString().length(), self.value.toString().length());
+                                                    }
+                                            ]]>
+                                    </attribute>    
+                                </doublebox>
+                            </auxheader>
+								 
+                        </auxhead>
+                        <listhead sizable="true">
+							
+                            <listheader id="hcode" label="Code" sort="auto(code)" onSort="regionWin.sort(event)"/>	
+                            <listheader id="hintitule" label="Intitule" sort="auto(intitule)" onSort="regionWin.sort(event)"/>
+                            <listheader id="hkilometrageMin" label="Kilometrage Min" sort="auto(kilometrageMin)" onSort="regionWin.sort(event)"/>
+                            <listheader id="hkilometrageMax" label="Kilometrage Max" sort="Max" onSort="regionWin.sort(event)"/>
+							                                 
+                        </listhead>
+                        <listitem self="@{each=element}">                         
+                            
+                            <listcell label="@{element.code}"/>
+                            <listcell label="@{element.intitule}"/>
+                            <listcell label="@{element.kilometrageMin}"/>
+                            <listcell label="@{element.kilometrageMax}"/>
+							     
+                        </listitem>
+                    </listbox>
+<!--                    <paging id="paging" totalSize="@{regionWin.tailleListe}" pageSize="@{regionWin.maxNb}" onPaging="regionWin.getNextElements(event);" />-->
+                    <separator/>
+                    <button id="btnNew" onClick="regionWin.newRecord()" label="Nouveau" image="/images/skin/database_add.png"/>
+                    <button id="btnPdf" onClick="regionWin.genererRapportPdf()" label="Generer rapport" image="/images/skin/pdf-soubor-logo.png"/>
+                    <button id="btnExcel" onClick="regionWin.genererRapportExcel()" label="Generer excel" image="/images/skin/excel-icon.png"/>
+                    <fileupload id="btnImport" label="Import en masse" onUpload="regionWin.importation(event.getMedia())" image="/images/skin/BriefcaseOpen-16x16.png"/>
+                </groupbox>
+            </center>
+        </borderlayout>
+    </window>
+</zk>

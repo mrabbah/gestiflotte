@@ -1,0 +1,185 @@
+
+<?init class="org.zkoss.zkplus.databind.AnnotateDataBinderInit" arg0="./tdbWin" ?>
+<?variable-resolver class="org.zkoss.zkplus.spring.DelegatingVariableResolver"?>
+
+
+<zk xmlns="http://www.zkoss.org/2005/zul"
+    xmlns:h="http://www.w3.org/1999/xhtml"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.zkoss.org/2005/zul http://www.zkoss.org/2005/zul/zul.xsd">
+
+    <window id="tdbWin" height="100%" width="100%" style="margin:auto;" use="${tdbWindow}">
+        <borderlayout>
+            <north title="Vue d'ensemble" size="100%" flex="true" splittable="true" collapsible="true" open="true">
+                <borderlayout>
+                    <west size="440px">
+
+                        <vlayout>
+                            <panel height="240px" width="430px" style="margin-bottom:10px"
+                    title="Etat du park véhicule" border="normal" 
+                    collapsible="true">
+                                <panelchildren style="overflow: auto">
+                                    <chart id="piechart3d" title="Etat du park" width="420" height="200"
+                            type="pie" threeD="true" fgAlpha="128" model="@{tdbWin.etatparkmdel}" />
+                                </panelchildren>
+                            </panel>
+                            <panel height="240px" width="430px" style="margin-bottom:10px"
+                    title="Dépenses et gains" border="normal" 
+                    collapsible="true">
+                                <panelchildren style="overflow: auto">
+                                    <chart id="sbarchart3d" title="Historique" width="420"
+                                height="200" type="bar" threeD="true" fgAlpha="128"
+                                model="@{tdbWin.depensesgains}" />
+                                </panelchildren>
+                            </panel>
+                        </vlayout>
+
+                    </west>
+                    <center autoscroll="true">
+                        <vlayout>
+                            <panel height="120px" width="100%" style="margin-bottom:10px"
+                    title="Liste véhicules garrés" border="normal" maximizable="true"
+                    collapsible="true" open="@{tdbWin.existVG}">
+                                <panelchildren>
+                                    <listbox id="lstVG" model="@{tdbWin.listeVG}" width="100%" height="100%" autopaging="true" vflex="120px">
+                                        <listitem self="@{each=element}"> 
+                                            <listcell label="@{element.vehicule}" />
+                                        </listitem>
+                                    </listbox>
+                                </panelchildren>
+                            </panel>
+                            <panel height="140px" width="100%" style="margin-bottom:10px"
+                    title="Rappel réservations" border="normal" maximizable="true"
+                    collapsible="true" open="@{tdbWin.existAlertsReservations}">
+                                <panelchildren>
+                                    <listbox id="lstReservations" model="@{tdbWin.listeReservations}" width="100%" height="100%" autopaging="true" vflex="140px">
+                                        <listhead sizable="true">
+                                            <listheader label="Véhicule"/>
+                                            <listheader label="Date départ"/>
+                                            <listheader label="Date restitution"/>
+                                        </listhead>
+                                        <listitem self="@{each=element}"> 
+                                            <listcell label="@{element.vehicule}" style="color:red" />
+                                            <listcell>
+                                                <datebox style="color:red" value="@{element.dateDepart}" width="90%" format="dd/MM/yyyy" buttonVisible="false" readonly="true"/>
+                                            </listcell>
+                                            <listcell>
+                                                <datebox style="color:red" value="@{element.dateRestitution}" width="90%" format="dd/MM/yyyy" buttonVisible="false" readonly="true"/>
+                                            </listcell>
+                                        </listitem>
+                                    </listbox>
+                                </panelchildren>
+                            </panel>
+                            <panel height="120px" width="100%" style="margin-bottom:10px"
+                    title="Rappel entretiens périodiques" border="normal" maximizable="true"
+                    collapsible="true" sizable="true" open="@{tdbWin.existAlertsEp}">
+                                <panelchildren>
+                                    <listbox id="lstEp" model="@{tdbWin.listeAlertsEp}" width="100%" height="100%" autopaging="true" vflex="120px">
+                                        <listhead sizable="true">
+                                            <listheader label="Véhicule"/>
+                                            <listheader label="Type"/>
+                                            <listheader label="Kilométrage"/>	
+                                        </listhead>
+                                        <listitem self="@{each=element}"> 
+                                            <listcell label="@{element.vehicule}" style="color:red"/>
+                                            <listcell label="@{element.typeEntretienPeriodique}" style="color:red"/>
+                                            <listcell label="@{element.vehicule.kilometrage}" style="color:red"/>
+                                        </listitem>
+                                    </listbox>
+                                </panelchildren>
+                            </panel>
+                            <panel height="260px" width="100%" style="margin-bottom:10px"
+                    title="Rappel frais circulation périodiques" border="normal" maximizable="true"
+                    collapsible="true" open="@{tdbWin.existAlertsFcp}">
+                                <panelchildren>
+                                    <listbox id="lstFcP" model="@{tdbWin.listeAlertsFcp}" width="100%" height="100%" autopaging="true" vflex="140px">
+                                        <listhead sizable="true">
+                                            <listheader label="Véhicule"/>
+                                            <listheader label="Type"/>
+                                            <listheader label="Prochain rendez-vous"/>	
+                                        </listhead>
+                                        <listitem self="@{each=element}"> 
+                                            <listcell label="@{element.vehicule}" style="color:red"/>
+                                            <listcell label="@{element.typeFraisCirculationPeriodique}" style="color:red"/>
+                                            <listcell>
+                                                <datebox style="color:red" value="@{element.periode}" width="90%" format="dd/MM/yyyy" buttonVisible="false" readonly="true"/>
+                                            </listcell>
+                                        </listitem>
+                                    </listbox>
+                                </panelchildren>
+                            </panel>
+                        
+                        </vlayout>
+                    </center>
+                </borderlayout>
+            </north>
+            <center title="Rapports" flex="true" hflex="1">
+                <vlayout>
+                    <groupbox mold="3d"  open="true" height="100%">
+                        <caption>
+                        Rapport des chèques
+                        </caption>
+                        <hlayout sclass="z-valign-center">
+                            <label value="Date début : " width="150px" />
+                            <datebox id="dateDebutPaiementGroup" width="100%" value="@{tdbWin.dateDebutPaiementGroup}" />
+                            <label value="Date fin : " width="50px" />
+                            <datebox id="dateFinPaiementGroup" value="@{tdbWin.dateFinPaiementGroup}" />
+                            <button image="/images/skin/pdf-soubor-logo.png" onClick="tdbWin.genererRapportPaiementGroup()" />
+                        </hlayout>
+                    </groupbox>
+                    <groupbox mold="3d"  open="true" height="100%">
+                        <caption>
+                        Rapport des interventions
+                        </caption>
+                        <hlayout sclass="z-valign-center">
+                            <label value="Date début : " width="150px" />
+                            <datebox id="dateDebutInterventions" width="100%" value="@{tdbWin.dateDebutInterventions}"/>
+                            <label value="Date fin : " width="50px" />
+                            <datebox id="dateFinInterventions" value="@{tdbWin.dateFinInterventions}" />
+                            <button image="/images/skin/pdf-soubor-logo.png" onClick="tdbWin.genererRapportInterventions()" />
+                        </hlayout>
+                    </groupbox>
+                    <groupbox mold="3d"  open="true" height="100%">
+                        <caption>
+                        Rapport des déplacements
+                        </caption>
+                        <hlayout sclass="z-valign-center">
+                            <label value="Date début : " width="150px" />
+                            <datebox id="dateDebutDeplacement" width="100%" value="@{tdbWin.dateDebutDeplacement}"/>
+                            <label value="Date fin : " width="50px" />
+                            <datebox id="dateFinDeplacement" value="@{tdbWin.dateFinDeplacement}" />
+                            <button image="/images/skin/pdf-soubor-logo.png" onClick="tdbWin.genererRapportDeplacement()" />
+                        </hlayout>
+                    </groupbox>
+                    <groupbox mold="3d"  open="true" height="100%">
+                        <caption>
+                        Détails du chèque 
+                        </caption>
+                        <hlayout sclass="z-valign-center">
+                            <label value="Choix du chèque : " width="150px" />
+                            <combobox id="cocheques" model="@{tdbWin.cheques}" selectedItem="@{tdbWin.cheque}" autocomplete="true">
+                                <comboitem self="@{each=elementcheque}" label="@{elementcheque}"/>
+                            </combobox>
+                            <button image="/images/skin/pdf-soubor-logo.png" onClick="tdbWin.genererRapportPaiementGroupDetails()" />
+                        </hlayout>
+                    </groupbox>
+<!--                    <groupbox mold="3d"  open="true" height="100%">
+                        <caption>
+                        Bénéfices réalisés pour une voiture
+                        </caption>
+                        <hlayout sclass="z-valign-center">
+                            <label value="Choix de la voiture : " width="150px" />
+                            <combobox id="coVoitures" model="@{tdbWin.voitures}" selectedItem="@{tdbWin.voiture}" autocomplete="true">
+                                <comboitem self="@{each=elementvoiture}" label="@{elementvoiture}"/>
+                            </combobox>
+                            <button image="/images/skin/pdf-soubor-logo.png" onClick="tdbWin.genererRapportBenifices()" />
+                        </hlayout>
+                    </groupbox>-->
+                    <button visible="false" id="triggerBtn1" onBindingValidate=""/>
+                </vlayout>
+            </center>
+        </borderlayout>
+        
+        
+    </window>
+</zk>

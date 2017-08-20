@@ -1,0 +1,225 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Rapport_des_locations" language="groovy" pageWidth="1161" pageHeight="595" orientation="Landscape" columnWidth="1121" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20">
+	<property name="ireport.zoom" value="1.464100000000006"/>
+	<property name="ireport.x" value="721"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="nomsociete" class="java.lang.String"/>
+	<parameter name="titrerapport" class="java.lang.String"/>
+	<field name="numBC" class="java.lang.String"/>
+	<field name="mission" class="java.lang.String"/>
+	<field name="prixParJour" class="java.lang.Double"/>
+	<field name="dateDepart" class="java.util.Date"/>
+	<field name="dateRestitution" class="java.util.Date"/>
+	<field name="nombreDeJours" class="java.lang.Integer"/>
+	<field name="kilometrageDepart" class="java.lang.Integer"/>
+	<field name="kilometrageRetour" class="java.lang.Integer"/>
+	<field name="kilometrageDisque" class="java.lang.Integer"/>
+	<field name="lieuLivraison" class="java.lang.String"/>
+	<field name="lieuReprise" class="java.lang.String"/>
+	<field name="observations" class="java.lang.String"/>
+	<field name="numFacture" class="java.lang.String"/>
+	<background>
+		<band/>
+	</background>
+	<title>
+		<band height="72">
+			<frame>
+				<reportElement mode="Opaque" x="0" y="-20" width="1121" height="92" backcolor="#006699"/>
+				<textField>
+					<reportElement x="20" y="20" width="426" height="43" forecolor="#FFFFFF"/>
+					<textElement>
+						<font size="34" isBold="true"/>
+					</textElement>
+					<textFieldExpression class="java.lang.String"><![CDATA[$P{nomsociete}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="931" y="43" width="180" height="20" forecolor="#FFFFFF"/>
+					<textElement textAlignment="Right">
+						<font size="14" isBold="false"/>
+					</textElement>
+					<textFieldExpression class="java.lang.String"><![CDATA[$P{titrerapport}]]></textFieldExpression>
+				</textField>
+			</frame>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="13"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="30">
+			<line>
+				<reportElement x="0" y="19" width="1121" height="2" forecolor="#666666"/>
+			</line>
+			<staticText>
+				<reportElement mode="Opaque" x="0" y="-1" width="86" height="20" forecolor="#006699" backcolor="#E6E6E6"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle" rotation="None" markup="none">
+					<font fontName="SansSerif" size="11" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+				</textElement>
+				<text><![CDATA[N° BC]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="86" y="-1" width="163" height="20" forecolor="#006699" backcolor="#E6E6E6"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle" rotation="None" markup="none">
+					<font fontName="SansSerif" size="11" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+				</textElement>
+				<text><![CDATA[Mission]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="325" y="-1" width="86" height="20" forecolor="#006699" backcolor="#E6E6E6"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle" rotation="None" markup="none">
+					<font fontName="SansSerif" size="11" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+				</textElement>
+				<text><![CDATA[Date Départ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="411" y="-1" width="86" height="20" forecolor="#006699" backcolor="#E6E6E6"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle" rotation="None" markup="none">
+					<font fontName="SansSerif" size="11" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+				</textElement>
+				<text><![CDATA[Date Restitution]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="497" y="-1" width="86" height="20" forecolor="#006699" backcolor="#E6E6E6"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" markup="none">
+					<font fontName="SansSerif" size="11" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+				</textElement>
+				<text><![CDATA[Nb jours]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="583" y="-1" width="86" height="20" forecolor="#006699" backcolor="#E6E6E6"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle" rotation="None" markup="none">
+					<font fontName="SansSerif" size="11" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+				</textElement>
+				<text><![CDATA[Km départ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="669" y="-1" width="86" height="20" forecolor="#006699" backcolor="#E6E6E6"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle" rotation="None" markup="none">
+					<font fontName="SansSerif" size="11" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+				</textElement>
+				<text><![CDATA[Km retour]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="755" y="-1" width="86" height="20" forecolor="#006699" backcolor="#E6E6E6"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle" rotation="None" markup="none">
+					<font fontName="SansSerif" size="11" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+				</textElement>
+				<text><![CDATA[Km disque]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="841" y="-1" width="191" height="20" forecolor="#006699" backcolor="#E6E6E6"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle" rotation="None" markup="none">
+					<font fontName="SansSerif" size="11" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+				</textElement>
+				<text><![CDATA[Observations]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="1032" y="-1" width="86" height="20" forecolor="#006699" backcolor="#E6E6E6"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle" rotation="None" markup="none">
+					<font fontName="SansSerif" size="11" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+				</textElement>
+				<text><![CDATA[N° Facture]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="249" y="-1" width="76" height="20" forecolor="#006699" backcolor="#E6E6E6"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" markup="none">
+					<font fontName="SansSerif" size="11" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+				</textElement>
+				<text><![CDATA[Prix/Jour]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="18">
+			<line>
+				<reportElement positionType="FixRelativeToBottom" x="0" y="17" width="1121" height="1"/>
+				<graphicElement>
+					<pen lineWidth="0.25" lineColor="#333333"/>
+				</graphicElement>
+			</line>
+			<textField isBlankWhenNull="true">
+				<reportElement x="0" y="0" width="76" height="17"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{numBC}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="86" y="0" width="164" height="17"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{mission}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="250" y="0" width="76" height="17"/>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression class="java.lang.Double"><![CDATA[$F{prixParJour}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="326" y="0" width="76" height="17"/>
+				<textElement/>
+				<textFieldExpression class="java.util.Date"><![CDATA[$F{dateDepart}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="412" y="0" width="76" height="17"/>
+				<textElement/>
+				<textFieldExpression class="java.util.Date"><![CDATA[$F{dateRestitution}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="498" y="0" width="76" height="17"/>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression class="java.lang.Integer"><![CDATA[$F{nombreDeJours}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="584" y="0" width="76" height="17"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.Integer"><![CDATA[$F{kilometrageDepart}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="670" y="0" width="76" height="17"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.Integer"><![CDATA[$F{kilometrageRetour}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="755" y="0" width="86" height="17"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.Integer"><![CDATA[$F{kilometrageDisque}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="841" y="0" width="181" height="17"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{observations}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="1032" y="0" width="76" height="17"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{numFacture}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band/>
+	</columnFooter>
+	<pageFooter>
+		<band height="19">
+			<textField>
+				<reportElement mode="Opaque" x="0" y="0" width="1081" height="13" backcolor="#E6E6E6"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.lang.String"><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement mode="Opaque" x="1081" y="0" width="40" height="13" backcolor="#E6E6E6"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField pattern="EEEEE dd MMMMM yyyy">
+				<reportElement x="0" y="0" width="100" height="13"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+	<lastPageFooter>
+		<band height="21"/>
+	</lastPageFooter>
+	<summary>
+		<band/>
+	</summary>
+</jasperReport>

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?page id="ERROR HACK HORLOGE" title="HORLOGE SYSTEME"?>
+
+<zk xmlns="http://www.zkoss.org/2005/zul"
+    xmlns:h="http://www.w3.org/1999/xhtml"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.zkoss.org/2005/zul http://www.zkoss.org/2005/zul/zul.xsd">
+	
+<window id="errorHack"  border="normal" height="150px" width="400px" mode="modal" position="center">
+    <caption image="/images/skin/redshd.gif" label="Erreur 900!"/>
+    <label id="messageaerrer" value="Horloge du serveur modifiÃ©e, veillez rÃ©tablir la valeur exacte!" style="color:red;font-family:  'Gill Sans',  'Gill Sans MT', Arial, Helvetica, sans-serif;font-size: x-large;" />
+</window>    
+</zk>

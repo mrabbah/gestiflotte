@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?init class="org.zkoss.zkplus.databind.AnnotateDataBinderInit" arg0="./facturationWin" ?>
+<?variable-resolver class="org.zkoss.zkplus.spring.DelegatingVariableResolver"?>
+
+
+<zk xmlns="http://www.zkoss.org/2005/zul"
+    xmlns:h="http://www.w3.org/1999/xhtml"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.zkoss.org/2005/zul http://www.zkoss.org/2005/zul/zul.xsd">
+
+    <window id="facturationWin" height="100%" width="100%" style="margin:auto;" use="${facturationWindow}">
+    <!-- <zscript src="/zs/facturation.zs"/> -->
+        <borderlayout>
+            <north id="eastPanel" size="65px" open="false"  title="Recherche avancée" flex="true" splittable="true"  collapsible="true"  >
+                <hlayout spacing="10px" style="margin-top:9px;margin-left:10px">
+					
+                    <label value="Interventions :" />
+                    <bandbox    autodrop="true" mold="rounded">
+                        <bandpopup>
+                            <listbox id="filterinterventions" model="@{facturationWin.interventions}" 
+                        selectedItem="@{facturationWin.filtre.interventionss, converter=com.choranet.zk.SelectedItemsConverterV3}"
+                        onSelect="facturationWin.ofs=0;facturationWin.filtrer();"
+                        fixedLayout="true" multiple="true" checkmark="true">
+                                <listhead>
+                                    <listheader label=""/>							
+                                </listhead>
+                                <listitem self="@{each=elementfiltreinterventions}">
+                                    <listcell label="@{elementfiltreinterventions}"/>							
+                                </listitem>								
+                            </listbox>
+                        </bandpopup>
+                    </bandbox>
+					
+                    <label value="Prestataire du groupe :" />
+                    <combobox id="filterperstataireGroup" model="@{facturationWin.perstataireGroups}" selectedItem="@{facturationWin.filtre.perstataireGroup}" autocomplete="true" autodrop="true" mold="rounded" onSelect="facturationWin.ofs=0;facturationWin.filtrer()" onOK="facturationWin.ofs=0;facturationWin.filtrer()">
+                        <comboitem self="@{each=elementfiltreperstataireGroup}" label="@{elementfiltreperstataireGroup}"/>
+                    </combobox>
+										                    
+                </hlayout>
+            </north>
+            <west id="westPanel" title="Gestion des factures client" size="40%" flex="true" splittable="true" collapsible="true" open="false">
+                <groupbox id="gbCrud" width="100%" height="100%">
+                    <grid fixedLayout="true">
+                        <rows>
+						
+                            <row>
+                                <label value="Numéro facture"/>
+								 
+                                <textbox id="fieldNumFacture" constraint="no empty: Veillez indiquez une valeur" value="@{facturationWin.objet.numFacture, save-when='triggerBtn.onClick'}" onBindingSave='if(self.value == null)throw new WrongValueException(self, "Vous devriez indiquer une valeur");'/>
+                            </row>												
+						
+                            <row>
+                                <label value="Date"/>
+								 
+                                <datebox id="fieldDate" constraint="no empty: Veillez indiquez une valeur" format="dd/MM/yyyy" value="@{facturationWin.objet.date, save-when='triggerBtn.onClick'}" onBindingSave='if(self.value == null)throw new WrongValueException(self, "Vous devriez indiquer une valeur");'/>
+                            </row>												
+						
+                            <row>
+                                <label value="Description"/>
+								 
+                                <textbox id="fieldDescription" constraint="no empty: Veillez indiquez une valeur" value="@{facturationWin.objet.description, save-when='triggerBtn.onClick'}" onBindingSave='if(self.value == null)throw new WrongValueException(self, "Vous devriez indiquer une valeur");'/>
+                            </row>												
+						
+                            <row>
+                                <label value="Montant HT"/>
+								 
+                                <doublebox id="fieldMontantHT" constraint="no empty: Veillez indiquez une valeur" value="@{facturationWin.objet.montantHT, save-when='triggerBtn.onClick'}" onBindingSave='if(self.value == null)throw new WrongValueException(self, "Vous devriez indiquer une valeur");'/>
+                            </row>												
+						
+                            <row>
+                                <label value="Payé"/>
+								 
+                                <checkbox id="fieldPaye" label="?" checked="@{facturationWin.objet.paye, save-when='triggerBtn.onClick'}"/>
+                            </row>												
+						 
+						
+                            <row>
+                                <label value="Interventions" />
+                                <bandbox    autodrop="true" mold="rounded">
+                                    <bandpopup>
+                                        <listbox id="lstinterventions" model="@{facturationWin.interventions}" selectedItem="@{facturationWin.interventionsSelected, converter=com.choranet.zk.SelectedItemsConverterV3}" fixedLayout="true" multiple="true" checkmark="true">
+                                            <listhead>
+                                                <listheader label=""/>							
+                                            </listhead>
+                                            <listitem self="@{each=elementinterventions}">
+                                                <listcell label="@{elementinterventions}"/>							
+                                            </listitem>								
+                                        </listbox>	
+                                    </bandpopup>
+                                </bandbox>
+                            </row>						
+						
+                            <row>
+                                <label value="Prestataire du groupe" />
+                                <combobox id="coperstataireGroups" model="@{facturationWin.perstataireGroups}" selectedItem="@{facturationWin.perstataireGroupSelected}">
+                                    <comboitem self="@{each=elementperstataireGroup}" label="@{elementperstataireGroup}"/>
+                                </combobox>
+                            </row>
+						
+                        </rows>
+                    </grid>					
+					
+                    <separator />
+                    <button id="btnSave" onClick="Events.sendEvent(new Event(Events.ON_CLICK,triggerBtn));facturationWin.add()" label="Sauveguarder" image="/images/skin/database_save.png"/>
+                    <button id="btnUpdate" onClick="Events.sendEvent(new Event(Events.ON_CLICK,triggerBtn));facturationWin.update()" label="Modifier" image="/images/skin/database_edit.png" visible="false"/>
+                    <button id="btnDelete" onClick="Events.sendEvent(new Event(Events.ON_CLICK,triggerBtn));facturationWin.delete()" label="Supprimer" image="/images/skin/database_delete.png" visible="false"/>
+                    <!-- <button id="btnNew" onClick="facturationWin.newRecord()" label="Nouveau enregistrement" image="/images/skin/database_add.png"/> -->
+                    <button id="btnCancel" onClick="facturationWin.cancel()" label="Annuler" image="/images/skin/cancel.png" visible="false"/>
+                    <button visible="false" id="triggerBtn" onBindingValidate=""/>
+                </groupbox>
+            </west>
+            <center border="none" flex="true">
+                <groupbox width="100%" height="100%">
+                    <listbox id="lstObjet" onSelect="facturationWin.select()" model="@{facturationWin.listeObjets}" selectedItem="@{facturationWin.objetSelected}"  width="100%" height="100%" mold="paging" paginal="${paging}">
+                        <auxhead sclass="category-center">
+							
+                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <textbox id="filterNumFacture" value="@{facturationWin.filtre.numFacture}" onChanging="facturationWin.ofs; facturationWin.filtre.numFacture=event.value; facturationWin.filtrer(); self.focus(); self.setSelectionRange(self.value.length(), self.value.length())" width="100%"/>
+                            </auxheader>
+								
+                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <datebox id="filterDate" format="dd/MM/yyyy" value="@{facturationWin.filtre.date}" onOK="facturationWin.ofs=0; facturationWin.filtrer(); self.focus();" width="90%"/>
+                            </auxheader>
+								
+                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <textbox id="filterDescription" value="@{facturationWin.filtre.description}" onChanging="facturationWin.ofs; facturationWin.filtre.description=event.value; facturationWin.filtrer(); self.focus(); self.setSelectionRange(self.value.length(), self.value.length())" width="100%"/>
+                            </auxheader>
+								
+                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <doublebox id="filterMontantHT" value="@{facturationWin.filtre.montantHT}" width="100%">
+                                    <attribute name="onChanging">
+										<![CDATA[
+											facturationWin.ofs=0;
+											if(event.value.equals("")) {
+												if(facturationWin.filtre.montantHT != null) {
+													facturationWin.filtre.montantHT = null;
+												}
+											} else {
+												facturationWin.filtre.montantHT=new Double(event.value);
+											}
+											facturationWin.filtrer();
+											self.focus();
+											if(!event.value.equals("")) {
+												self.setSelectionRange(self.value.toString().length(), self.value.toString().length());
+											}
+										]]>
+                                    </attribute>    
+                                </doublebox>
+                            </auxheader>
+								
+                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <checkbox id="filterPaye" onCheck="facturationWin.ofs=0;facturationWin.filtre.paye=self.checked; facturationWin.filtrer()" />
+                            </auxheader>
+								 
+                        </auxhead>
+                        <listhead sizable="true">
+							
+                            <listheader label="Numéro facture" sort="auto(numFacture)" onSort="facturationWin.sort(event)"/>	
+							
+                            <listheader label="Date" sort="auto(date)" onSort="facturationWin.sort(event)"/>	
+							
+                            <listheader label="Description" sort="auto(description)" onSort="facturationWin.sort(event)"/>	
+							
+                            <listheader label="Montant HT" sort="auto(montantHT)" onSort="facturationWin.sort(event)"/>	
+							
+                            <listheader label="Payé?" sort="auto(paye)" onSort="facturationWin.sort(event)"/>	
+							                                 
+                        </listhead>
+                        <listitem self="@{each=element}">                         
+                            
+                            <listcell label="@{element.numFacture}"/>
+							
+                            <listcell label="@{element.date}"/>
+							
+                            <listcell label="@{element.description}"/>
+							
+                            <listcell label="@{element.montantHT}"/>
+							
+                            <listcell label="@{element.paye}"/>
+							     
+                        </listitem>
+                    </listbox>
+                    <paging id="paging" totalSize="@{facturationWin.tailleListe}" pageSize="@{facturationWin.maxNb}" onPaging="facturationWin.getNextElements(event);" />
+                    <separator/>
+                    <button id="btnNew" onClick="facturationWin.newRecord()" label="Nouveau" image="/images/skin/database_add.png"/>
+                    <button id="btnPdf" onClick="facturationWin.genererRapportPdf()" label="Generer rapport" image="/images/skin/pdf-soubor-logo.png"/>
+                    <button id="btnExcel" onClick="facturationWin.genererRapportExcel()" label="Generer excel" image="/images/skin/excel-icon.png"/>
+                </groupbox>
+            </center>
+        </borderlayout>
+    </window>
+</zk>

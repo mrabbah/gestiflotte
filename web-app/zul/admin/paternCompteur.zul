@@ -1,0 +1,264 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?init class="org.zkoss.zkplus.databind.AnnotateDataBinderInit" arg0="./paternCompteurWin" ?>
+<?variable-resolver class="org.zkoss.zkplus.spring.DelegatingVariableResolver"?>
+
+
+<zk xmlns="http://www.zkoss.org/2005/zul"
+    xmlns:h="http://www.w3.org/1999/xhtml"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.zkoss.org/2005/zul http://www.zkoss.org/2005/zul/zul.xsd">
+
+    <window id="paternCompteurWin" height="100%" width="100%" style="margin:auto;" use="${paternCompteurWindow}">
+    <!-- <zscript src="/zs/paternCompteur.zs"/> -->
+        <borderlayout>
+<!--            <west id="westPanel" title="CRUD" size="40%" flex="true" splittable="true" collapsible="true" open="false">
+                <groupbox id="gbCrud" width="100%" height="100%">
+                    <grid fixedLayout="true">
+                        <rows>
+						
+                            <row>
+                                <label value="Libelle"/>
+								 
+                                <textbox id="fieldLibelle" constraint="no empty: Veillez indiquez une valeur" value="@{paternCompteurWin.objet.libelle, save-when='triggerBtn.onClick'}" onBindingSave='if(self.value == null)throw new WrongValueException(self, "Vous devriez indiquer une valeur");'/>
+                            </row>												
+						
+                            <row>
+                                <label value="Prefixe"/>
+								 
+                                <textbox id="fieldPrefixe" constraint="no empty: Veillez indiquez une valeur" value="@{paternCompteurWin.objet.prefixe, save-when='triggerBtn.onClick'}" onBindingSave='if(self.value == null)throw new WrongValueException(self, "Vous devriez indiquer une valeur");'/>
+                            </row>												
+						
+                            <row>
+                                <label value="Suffixe"/>
+								 
+                                <textbox id="fieldSuffixe" constraint="no empty: Veillez indiquez une valeur" value="@{paternCompteurWin.objet.suffixe, save-when='triggerBtn.onClick'}" onBindingSave='if(self.value == null)throw new WrongValueException(self, "Vous devriez indiquer une valeur");'/>
+                            </row>												
+						
+                            <row>
+                                <label value="Pas"/>
+								 
+                                <intbox id="fieldPas" constraint="no empty: Veillez indiquez une valeur" value="@{paternCompteurWin.objet.pas, save-when='triggerBtn.onClick'}" onBindingSave='if(self.value == null)throw new WrongValueException(self, "Vous devriez indiquer une valeur");'/>
+                            </row>												
+						
+                            <row>
+                                <label value="Remplissage"/>
+								 
+                                <intbox id="fieldRemplissage" constraint="no empty: Veillez indiquez une valeur" value="@{paternCompteurWin.objet.remplissage, save-when='triggerBtn.onClick'}" onBindingSave='if(self.value == null)throw new WrongValueException(self, "Vous devriez indiquer une valeur");'/>
+                            </row>												
+						
+                            <row>
+                                <label value="NumeroSuivant"/>
+								 
+                                <intbox id="fieldNumeroSuivant" constraint="no empty: Veillez indiquez une valeur" value="@{paternCompteurWin.objet.numeroSuivant, save-when='triggerBtn.onClick'}" onBindingSave='if(self.value == null)throw new WrongValueException(self, "Vous devriez indiquer une valeur");'/>
+                            </row>												
+						
+                            <row>
+                                <label value="Type"/>
+								 
+                                <textbox id="fieldType" constraint="no empty: Veillez indiquez une valeur" value="@{paternCompteurWin.objet.type, save-when='triggerBtn.onClick'}" onBindingSave='if(self.value == null)throw new WrongValueException(self, "Vous devriez indiquer une valeur");'/>
+                            </row>												
+						 
+						
+                        </rows>
+                    </grid>					
+					
+                    <separator />
+                    <button id="btnSave" onClick="Events.sendEvent(new Event(Events.ON_CLICK,triggerBtn));paternCompteurWin.add()" label="Sauveguarder" image="/images/skin/database_save.png"/>
+                    <button id="btnUpdate" onClick="Events.sendEvent(new Event(Events.ON_CLICK,triggerBtn));paternCompteurWin.update()" label="Modifier" image="/images/skin/database_edit.png" visible="false"/>
+                    <button id="btnDelete" onClick="Events.sendEvent(new Event(Events.ON_CLICK,triggerBtn));paternCompteurWin.delete()" label="Supprimer" image="/images/skin/database_delete.png" visible="false"/>
+                     <button id="btnNew" onClick="paternCompteurWin.newRecord()" label="Nouveau enregistrement" image="/images/skin/database_add.png"/> 
+                    <button id="btnCancel" onClick="paternCompteurWin.cancel()" label="Annuler" image="/images/skin/cancel.png" visible="false"/>
+                    <button visible="false" id="triggerBtn" onBindingValidate=""/>
+                </groupbox>
+            </west>-->
+            <center border="none" flex="true">
+                <groupbox width="100%" height="100%">
+                    <listbox id="lstObjet" onSelect="paternCompteurWin.select()" model="@{paternCompteurWin.listeObjets}" selectedItem="@{paternCompteurWin.objetSelected}"  width="100%" height="100%" mold="paging" paginal="${paging}">
+                        <auxhead sclass="category-center">
+							
+                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <textbox id="filterLibelle" value="@{paternCompteurWin.filtre.libelle}" onChanging="paternCompteurWin.ofs; paternCompteurWin.filtre.libelle=event.value; paternCompteurWin.filtrer(); self.focus(); self.setSelectionRange(self.value.length(), self.value.length())" width="100%"/>
+                            </auxheader>
+								
+                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <textbox id="filterPrefixe" value="@{paternCompteurWin.filtre.prefixe}" onChanging="paternCompteurWin.ofs; paternCompteurWin.filtre.prefixe=event.value; paternCompteurWin.filtrer(); self.focus(); self.setSelectionRange(self.value.length(), self.value.length())" width="100%"/>
+                            </auxheader>
+								
+                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <textbox id="filterSuffixe" value="@{paternCompteurWin.filtre.suffixe}" onChanging="paternCompteurWin.ofs; paternCompteurWin.filtre.suffixe=event.value; paternCompteurWin.filtrer(); self.focus(); self.setSelectionRange(self.value.length(), self.value.length())" width="100%"/>
+                            </auxheader>
+								
+                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <intbox id="filterPas" value="@{paternCompteurWin.filtre.pas}" width="100%">
+                                    <attribute name="onChanging">
+                                        <![CDATA[
+                                            paternCompteurWin.ofs=0;
+                                            if(event.value.equals("")) {
+                                                    if(paternCompteurWin.filtre.pas != null) {
+                                                            paternCompteurWin.filtre.pas = null;
+                                                    }
+                                            } else {
+                                                    paternCompteurWin.filtre.pas=new Integer(event.value);
+                                            }
+                                            paternCompteurWin.filtrer();
+                                            self.focus();
+                                            if(!event.value.equals("")) {
+                                                    self.setSelectionRange(self.value.toString().length(), self.value.toString().length());
+                                            }
+                                        ]]>
+                                    </attribute>    
+                                </intbox>
+                            </auxheader>
+								
+                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <intbox id="filterRemplissage" value="@{paternCompteurWin.filtre.remplissage}" width="100%">
+                                    <attribute name="onChanging">
+                                        <![CDATA[
+                                            paternCompteurWin.ofs=0;
+                                            if(event.value.equals("")) {
+                                                    if(paternCompteurWin.filtre.remplissage != null) {
+                                                            paternCompteurWin.filtre.remplissage = null;
+                                                    }
+                                            } else {
+                                                    paternCompteurWin.filtre.remplissage=new Integer(event.value);
+                                            }
+                                            paternCompteurWin.filtrer();
+                                            self.focus();
+                                            if(!event.value.equals("")) {
+                                                    self.setSelectionRange(self.value.toString().length(), self.value.toString().length());
+                                            }
+                                        ]]>
+                                    </attribute>    
+                                </intbox>
+                            </auxheader>
+								
+                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <intbox id="filterNumeroSuivant" value="@{paternCompteurWin.filtre.numeroSuivant}" width="100%">
+                                    <attribute name="onChanging">
+                                        <![CDATA[
+                                            paternCompteurWin.ofs=0;
+                                            if(event.value.equals("")) {
+                                                    if(paternCompteurWin.filtre.numeroSuivant != null) {
+                                                            paternCompteurWin.filtre.numeroSuivant = null;
+                                                    }
+                                            } else {
+                                                    paternCompteurWin.filtre.numeroSuivant=new Integer(event.value);
+                                            }
+                                            paternCompteurWin.filtrer();
+                                            self.focus();
+                                            if(!event.value.equals("")) {
+                                                    self.setSelectionRange(self.value.toString().length(), self.value.toString().length());
+                                            }
+                                        ]]>
+                                    </attribute>    
+                                </intbox>
+                            </auxheader>
+								
+                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <textbox id="filterType" value="@{paternCompteurWin.filtre.type}" onChanging="paternCompteurWin.ofs; paternCompteurWin.filtre.type=event.value; paternCompteurWin.filtrer(); self.focus(); self.setSelectionRange(self.value.length(), self.value.length())" width="100%"/>
+                            </auxheader>
+								 
+                        </auxhead>
+                        <listhead sizable="true">
+							
+                            <listheader id="hlibelle" label="Libelle" sort="auto(libelle)" onSort="paternCompteurWin.sort(event)"/>	
+							
+                            <listheader id="hprefixe" label="Prefixe" sort="auto(prefixe)" onSort="paternCompteurWin.sort(event)"/>	
+							
+                            <listheader id="hsuffixe" label="Suffixe" sort="auto(suffixe)" onSort="paternCompteurWin.sort(event)"/>	
+							
+                            <listheader id="hpas" label="Pas" sort="auto(pas)" onSort="paternCompteurWin.sort(event)"/>	
+							
+                            <listheader id="hremplissage" label="Remplissage" sort="auto(remplissage)" onSort="paternCompteurWin.sort(event)"/>	
+							
+                            <listheader id="hnumeroSuivant" label="NumeroSuivant" sort="auto(numeroSuivant)" onSort="paternCompteurWin.sort(event)"/>	
+							
+                            <listheader id="htype" label="Type" sort="auto(type)" onSort="paternCompteurWin.sort(event)"/>	
+							                                 
+                        </listhead>
+                        
+                        <listitem value="@{element}" self="@{each=element}">    
+                            
+                            <listcell>
+							
+                                <textbox value="@{element.libelle, save-when='self.onChange'}" inplace="true" constraint="no empty: Veillez indiquez une valeur" onOK="paternCompteurWin.objet=self.parent.parent.value; paternCompteurWin.update();" onChange='self.style="font-weight:bold"' width="99%"/>
+							
+                            </listcell>							
+							
+                            <listcell>
+							
+                                <textbox value="@{element.prefixe, save-when='self.onChange'}" inplace="true" onOK="paternCompteurWin.objet=self.parent.parent.value; paternCompteurWin.update();" onChange='self.style="font-weight:bold"' width="99%"/>
+							
+                            </listcell>							
+							
+                            <listcell>
+							
+                                <textbox value="@{element.suffixe, save-when='self.onChange'}" inplace="true" onOK="paternCompteurWin.objet=self.parent.parent.value; paternCompteurWin.update();" onChange='self.style="font-weight:bold"' width="99%"/>
+							
+                            </listcell>							
+							
+                            <listcell>
+							
+                                <intbox value="@{element.pas, save-when='self.onChange'}" inplace="true" constraint="no empty: Veillez indiquez une valeur" onOK="paternCompteurWin.objet=self.parent.parent.value; paternCompteurWin.update();" onChange='self.style="font-weight:bold"' width="99%" />
+							
+                            </listcell>							
+							
+                            <listcell>
+							
+                                <intbox value="@{element.remplissage, save-when='self.onChange'}" inplace="true" constraint="no empty: Veillez indiquez une valeur" onOK="paternCompteurWin.objet=self.parent.parent.value; paternCompteurWin.update();" onChange='self.style="font-weight:bold"' width="99%" />
+							
+                            </listcell>							
+							
+                            <listcell>
+							
+                                <intbox value="@{element.numeroSuivant, save-when='self.onChange'}" inplace="true" constraint="no empty: Veillez indiquez une valeur" onOK="paternCompteurWin.objet=self.parent.parent.value; paternCompteurWin.update();" onChange='self.style="font-weight:bold"' width="99%" />
+							
+                            </listcell>							
+							
+                            <listcell>
+							
+                                <textbox readonly="true" value="@{element.type, save-when='self.onChange'}" inplace="true" constraint="no empty: Veillez indiquez une valeur" 
+                                         onOK="paternCompteurWin.objet=self.parent.parent.value; paternCompteurWin.update();" onChange='self.style="font-weight:bold"' 
+                                         width="99%"/>
+
+                            </listcell>		
+							     
+                        </listitem>
+                    </listbox>
+                    <paging id="paging" totalSize="@{paternCompteurWin.tailleListe}" pageSize="@{paternCompteurWin.maxNb}" onPaging="paternCompteurWin.getNextElements(event);" />
+                    <separator/>
+                    <grid>
+                        <columns>
+							
+                            <column />
+							
+                            <column />
+							
+                            <column />
+							
+                            <column />
+							
+                            <column />
+							
+                            <column />
+							
+                            <column />
+							
+                        </columns>
+
+                    </grid>
+                    <separator/>
+                    <button id="btnPdf" onClick="paternCompteurWin.genererRapportPdf()" label="Generer rapport" image="/images/skin/pdf-soubor-logo.png"/>
+                    <button id="btnExcel" onClick="paternCompteurWin.genererRapportExcel()" label="Generer excel" image="/images/skin/excel-icon.png"/>
+                </groupbox>
+            </center>
+        </borderlayout>
+    </window>
+</zk>

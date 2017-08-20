@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?init class="org.zkoss.zkplus.databind.AnnotateDataBinderInit" arg0="./activationWin" ?>
+<?variable-resolver class="org.zkoss.zkplus.spring.DelegatingVariableResolver"?>
+
+
+<zk xmlns="http://www.zkoss.org/2005/zul"
+    xmlns:h="http://www.w3.org/1999/xhtml"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.zkoss.org/2005/zul http://www.zkoss.org/2005/zul/zul.xsd">
+
+    <zscript>
+            <![CDATA[
+                 Messagebox.show("Votre clé a expiré, veuillez entrer une nouvelle clé.", "Warning", Messagebox.OK, Messagebox.EXCLAMATION);
+                String raisonSociale = (String) session.getAttribute("raisonSociale");
+                String idInstance = (String) session.getAttribute("idInstance");
+                String produit = (String) session.getAttribute("produit");
+                String version = (String) session.getAttribute("version");
+                String mailto = "mailto:contact@choranet.com?subject=Demande clé d'activation&body=Bonjour, %0A%0AVeuillez nous communiquer une clé pour une durée de : %0AInformations produit :%0A Raison social : " + raisonSociale + "%0AID INSTANCE :" + idInstance + "%0APRODUIT : " + produit + "%0AVersion : " + version + "%0A%0ACordialement.";
+            ]]>
+    </zscript>
+    <window id="activationWin" height="100%" width="100%" style="margin:auto;" use="${cleWindow}">
+    <!-- <zscript src="/zs/activation.zs"/> -->
+        <borderlayout>
+            <west id="westPanel" title="Gestion de l'activation d'une lécence" size="40%" flex="true" splittable="true" collapsible="true" open="false">
+                <groupbox id="gbCrud" width="100%" height="100%">
+                    <grid fixedLayout="true">
+                        <rows>
+                            <row>
+                                <label value="ClÃ© produit"/>								 
+                                <textbox id="fieldCleProduit" constraint="no empty: Veillez indiquez une valeur" value="@{activationWin.objet.cleProduit, save-when='triggerBtn.onClick'}" onBindingSave='if(self.value == null)throw new WrongValueException(self, "Vous devriez indiquer une valeur");'/>
+                            </row>
+<!--                            <row>
+                                <label value="Date Activation"/>
+                                <datebox id="fieldDateActivation" constraint="no empty: Veillez indiquez une valeur" format="dd/MM/yyyy" value="@{activationWin.objet.dateActivation, save-when='triggerBtn.onClick'}" onBindingSave='if(self.value == null)throw new WrongValueException(self, "Vous devriez indiquer une valeur");'/>
+                            </row>												-->
+                        </rows>
+                    </grid>					
+                    <separator />
+                    <button id="btnSave" onClick="Events.sendEvent(new Event(Events.ON_CLICK,triggerBtn));activationWin.add()" label="Ajouter" image="/images/skin/database_save.png"/>
+                    <button id="btnCancel" onClick="activationWin.cancel()" label="Annuler" image="/images/skin/cancel.png" visible="false"/>
+                    <button visible="false" id="triggerBtn" onBindingValidate=""/>
+                </groupbox>
+            </west>
+            <center border="none" flex="true">
+                <groupbox width="100%" height="100%">
+                    <listbox id="lstObjet" onSelect="activationWin.select()" model="@{activationWin.listeObjets}" selectedItem="@{activationWin.objetSelected}"  width="100%" height="100%" mold="paging" paginal="${paging}">
+                        
+                        <listhead sizable="true">
+                            <listheader label="ClÃ© Produit" sort="auto(activationProduit)" onSort="activationWin.sort(event)"/>	
+                            <listheader label="Date Activation" sort="auto(dateActivation)" onSort="activationWin.sort(event)"/>	
+                            <listheader label="Date Expiration" sort="auto(dateFinActivation)" onSort="activationWin.sort(event)"/>	
+                        </listhead>
+                        <listitem self="@{each=element}">                         
+                            <listcell label="@{element.cleProduit}"/>
+                            <listcell label="@{element.dateActivation}"/>
+                            <listcell label="@{element.dateFinActivation}"/>
+                        </listitem>
+                    </listbox>
+                    <paging id="paging" totalSize="@{activationWin.tailleListe}" pageSize="@{activationWin.maxNb}" onPaging="activationWin.getNextElements(event);" />
+                    <separator/>
+                    <button id="btnNew" onClick="activationWin.newRecord()" label="Ajouter une clÃ©" image="/images/skin/database_add.png"/>
+                    <button id="btnDemanderCle" href="${mailto}"  label="Demander une clÃ©" image="/images/skin/EnvelopeOpen-16x16.png" />
+                </groupbox>
+            </center>
+        </borderlayout>
+    </window>
+    
+    
+</zk>

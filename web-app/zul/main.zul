@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?page id="gestiflotte" title="gestiflotte"?>
+<?link rel="stylesheet" type="text/css" href="/macros/category.css.dsp?v=${desktop.webApp.build}"?>
+<?script type="text/javascript" src="/macros/zksandbox.js.dsp?v=${desktop.webApp.build}"?>
+<?script type="text/javascript" content="jq.IE6_ALPHAFIX=/24x24.png|32x32.png|48x48.png|128x128.png|ButtonBlue.png|ButtonGray.png|small.png|small-sel.png|normal.png|normal-sel.png|large.png|large-sel.png/;"?>
+<?meta name="keywords" content="Location voiture, Maroc" ?>
+<?component name="category" extends="button" widgetClass="com.choranet.zk.Category" mold="default"?>
+<?component name="categorybar" extends="div" widgetClass="com.choranet.zk.Categorybar"?>
+<?init class="org.zkoss.zkplus.databind.AnnotateDataBinderInit" root="mainWin" ?>
+<?variable-resolver class="org.zkoss.zkplus.spring.DelegatingVariableResolver"?>
+
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c" ?>
+
+<zk xmlns="http://www.zkoss.org/2005/zul"
+    xmlns:h="http://www.w3.org/1999/xhtml"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.zkoss.org/2005/zul http://www.zkoss.org/2005/zul/zul.xsd">
+
+<!--    <style dynamic="true">
+        div.z-listcell-cnt {
+            font-weight: bold;  
+            font-size: 14px;
+        }
+        
+    </style>-->
+
+    <zscript>
+            <![CDATA[
+                
+                Boolean isroot = (Boolean) session.getAttribute("isroot");
+                Boolean isadmin = (Boolean) session.getAttribute("isadmin");
+                Boolean isgestion = (Boolean) session.getAttribute("isgestion");
+                
+                String imgPath = "/images/skin";
+            ]]>
+    </zscript>
+    
+    <window id="mainWin" border="normal" height="700px" width="100%" style="margin-left:auto;margin-right:auto;margin-top:5px;" use="${mainWindow}">
+        <borderlayout id="main">
+            <north border="none" size="90px" sclass="demo-header" collapsible="true">
+                <div>         
+               
+                    <div sclass="demo-logo pointer">
+                        <a href="@{mainWin.site}" target="_blank">
+                            <image width="180px" height="80px" content="@{mainWin.trans_logo}"/>
+                        </a>
+                    </div>
+                    <categorybar zclass="demo-categorybar" id="header">   
+                    
+                        <category id="cg_tdb" image="${imgPath}/ChartLogo600.png" label="Tableau de bord" onClick='xcontents.src = "/zul/gestion/tdb.zul"' zclass="demo-category" if="${isgestion == true}"/>  
+                        <category id="cg_intervention" image="${imgPath}/location-voiture.png" label="Interventions" onClick='xcontents.src = "/zul/gestion/intervention.zul"' zclass="demo-category" if="${isgestion == true}"/>  
+<!--                        <category id="cg_reservation" image="${imgPath}/reservationbis.png" label="Résérvations" onClick='xcontents.src = "/zul/gestion/reservation.zul"' zclass="demo-category" if="${isgestion == true}"/>  -->
+                        <category id="cg_deplacement" image="${imgPath}/deplacement.png" label="Déplacements" onClick='xcontents.src = "/zul/gestion/deplacement.zul"' zclass="demo-category" if="${isgestion == true}"/>  
+                        <category id="cg_intervenant" image="${imgPath}/client.png" label="Intervenants" onClick='xcontents.src = "/zul/gestion/intervenant.zul"' zclass="demo-category" if="${isgestion == true}"/>  
+                        <category id="cg_societe" image="${imgPath}/societe.png" label="Sociétés" onClick='xcontents.src = "/zul/gestion/societe.zul"' zclass="demo-category" if="${isgestion == true}"/>  
+                        <category id="cg_vehicule" image="${imgPath}/vehicule8.png" label="Véhicules" onClick='xcontents.src = "/zul/gestion/vehicule.zul"' zclass="demo-category" if="${isgestion == true}"/>  
+<!--                        <category id="cg_fournisseur" image="${imgPath}/vehicule8.png" label="Fournisseurs" onClick='xcontents.src = "/zul/gestion/fournisseur.zul"' zclass="demo-category" if="${isgestion == true}"/>  -->
+                        
+                        
+                        <category id="cg_fraisCirculation" image="/images/skin/carburant.png" label="Frais Interventions" onClick='xcontents.src = "/zul/gestion/bonFraisCirculation.zul"' zclass="demo-category" if="${isgestion == true}"/>  
+                        <category id="cg_entretien" image="/images/skin/voiture.png" label="Entretiens" onClick='xcontents.src = "/zul/gestion/entretien.zul"' zclass="demo-category" if="${isgestion == true}" />  
+                        <category id="cg_entretienPeriodique" image="/images/skin/vidange.png" label="Entretiens périodiques" onClick='xcontents.src = "/zul/gestion/entretienPeriodique.zul"' zclass="demo-category" if="${isgestion == true}"/>  
+                        <category id="cg_fraisCirculationPeriodique" image="/images/skin/NicOx.png" label="Frais circulation périodiques" onClick='xcontents.src = "/zul/gestion/fraisCirculationPeriodique.zul"' zclass="demo-category" if="${isgestion == true}"/>  
+                        <category id="cg_paiementGroup" image="/images/skin/Cheque.PNG" label="Chèques" onClick='xcontents.src = "/zul/gestion/paiementGroup.zul"' zclass="demo-category" if="${isgestion == true}"/>  
+                        
+                        
+                        <category id="cg_parametragesvehicules" image="/images/skin/tache.png" label="Paramètarges véhicules" onClick='parametragesvehicules.open(self, "after_start")' zclass="demo-category" if="${isadmin == true}"/>  
+                        <category id="cg_typecharges" image="/images/skin/img_guauche.png" label="Paramètrage de base" onClick='typecharges.open(self, "after_start")' zclass="demo-category" if="${isadmin == true}"/>  
+<!--                        <category id="cg_nationalite" image="/images/skin/glob.png" label="Nationalités" onClick='xcontents.src = "/zul/admin/nationalite.zul"' zclass="demo-category" if="${isadmin == true}"/>  -->
+<!--                        <category id="cg_configuration" image="/images/skin/glob.png" label="Configuration" onClick='parametragesysteme.open(self, "after_start")' zclass="demo-category" if="${isadmin == true}"/>  -->
+                        
+                        
+                        <category id="cg_clientinfo" image="${imgPath}/EnterpriseAndIntegration-48x48.png" label="Information client" onClick='xcontents.src = "/zul/root/clientinfo.zul"' zclass="demo-category" if="${isroot == true}"/>  
+<!--                        <category id="cg_backup" image="${imgPath}/backup.png" label="Sauveguarder Restaurer" onClick='xcontents.src = "/zul/root/backup.zul"' zclass="demo-category" if="${isroot == true}"/>  -->
+                        <category id="cg_gressource" image="${imgPath}/icon_users.png" label="Utilisateurs" onClick='xcontents.src = "/zul/root/utilisateur.zul"' zclass="demo-category" if="${isroot == true}"/>  
+                        
+                        
+                        <category zclass="demo-category" id="cg_help" image="${imgPath}/merlin.gif" label="Aide" onClick='helpmenu.open(self, "after_start")' />  
+                        <category zclass="demo-category" id="cg_logout" href="/logout" image="${imgPath}/48px-Vista-logout.png" label="Se déconnecter" />  
+                    </categorybar>
+                </div>
+            </north>
+            <center autoscroll="true" flex="true">                
+                <include src="@{mainWindow.currentinclude}" style="padding:3px;" id="xcontents" progressing="true" />
+            </center>
+        </borderlayout>
+        <popup id="parametragesvehicules" width="230px">
+            <toolbar orient="vertical" mold="panel">
+                <toolbarbutton label="Catégories" image="${imgPath}/categorie.png" onClick='parametragesvehicules.close(); xcontents.src = "/zul/admin/categorie.zul";' width="200px" />            
+                <toolbarbutton label="Marques" image="${imgPath}/plan_voiture_bebe.png" onClick='parametragesvehicules.close(); xcontents.src = "/zul/admin/marque.zul";' width="200px" />            
+                <toolbarbutton label="Modèles" image="${imgPath}/marque_1.png" onClick='parametragesvehicules.close(); xcontents.src = "/zul/admin/model.zul";' width="200px" />            
+                <toolbarbutton label="Enérgies" image="${imgPath}/pg.png" onClick='parametragesvehicules.close(); xcontents.src = "/zul/admin/energie.zul";' width="200px" />            
+            </toolbar>
+        </popup>
+        <popup id="typecharges" width="230px">
+            <toolbar orient="vertical" mold="panel">
+                <toolbarbutton label="Unités de Mesure" image="/images/skin/uniteMesure.png" onClick='typecharges.close(); xcontents.src = "/zul/admin/uniteDeMesure.zul";' width="200px" />            
+                <toolbarbutton label="Compteur Interventions" image="/images/skin/cubes_small.png" onClick='typecharges.close(); xcontents.src = "/zul/admin/paternCompteur.zul";' width="200px" />            
+                <toolbarbutton label="Frais circulation" image="/images/skin/bidon-pour-carburant-vert-79106ec.png" onClick='typecharges.close(); xcontents.src = "/zul/admin/categorieFraisCirculation.zul";' width="200px" />            
+                <toolbarbutton label="Entretiens" image="/images/skin/mecanique-carrosserie.png" onClick='typecharges.close(); xcontents.src = "/zul/admin/typeEntretien.zul";' width="200px" />            
+                <toolbarbutton label="Frais circulation périodiques" image="/images/skin/TimeIsMoney.png" onClick='typecharges.close(); xcontents.src = "/zul/admin/typeFraisCirculationPeriodique.zul";' width="200px" />            
+                <toolbarbutton label="Entretiens périodiques" image="/images/skin/vidange.png" onClick='typecharges.close(); xcontents.src = "/zul/admin/typeEntretienPeriodique.zul";' width="200px" />            
+                <toolbarbutton label="Fournisseurs" image="/images/skin/fournisseur_small.png" onClick='typecharges.close(); xcontents.src = "/zul/gestion/fournisseur.zul";' width="200px" />            
+                <toolbarbutton label="Régions Voyages" image="/images/skin/region_small.png" onClick='typecharges.close(); xcontents.src = "/zul/admin/region.zul";' width="200px" />            
+                <toolbarbutton label="Trajets Voyages" image="/images/skin/trajet_small.png" onClick='typecharges.close(); xcontents.src = "/zul/admin/trajet.zul";' width="200px" />            
+                <toolbarbutton label="Tarification Voyages" image="/images/skin/tarification_small.png" onClick='typecharges.close(); xcontents.src = "/zul/admin/tarification.zul";' width="200px" />            
+                <toolbarbutton label="Nationalités" image="/images/skin/glob_small.png" onClick='typecharges.close(); xcontents.src = "/zul/admin/nationalite.zul";' width="200px" />            
+            </toolbar>
+        </popup>
+<!--        <popup id="parametragesysteme" width="230px">
+            <toolbar orient="vertical" mold="panel">
+                <toolbarbutton label="Unités de Mesure" image="/images/skin/uniteMesure.png" onClick='parametragesysteme.close(); xcontents.src = "/zul/admin/uniteDeMesure.zul";' width="200px" />            
+                <toolbarbutton label="Compteur Interventions" image="/images/skin/cubes_small.png" onClick='parametragesysteme.close(); xcontents.src = "/zul/admin/paternCompteur.zul";' width="200px" />            
+                <toolbarbutton label="Trajets Voyages" image="/images/skin/trajet_small.jpg" onClick='parametragesysteme.close(); xcontents.src = "/zul/admin/trajet.zul";' width="200px" />            
+                <toolbarbutton label="Nationalités" image="/images/skin/glob_small.png" onClick='parametragesysteme.close(); xcontents.src = "/zul/admin/nationalite.zul";' width="200px" />            
+            </toolbar>
+        </popup>-->
+        
+        <popup id="helpmenu" width="230px">
+            <toolbar orient="vertical" mold="panel">
+                <toolbarbutton label="Aide" width="200px" image="${imgPath}/help.png" onClick="" />
+                <toolbarbutton label="Manager vos licences" width="200px" image="${imgPath}/cle.png" if="${isroot == true}">
+                    <attribute name="onClick">
+                    <![CDATA[
+                        helpmenu.close();
+                        Executions.createComponents("/zul/root/cle.zul", null, null).doModal();
+                    ]]>
+                    </attribute>
+                </toolbarbutton>
+                <separator bar="true" width="200px" />
+                <toolbarbutton label="A propos de" width="200px" image="${imgPath}/about_32.png">
+                    <attribute name="onClick">
+                    <![CDATA[
+                        helpmenu.close();
+                        Executions.createComponents("/zul/aide/apropos.zul", null, null).doModal();
+                    ]]>
+                    </attribute>
+                </toolbarbutton>
+            </toolbar>
+        </popup>
+    </window>
+</zk>
